@@ -1,6 +1,6 @@
 // src/packs/litPacks.js
 // AuthorCraft Appreciation — LITERATURE PACKS (Option A: one big file)
-//
+// Debug
 // Standard: momentType must be "AuthorCraft" for all packs.
 // These packs are scene-based craft-noticing activities (no scoring, no correctness UI).
 

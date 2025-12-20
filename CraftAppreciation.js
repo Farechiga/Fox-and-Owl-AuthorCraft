@@ -1,10 +1,6 @@
 // CraftAppreciation.js
 // Runtime renderer for AuthorCraft Appreciation (no scoring UI).
-// Renders into index.html containers: pair-left/right, sliders-container, bucket-* and spotlights-container.
-//
-// Requires ES module exports:
-//   - filmPacks.js exporting FILM_PACKS
-//   - litPacks.js exporting LIT_PACKS
+// Fixes: no attractor clutter, pair-match shuffle, buckets drag/drop, spotlights selection, slider scope support.
 
 import { FILM_PACKS } from "./filmPacks.js";
 import { LIT_PACKS } from "./litPacks.js";
@@ -13,8 +9,8 @@ import { LIT_PACKS } from "./litPacks.js";
    State
 ----------------------------*/
 const state = {
-  source: "film",          // "film" | "literature"
-  modeKey: "pairMatch",    // "pairMatch" | "sliders" | "rankBuckets" | "interpretiveTakes"
+  source: "film",               // "film" | "literature"
+  modeKey: "pairMatch",         // "pairMatch" | "sliders" | "rankBuckets" | "interpretiveTakes"
   pack: null,
   usedIds: new Set(),
 
@@ -22,6 +18,9 @@ const state = {
   buckets: { selectedCardId: null, placed: new Map() },  // cardId -> bucketId
   slidersTouched: new Set(),
   spotlightsSelected: new Set(),
+
+  // per-pack randomized ordering so items don’t line up by row
+  shuffled: { left: [], right: [], bucketCards: [], spotlights: [] },
 };
 
 /* ---------------------------
@@ -39,17 +38,25 @@ function clear(id) {
   if (el) el.innerHTML = "";
 }
 
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 function makeChip(text, { onClick, selected = false, disabled = false } = {}) {
   const el = document.createElement("div");
   el.className = "chip";
   el.textContent = text;
 
   if (selected) {
-    el.style.outline = "2px solid rgba(189,155,64,0.9)";
-    el.style.outlineOffset = "2px";
+    el.classList.add("selected");
   }
   if (disabled) {
-    el.style.opacity = "0.45";
+    el.classList.add("disabled");
   } else if (onClick) {
     el.style.cursor = "pointer";
     el.addEventListener("click", onClick);
@@ -57,8 +64,6 @@ function makeChip(text, { onClick, selected = false, disabled = false } = {}) {
 
   return el;
 }
-
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /* ---------------------------
    Pack selection
@@ -86,26 +91,31 @@ function pickNextPack() {
    Header/meta render
 ----------------------------*/
 function renderHeader(pack) {
+  // REMOVE ATTRACTORS FROM UI (editor-only metadata)
   setText("scene-title", `Scene — ${pack?.sceneTitle || ""}`);
   setText("scene-text", pack?.scene || "");
   setText("tier-label", pack?.tier || "");
 
-  const iconsWrap = $("gate-icons");
-  if (iconsWrap) {
-    iconsWrap.innerHTML = "";
-    const ats = pack?.passageSelector?.attractors || [];
-    if (ats.length) {
-      const label = document.createElement("span");
-      label.style.color = "rgba(189,155,64,0.9)";
-      label.style.fontSize = "0.9rem";
-      label.textContent = `Attractors: ${ats.join(" · ")}`;
-      iconsWrap.appendChild(label);
-    }
-  }
+  // If your HTML has an attractors line container, blank it so it never shows.
+  const gateIcons = $("gate-icons");
+  if (gateIcons) gateIcons.innerHTML = "";
 }
 
-function setPrompt(text) {
-  setText("mode-prompt", text ?? "");
+/* ---------------------------
+   Slider scope helper
+----------------------------*/
+function sliderScopeLabel(pack) {
+  const m = pack?.modes?.sliders;
+  // Generation should supply one of: "Scene", "Judy", "Nick", "Judy ↔ Nick", etc.
+  // Field name: scope (string)
+  const scope = (m?.scope || "").trim();
+  if (!scope) return ""; // keep UI clean if missing
+  return `Scope: ${scope}`;
+}
+
+function setPrompt(text, pack) {
+  const scope = state.modeKey === "sliders" ? sliderScopeLabel(pack) : "";
+  setText("mode-prompt", scope ? `${text}  •  ${scope}` : (text ?? ""));
 }
 
 function getPrompt(pack) {
@@ -134,34 +144,52 @@ function resetModeState(modeKey) {
 }
 
 /* ---------------------------
-   Auto-advance (completion-based)
+   Completion-based advance (no correctness)
 ----------------------------*/
-async function maybeAdvance() {
-  await sleep(300);
+function maybeAdvanceAfterCompletion() {
+  // If you want to slow down/disable auto-advance, this is the switch.
+  // For now: keep it simple and advance on completion.
   loadNewPack();
 }
 
 /* ---------------------------
-   Renderers per mode
+   Randomize ordering per pack + mode
+----------------------------*/
+function computeShuffles(pack) {
+  const pm = pack?.modes?.pairMatch;
+  const rb = pack?.modes?.rankBuckets;
+  const sp = pack?.modes?.interpretiveTakes;
+
+  state.shuffled.left = pm?.leftCards ? shuffle(pm.leftCards) : [];
+  state.shuffled.right = pm?.rightCards ? shuffle(pm.rightCards) : []; // IMPORTANT: independent shuffle
+
+  state.shuffled.bucketCards = rb?.cards ? shuffle(rb.cards) : [];
+  state.shuffled.spotlights = sp?.takes ? shuffle(sp.takes) : [];
+}
+
+/* ---------------------------
+   Pair Match renderer
 ----------------------------*/
 function renderPairMatch(pack) {
-  const m = pack?.modes?.pairMatch;
   clear("pair-left");
   clear("pair-right");
+
+  const m = pack?.modes?.pairMatch;
   if (!m) return;
 
   const leftWrap = $("pair-left");
   const rightWrap = $("pair-right");
   if (!leftWrap || !rightWrap) return;
 
-  const left = m.leftCards || [];
-  const right = m.rightCards || [];
+  const left = state.shuffled.left;
+  const right = state.shuffled.right;
+
   const oneMovePerRight = !!m?.guardrails?.oneMovePerRightCard;
 
-  // Left list
   left.forEach((card) => {
     const assigned = state.pair.placed.get(card.id);
     const selected = state.pair.selectedLeftId === card.id;
+
     leftWrap.appendChild(
       makeChip(card.text + (assigned ? " ✓" : ""), {
         selected,
@@ -173,7 +201,6 @@ function renderPairMatch(pack) {
     );
   });
 
-  // Right list
   right.forEach((card) => {
     const isUsed = oneMovePerRight
       ? Array.from(state.pair.placed.values()).includes(card.id)
@@ -190,8 +217,9 @@ function renderPairMatch(pack) {
           state.pair.selectedLeftId = null;
           render();
 
-          if (state.pair.placed.size >= left.length && left.length > 0) {
-            maybeAdvance();
+          // completion = all left placed
+          if (left.length > 0 && state.pair.placed.size >= left.length) {
+            maybeAdvanceAfterCompletion();
           }
         },
       })
@@ -199,15 +227,19 @@ function renderPairMatch(pack) {
   });
 }
 
+/* ---------------------------
+   Sliders renderer
+----------------------------*/
 function renderSliders(pack) {
-  const m = pack?.modes?.sliders;
   clear("sliders-container");
+  const m = pack?.modes?.sliders;
   if (!m) return;
 
   const wrap = $("sliders-container");
   if (!wrap) return;
 
   const axes = m.sliders || [];
+
   axes.forEach((axis) => {
     const row = document.createElement("div");
     row.className = "slider-row";
@@ -232,7 +264,7 @@ function renderSliders(pack) {
     input.addEventListener("input", () => {
       state.slidersTouched.add(axis.id);
       if (axes.length > 0 && state.slidersTouched.size >= axes.length) {
-        maybeAdvance();
+        maybeAdvanceAfterCompletion();
       }
     });
 
@@ -242,12 +274,16 @@ function renderSliders(pack) {
   });
 }
 
+/* ---------------------------
+   Buckets renderer (true drag/drop + click fallback)
+----------------------------*/
 function renderBuckets(pack) {
-  const m = pack?.modes?.rankBuckets;
   clear("bucket-elements");
   clear("bucket-engine");
   clear("bucket-support");
   clear("bucket-spice");
+
+  const m = pack?.modes?.rankBuckets;
   if (!m) return;
 
   const elementsWrap = $("bucket-elements");
@@ -256,45 +292,73 @@ function renderBuckets(pack) {
   const spiceWrap = $("bucket-spice");
   if (!elementsWrap || !engineWrap || !supportWrap || !spiceWrap) return;
 
-  const cards = m.cards || [];
+  const cards = state.shuffled.bucketCards;
 
-  function place(bucketId) {
-    const cardId = state.buckets.selectedCardId;
+  function place(cardId, bucketId) {
     if (!cardId) return;
     state.buckets.placed.set(cardId, bucketId);
     state.buckets.selectedCardId = null;
     render();
 
     if (cards.length > 0 && state.buckets.placed.size >= cards.length) {
-      maybeAdvance();
+      maybeAdvanceAfterCompletion();
     }
   }
 
-  // Make bucket panels clickable drop targets
-  engineWrap.onclick = () => place("engine");
-  supportWrap.onclick = () => place("support");
-  spiceWrap.onclick = () => place("spice");
+  function makeDropTarget(el, bucketId) {
+    el.classList.add("dropzone");
 
-  // Unplaced elements list
+    el.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      el.classList.add("dragover");
+    });
+
+    el.addEventListener("dragleave", () => el.classList.remove("dragover"));
+
+    el.addEventListener("drop", (e) => {
+      e.preventDefault();
+      el.classList.remove("dragover");
+      const cardId = e.dataTransfer.getData("text/cardId");
+      place(cardId, bucketId);
+    });
+
+    // click fallback: if a card is selected, clicking bucket places it
+    el.addEventListener("click", () => {
+      if (state.buckets.selectedCardId) place(state.buckets.selectedCardId, bucketId);
+    });
+  }
+
+  makeDropTarget(engineWrap, "engine");
+  makeDropTarget(supportWrap, "support");
+  makeDropTarget(spiceWrap, "spice");
+
+  // Unplaced element chips (draggable)
   cards.forEach((c) => {
     if (state.buckets.placed.has(c.id)) return;
-    const selected = state.buckets.selectedCardId === c.id;
 
-    elementsWrap.appendChild(
-      makeChip(c.text, {
-        selected,
-        onClick: () => {
-          state.buckets.selectedCardId = c.id;
-          render();
-        },
-      })
-    );
+    const chip = makeChip(c.text, {
+      selected: state.buckets.selectedCardId === c.id,
+      onClick: () => {
+        state.buckets.selectedCardId = c.id;
+        render();
+      },
+    });
+
+    chip.setAttribute("draggable", "true");
+    chip.addEventListener("dragstart", (e) => {
+      e.dataTransfer.setData("text/cardId", c.id);
+      e.dataTransfer.effectAllowed = "move";
+      chip.classList.add("dragging");
+    });
+    chip.addEventListener("dragend", () => chip.classList.remove("dragging"));
+
+    elementsWrap.appendChild(chip);
   });
 
   // Placed chips inside buckets (click to unplace)
   cards.forEach((c) => {
-    const b = state.buckets.placed.get(c.id);
-    if (!b) return;
+    const bucketId = state.buckets.placed.get(c.id);
+    if (!bucketId) return;
 
     const node = makeChip(c.text, {
       onClick: () => {
@@ -303,38 +367,49 @@ function renderBuckets(pack) {
       },
     });
 
-    if (b === "engine") engineWrap.appendChild(node);
-    if (b === "support") supportWrap.appendChild(node);
-    if (b === "spice") spiceWrap.appendChild(node);
+    if (bucketId === "engine") engineWrap.appendChild(node);
+    if (bucketId === "support") supportWrap.appendChild(node);
+    if (bucketId === "spice") spiceWrap.appendChild(node);
   });
 }
 
+/* ---------------------------
+   Spotlights renderer (selection + visual)
+----------------------------*/
 function renderSpotlights(pack) {
-  const m = pack?.modes?.interpretiveTakes;
   clear("spotlights-container");
+  const m = pack?.modes?.interpretiveTakes;
   if (!m) return;
 
   const wrap = $("spotlights-container");
   if (!wrap) return;
 
-  const takes = m.takes || [];
+  const takes = state.shuffled.spotlights;
+
   takes.forEach((t) => {
     const el = document.createElement("div");
     el.className = "spotlight";
     el.textContent = t.text;
+    el.tabIndex = 0;
 
-    if (state.spotlightsSelected.has(t.id)) el.classList.add("selected");
+    const selected = state.spotlightsSelected.has(t.id);
+    if (selected) el.classList.add("selected");
 
-    el.addEventListener("click", () => {
+    function toggle() {
       if (state.spotlightsSelected.has(t.id)) state.spotlightsSelected.delete(t.id);
       else state.spotlightsSelected.add(t.id);
 
       render();
 
-      // completion: first selection
+      // completion = at least one selected
       if (state.spotlightsSelected.size >= 1) {
-        maybeAdvance();
+        maybeAdvanceAfterCompletion();
       }
+    }
+
+    el.addEventListener("click", toggle);
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") toggle();
     });
 
     wrap.appendChild(el);
@@ -348,7 +423,7 @@ function render() {
   if (!state.pack) return;
 
   renderHeader(state.pack);
-  setPrompt(getPrompt(state.pack));
+  setPrompt(getPrompt(state.pack), state.pack);
 
   if (state.modeKey === "pairMatch") renderPairMatch(state.pack);
   if (state.modeKey === "sliders") renderSliders(state.pack);
@@ -361,6 +436,7 @@ function render() {
 ----------------------------*/
 function loadNewPack() {
   state.pack = pickNextPack();
+  computeShuffles(state.pack);
   resetModeState(state.modeKey);
   render();
 }

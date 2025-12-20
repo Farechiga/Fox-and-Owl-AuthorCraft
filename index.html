@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fox & Owl Story Studio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    :root {
+      --plum: #340c44;
+      --gold: #bd9b40;
+      --text-light: #f7efe3;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background-color: var(--plum);
+      color: var(--text-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Background overlay — only for game modes */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 0.9;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body.mode-film::before {
+      background-image: url("Theater overlay.png");
+    }
+
+    body.mode-literature::before {
+      background-image: url("Library overlay.png");
+    }
+
+    body.landing::before {
+      background-image: none;
+    }
+
+    .app-root {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 1200px;
+      padding: 24px;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: center;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* -------- Landing screen -------- */
+
+    .landing-screen {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+    }
+
+    .landing-logo {
+      max-width: 520px;
+      width: 80%;
+      height: auto;
+      display: block;
+    }
+
+    .play-button {
+      margin-top: 16px;
+      padding: 10px 32px;
+      border-radius: 999px;
+      border: 2px solid var(--gold);
+      background: transparent;
+      color: var(--gold);
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      transition: transform 0.1s ease-out, box-shadow 0.1s ease-out, background 0.1s ease-out;
+    }
+
+    .play-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.65);
+      background: rgba(0, 0, 0, 0.18);
+    }
+
+    /* -------- Game screen -------- */
+
+    .game-screen {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .mode-toggle-wrapper {
+      position: absolute;
+      top: 26px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+    }
+
+    .mode-toggle {
+      display: inline-flex;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 999px;
+      padding: 3px;
+      border: 1px solid rgba(0, 0, 0, 0.9);
+    }
+
+    .mode-btn {
+      border: none;
+      padding: 6px 22px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      background: transparent;
+      color: #d0ced4;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .mode-btn.active {
+      background: #101010;
+      color: var(--gold);
+    }
+
+    .game-area {
+      width: 100%;
+      max-width: 900px;
+      margin: 110px auto 40px;
+      padding: 24px 26px 28px;
+      box-sizing: border-box;
+      border-radius: 18px;
+      background: radial-gradient(circle at top, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.85));
+      border: 1px solid rgba(189, 155, 64, 0.9);
+      box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.5),
+        0 24px 50px rgba(0, 0, 0, 0.85);
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: baseline;
+      margin-bottom: 16px;
+    }
+
+    .scene-title {
+      font-size: 1.1rem;
+      color: var(--gold);
+    }
+
+    .tier-label {
+      font-size: 0.95rem;
+      color: var(--gold);
+    }
+
+    .scene-text {
+      font-size: 0.98rem;
+      line-height: 1.5;
+      margin-bottom: 20px;
+      color: var(--text-light);
+    }
+
+    .question-text {
+      font-size: 1.05rem;
+      font-weight: 500;
+      margin-bottom: 12px;
+      color: var(--gold);
+    }
+
+    .answers {
+      display: grid;
+      gap: 9px;
+      margin-top: 4px;
+    }
+
+    .answer-btn {
+      text-align: left;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 0, 0, 0.9);
+      background: #050505;
+      color: var(--text-light);
+      padding: 9px 16px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out,
+        border-color 0.08s ease-out, background 0.08s ease-out;
+    }
+
+    .answer-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.65);
+      border-color: var(--gold);
+      background: #111111;
+    }
+
+    .answer-btn.correct {
+      border-color: #c6ff9f;
+      background: #214a25;
+    }
+
+    .answer-btn.incorrect {
+      border-color: #ff9b9b;
+      background: #5b1220;
+    }
+
+    .feedback {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      min-height: 1.2em;
+      color: var(--text-light);
+    }
+
+    .feedback.error {
+      color: #ffb3b3;
+    }
+
+    .score {
+      margin-top: 10px;
+      font-size: 1rem;
+      text-align: center;
+      color: var(--gold);
+    }
+
+.meta-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.gate-icons {
+  font-size: 1.1rem;
+  display: flex;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.gate-icon {
+  filter: drop-shadow(0 0 4px rgba(0,0,0,0.9));
+}
+
+/* Tooltip / key */
+.gate-tooltip {
+  position: absolute;
+  right: 24px;
+  top: 70px;
+  max-width: 280px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.9);
+  border: 1px solid rgba(189, 155, 64, 0.9);
+  color: var(--text-light);
+  font-size: 0.78rem;
+  line-height: 1.35;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.8);
+  z-index: 5;
+}
+
+.gate-tooltip .gate-key-title {
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--gold);
+}
+
+.gate-tooltip .gate-key-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.gate-tooltip .gate-key-icon {
+  width: 1.1rem;
+}
+    
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+      100% { transform: translateX(0); }
+    }
+
+    .shake {
+      animation: shake 0.28s ease-in-out;
+    }
+
+    @media (max-width: 900px) {
+      .game-area {
+        margin-top: 80px;
+        padding: 18px 16px 22px;
+      }
+    }
+  </style>
+</head>
+<body class="landing">
+  <div class="app-root">
+    <!-- Landing Screen -->
+    <section id="landing-screen" class="landing-screen">
+      <img
+        src="Fox and Owl Story Studio Logo.png"
+        alt="The Fox & Owl Story Studio"
+        class="landing-logo"
+      />
+      <button id="play-btn" class="play-button">Play!</button>
+    </section>
+
+    <!-- Game Screen -->
+    <section id="game-screen" class="game-screen hidden">
+      <div class="mode-toggle-wrapper">
+        <div class="mode-toggle">
+          <button id="mode-film" class="mode-btn" data-mode="film">Film</button>
+          <button id="mode-literature" class="mode-btn active" data-mode="literature">Literature</button>
+        </div>
+      </div>
+      
+      <div id="game-area" class="game-area">
+        <div class="header-row">
+          <div id="scene-title" class="scene-title">Scene –</div>
+          <div class="meta-right">
+            <div id="gate-icons" class="gate-icons"></div>
+            <div id="tier-label" class="tier-label"></div>
+          </div>
+        </div>
+      
+        <div id="scene-text" class="scene-text"></div>
+      
+        <div id="question-text" class="question-text"></div>
+      
+        <div id="answers" class="answers"></div>
+      
+        <div id="feedback" class="feedback"></div>
+      
+        <div id="score" class="score">Score: 0</div>
+      
+        <!-- Tooltip with Seven Gates key -->
+        <div id="gate-tooltip" class="gate-tooltip hidden"></div>
+      </div>
+    </section>
+  </div>
+
+  <script src="questions.js"></script>
+</body>
+</html>

@@ -1,6 +1,5 @@
-// src/packs/filmPacks.js
+// filmPacks.js
 // AuthorCraft Appreciation — FILM PACKS (Option A: one big file)
-// Each entry must conform to the CraftAppreciation "appreciationPack" schema.
 
 export const FILM_PACKS = [
   // --- ZOOTOPIA ---
@@ -22,8 +21,7 @@ export const FILM_PACKS = [
 
     modes: {
       pairMatch: {
-        prompt:
-          "Match each micro-moment to the best “why it lands.” No scoring—make the strongest reading you can defend.",
+        prompt: "Match micro-moments to why they land. Make the strongest read you can defend.",
         leftCards: [
           { id: "L1", text: "The DMV looks official and procedural, with numbered stations and a long line." },
           { id: "L2", text: "The sloth clerk turns toward them at a glacial pace, pausing between movements." },
@@ -52,8 +50,7 @@ export const FILM_PACKS = [
       },
 
       rankBuckets: {
-        prompt:
-          "Drag each craft element into Engine / Support / Spice. You’re arguing what matters most—not what’s ‘correct.’",
+        prompt: "Sort the craft elements by what drives the scene.",
         buckets: [
           { id: "engine", label: "Engine" },
           { id: "support", label: "Support" },
@@ -65,19 +62,15 @@ export const FILM_PACKS = [
           { id: "B3", text: "Judy’s polite face vs. internal urgency (visible restraint)." },
           { id: "B4", text: "Nick’s calm presence beside her (contrast in tempo)." },
           { id: "B5", text: "Long holds and tiny movements that make time feel heavy." },
-          { id: "B6", text: "A line of people watching the delay happen in public." },
-          { id: "B7", text: "The scene turns a mundane task into a high-stakes obstacle." },
-          { id: "B8", text: "Micro-pauses that invite anticipation of the next inch of progress." }
+          { id: "B6", text: "A line of people watching the delay happen in public." }
         ]
       },
 
       sliders: {
-        prompt: "Use sliders to describe your read. Neutral defaults—no ‘better’ side.",
+        prompt: "Set your read using descriptive axes.",
         items: [
           { id: "S1", text: "Judy’s demeanor" },
-          { id: "S2", text: "Nick’s stance" },
-          { id: "S3", text: "The DMV line" },
-          { id: "S4", text: "The clerk’s pace" }
+          { id: "S2", text: "Nick’s stance" }
         ],
         sliders: [
           { id: "A1", leftLabel: "Earnest", rightLabel: "Performative", defaultValue: 50 },
@@ -88,18 +81,14 @@ export const FILM_PACKS = [
       },
 
       interpretiveTakes: {
-        prompt: "Select the spotlights that feel true at the same time. Multiple readings can coexist.",
+        prompt: "Choose the spotlights that can coexist.",
         interaction: "selectMultiple",
         takes: [
-          { id: "T1", text: "The joke isn’t just ‘slow’—the whole room treats the slowness as standard procedure." },
+          { id: "T1", text: "The room treats the slowness as standard procedure—that’s the real joke engine." },
           { id: "T2", text: "Judy’s professionalism becomes a visible mask; you can watch her hold it in place." },
-          { id: "T3", text: "Nick’s calm reads like confidence—he’s comfortable in this world while Judy is fighting it." },
-          { id: "T4", text: "The line behind them makes the delay public pressure; waiting becomes a group performance." },
-          { id: "T5", text: "The scene makes time tangible by isolating tiny motions and forcing you to sit inside the pause." },
-          { id: "T6", text: "A mundane civic ritual becomes an initiation test: can you keep composure inside the machine?" }
-        ],
-        gentleNudge:
-          "Pick two spotlights that pull in different directions, then support both with the same concrete moment."
+          { id: "T3", text: "Nick’s calm reads like confidence—he’s comfortable in this world while Judy fights it." },
+          { id: "T4", text: "The line behind them makes waiting public pressure; delay becomes group theater." }
+        ]
       }
     }
   }
@@ -107,5 +96,4 @@ export const FILM_PACKS = [
   // ------ add new film scenes here ---------
 ];
 
-// Optional: quick lookup by id (nice for debugging)
-export const FILM_PACKS_BY_ID = Object.fromEntries(FILM_PACKS.map(p => [p.id, p]));
+export const FILM_PACKS_BY_ID = Object.fromEntries(FILM_PACKS.map((p) => [p.id, p]));

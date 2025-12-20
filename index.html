@@ -489,6 +489,53 @@
 
       const promptEl = document.getElementById("mode-prompt");
 
+          // ------------------------------------------------------------------
+    // Landing -> Game transition + default medium
+    // ------------------------------------------------------------------
+    const landingScreen = document.getElementById("landing-screen");
+    const gameScreen = document.getElementById("game-screen");
+    const playBtn = document.getElementById("play-btn");
+
+    const filmBtn = document.getElementById("mode-film");
+    const litBtn = document.getElementById("mode-literature");
+
+    function setMedium(medium) {
+      // Update button active state
+      const isFilm = medium === "film";
+      filmBtn?.classList.toggle("active", isFilm);
+      litBtn?.classList.toggle("active", !isFilm);
+
+      // Update body class to swap background overlay
+      document.body.classList.remove("mode-film", "mode-literature", "landing");
+      document.body.classList.add(isFilm ? "mode-film" : "mode-literature");
+
+      // Notify runtime (questions.js / main.js) to load correct packs
+      document.dispatchEvent(new CustomEvent("sourcechange", { detail: { source: medium } }));
+    }
+
+    function enterGame(defaultMedium = "film") {
+      // Show game, hide landing
+      landingScreen?.classList.add("hidden");
+      gameScreen?.classList.remove("hidden");
+
+      // Ensure body background overlay activates
+      setMedium(defaultMedium);
+
+      // Optional: start on a deterministic mode tab
+      setActive("tab-pair");
+
+      // Ask runtime to load first scene
+      document.dispatchEvent(new CustomEvent("scenenext"));
+    }
+
+    // Wire Play button
+    playBtn?.addEventListener("click", () => enterGame("film"));
+
+    // Wire medium toggle buttons (Film / Literature)
+    filmBtn?.addEventListener("click", () => setMedium("film"));
+    litBtn?.addEventListener("click", () => setMedium("literature"));
+
+
       function setActive(tabId) {
         tabs.forEach(t => {
           const tab = document.getElementById(t.id);

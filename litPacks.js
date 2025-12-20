@@ -266,4 +266,5 @@ export const LIT_PACKS = [
         { id: "B4", text: "A question-shift that escalates stakes without escalating danger." },
         { id: "B5", text: "Payoff of earlier competence as evidence of growth." },
         { id: "B6", text: "A larger world hinted at without removing the children’s agency." }
-      ]
+        ]
+      },

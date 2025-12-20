@@ -259,10 +259,11 @@ export const LIT_PACKS = [
           { id: "support", label: "Support" },
           { id: "spice", label: "Spice" }
         ],
-        cards: [
-          { id: "B1", text: "A safe adult option introduced after independence is established." },
-          { id: "B2", text: "Relief mixed with uncertainty instead of a simple happy ending." },
-          { id: "B3", text: "A ‘two homes’ contrast (built vs given)." },
-          { id: "B4", text: "A question-shift that escalates stakes without escalating danger." },
-          { id: "B5", text: "Payoff of earlier competence as evidence of growth." },
-          { id: "B6", text: "A lar
+      cards: [
+        { id: "B1", text: "A safe adult option introduced after independence is established." },
+        { id: "B2", text: "Relief mixed with uncertainty instead of a simple happy ending." },
+        { id: "B3", text: "A ‘two homes’ contrast (built vs given)." },
+        { id: "B4", text: "A question-shift that escalates stakes without escalating danger." },
+        { id: "B5", text: "Payoff of earlier competence as evidence of growth." },
+        { id: "B6", text: "A larger world hinted at without removing the children’s agency." }
+      ]

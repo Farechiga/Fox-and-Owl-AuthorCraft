@@ -21,7 +21,7 @@ export const FILM_PACKS = [
 
     modes: {
       pairMatch: {
-        prompt: "Match micro-moments to why they land. Make the strongest read you can defend.",
+        prompt: "Match each micro-moment to the best “why it lands.”",
         leftCards: [
           { id: "L1", text: "The DMV looks official and procedural, with numbered stations and a long line." },
           { id: "L2", text: "The sloth clerk turns toward them at a glacial pace, pausing between movements." },
@@ -45,12 +45,23 @@ export const FILM_PACKS = [
           { leftId: "L4", rightId: "R4" },
           { leftId: "L5", rightId: "R5" },
           { leftId: "L6", rightId: "R6" }
-        ],
-        guardrails: { standaloneLeftCards: true, oneMovePerRightCard: true, noThesisLanguage: true }
+        ]
+      },
+
+      sliders: {
+        // ✅ required scope clarity
+        scopeLabel: "Judy’s stance in the scene",
+        prompt: "Set your read using descriptive axes.",
+        sliders: [
+          { id: "S1", leftLabel: "Earnest", rightLabel: "Performative", defaultValue: 50, minValue: 20, maxValue: 85 },
+          { id: "S2", leftLabel: "Patient", rightLabel: "Boiling", defaultValue: 50, minValue: 0, maxValue: 100 },
+          { id: "S3", leftLabel: "Routine", rightLabel: "Obstacle-course", defaultValue: 50, minValue: 10, maxValue: 90 },
+          { id: "S4", leftLabel: "Grounded", rightLabel: "Absurd", defaultValue: 50, minValue: 0, maxValue: 100 }
+        ]
       },
 
       rankBuckets: {
-        prompt: "Sort the craft elements by what drives the scene.",
+        prompt: "Drag each craft element into Engine / Support / Spice. You’re arguing what matters most—not what’s ‘correct.’",
         buckets: [
           { id: "engine", label: "Engine" },
           { id: "support", label: "Support" },
@@ -61,39 +72,20 @@ export const FILM_PACKS = [
           { id: "B2", text: "A setting associated with bureaucracy and waiting." },
           { id: "B3", text: "Judy’s polite face vs. internal urgency (visible restraint)." },
           { id: "B4", text: "Nick’s calm presence beside her (contrast in tempo)." },
-          { id: "B5", text: "Long holds and tiny movements that make time feel heavy." },
-          { id: "B6", text: "A line of people watching the delay happen in public." }
-        ]
-      },
-
-      sliders: {
-        prompt: "Set your read using descriptive axes.",
-        items: [
-          { id: "S1", text: "Judy’s demeanor" },
-          { id: "S2", text: "Nick’s stance" }
-        ],
-        sliders: [
-          { id: "A1", leftLabel: "Earnest", rightLabel: "Performative", defaultValue: 50 },
-          { id: "A2", leftLabel: "Patient", rightLabel: "Boiling", defaultValue: 50 },
-          { id: "A3", leftLabel: "Routine", rightLabel: "Obstacle-course", defaultValue: 50 },
-          { id: "A4", leftLabel: "Grounded", rightLabel: "Absurd", defaultValue: 50 }
+          { id: "B5", text: "Micro-pauses that keep resetting your expectation of progress." },
+          { id: "B6", text: "A line of strangers forced into the same public ritual." }
         ]
       },
 
       interpretiveTakes: {
-        prompt: "Choose the spotlights that can coexist.",
-        interaction: "selectMultiple",
+        prompt: "Rank the top three decisions that make the scene memorable.",
         takes: [
-          { id: "T1", text: "The room treats the slowness as standard procedure—that’s the real joke engine." },
-          { id: "T2", text: "Judy’s professionalism becomes a visible mask; you can watch her hold it in place." },
-          { id: "T3", text: "Nick’s calm reads like confidence—he’s comfortable in this world while Judy fights it." },
+          { id: "T1", text: "Nick’s calm reads like confidence—he’s comfortable in this world while Judy fights it." },
+          { id: "T2", text: "The room treats the slowness as standard procedure—that’s the real joke engine." },
+          { id: "T3", text: "Judy’s professionalism becomes a visible mask; you can watch her hold it in place." },
           { id: "T4", text: "The line behind them makes waiting public pressure; delay becomes group theater." }
         ]
       }
     }
   }
-
-  // ------ add new film scenes here ---------
 ];
-
-export const FILM_PACKS_BY_ID = Object.fromEntries(FILM_PACKS.map((p) => [p.id, p]));

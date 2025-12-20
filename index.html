@@ -1,5 +1,3 @@
-// AuthorCraft Appreciation Expansion Play
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,19 +9,16 @@
     :root {
       --plum: #340c44;
       --gold: #bd9b40;
-      --text-light: #f7efe3;
+      --text: #f7efe3;
+      --muted: #d0ced4;
+      --black: #050505;
     }
 
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-    }
-
+    html, body { height: 100%; margin: 0; padding: 0; }
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background-color: var(--plum);
-      color: var(--text-light);
+      color: var(--text);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -44,7 +39,6 @@
       pointer-events: none;
       z-index: 0;
     }
-
     body.mode-film::before { background-image: url("Theater overlay.png"); }
     body.mode-literature::before { background-image: url("Library overlay.png"); }
     body.landing::before { background-image: none; }
@@ -59,7 +53,6 @@
       display: flex;
       justify-content: center;
     }
-
     .hidden { display: none !important; }
 
     /* -------- Landing screen -------- */
@@ -71,14 +64,12 @@
       justify-content: center;
       gap: 24px;
     }
-
     .landing-logo {
       max-width: 520px;
       width: 80%;
       height: auto;
       display: block;
     }
-
     .play-button {
       margin-top: 16px;
       padding: 10px 32px;
@@ -93,7 +84,6 @@
       text-transform: uppercase;
       transition: transform 0.1s ease-out, box-shadow 0.1s ease-out, background 0.1s ease-out;
     }
-
     .play-button:hover {
       transform: translateY(-1px);
       box-shadow: 0 8px 18px rgba(0, 0, 0, 0.65);
@@ -109,7 +99,7 @@
       justify-content: flex-start;
     }
 
-    /* Keep original toggle style & position */
+    /* Toggle centered at top, like original */
     .mode-toggle-wrapper {
       position: absolute;
       top: 26px;
@@ -119,6 +109,7 @@
       display: flex;
       gap: 10px;
       align-items: center;
+      justify-content: center;
     }
 
     .mode-toggle {
@@ -136,39 +127,12 @@
       font-size: 0.85rem;
       cursor: pointer;
       background: transparent;
-      color: #d0ced4;
+      color: var(--muted);
       transition: background 0.15s ease, color 0.15s ease;
     }
-
     .mode-btn.active {
       background: #101010;
       color: var(--gold);
-    }
-
-    /* New: small top actions, styled to match */
-    .top-actions {
-      display: inline-flex;
-      gap: 10px;
-      align-items: center;
-      margin-left: 10px;
-    }
-
-    .top-action-btn {
-      border: 1px solid rgba(0, 0, 0, 0.9);
-      background: rgba(0, 0, 0, 0.7);
-      color: var(--gold);
-      padding: 6px 16px;
-      border-radius: 999px;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out, background 0.08s ease-out;
-      white-space: nowrap;
-    }
-
-    .top-action-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.55);
-      background: rgba(0, 0, 0, 0.78);
     }
 
     .game-area {
@@ -192,30 +156,15 @@
       align-items: baseline;
       margin-bottom: 16px;
     }
-
     .scene-title {
       font-size: 1.1rem;
       color: var(--gold);
     }
-
-    .tier-label {
-      font-size: 0.95rem;
-      color: var(--gold);
-    }
-
     .scene-text {
       font-size: 0.98rem;
       line-height: 1.5;
-      margin-bottom: 16px;
-      color: var(--text-light);
-    }
-
-    /* This replaces "question-text" with mode prompt text */
-    .mode-prompt {
-      font-size: 1.05rem;
-      font-weight: 500;
-      margin: 6px 0 12px;
-      color: var(--gold);
+      margin-bottom: 12px;
+      color: var(--text);
     }
 
     .meta-right {
@@ -224,66 +173,36 @@
       align-items: flex-end;
       gap: 6px;
     }
-
+    .tier-label {
+      font-size: 0.95rem;
+      color: var(--gold);
+    }
     .gate-icons {
       font-size: 1.1rem;
       display: flex;
       gap: 4px;
-      cursor: pointer;
+      cursor: default;
+      user-select: none;
     }
-
     .gate-icon {
       filter: drop-shadow(0 0 4px rgba(0,0,0,0.9));
     }
 
-    /* Tooltip / key */
-    .gate-tooltip {
-      position: absolute;
-      right: 24px;
-      top: 70px;
-      max-width: 280px;
-      padding: 10px 12px;
-      border-radius: 10px;
-      background: rgba(0, 0, 0, 0.9);
-      border: 1px solid rgba(189, 155, 64, 0.9);
-      color: var(--text-light);
-      font-size: 0.78rem;
-      line-height: 1.35;
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.8);
-      z-index: 5;
-    }
-
-    .gate-tooltip .gate-key-title {
-      font-weight: 600;
-      margin-bottom: 6px;
-      color: var(--gold);
-    }
-
-    .gate-tooltip .gate-key-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 6px;
-      margin-bottom: 2px;
-    }
-
-    .gate-tooltip .gate-key-icon { width: 1.1rem; }
-
-    /* -------- New: mode tabs (matches existing pill style) -------- */
+    /* Mode tabs: same pill language */
     .mode-tabs {
       display: inline-flex;
       gap: 8px;
       align-items: center;
       justify-content: flex-start;
-      margin: 4px 0 10px;
+      margin: 8px 0 12px;
       flex-wrap: wrap;
     }
-
     .mode-tab {
       text-align: center;
       border-radius: 999px;
       border: 1px solid rgba(0, 0, 0, 0.9);
-      background: #050505;
-      color: #d0ced4;
+      background: var(--black);
+      color: var(--muted);
       padding: 7px 14px;
       font-size: 0.88rem;
       cursor: pointer;
@@ -291,100 +210,132 @@
         border-color 0.08s ease-out, background 0.08s ease-out;
       user-select: none;
     }
-
     .mode-tab:hover {
       transform: translateY(-1px);
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.65);
       border-color: var(--gold);
       background: #111111;
-      color: var(--text-light);
+      color: var(--text);
     }
-
     .mode-tab.active {
       border-color: var(--gold);
       color: var(--gold);
     }
 
-    /* -------- Mode views container -------- */
-    .mode-view { display: none; margin-top: 10px; }
+    /* Mode prompt (short, non-dev) */
+    .mode-prompt {
+      font-size: 1.05rem;
+      font-weight: 500;
+      margin: 6px 0 12px;
+      color: var(--gold);
+    }
+
+    /* Views */
+    .mode-view { display: none; margin-top: 6px; }
     .mode-view.active { display: block; }
 
-    /* Keep visuals simple for now; JS will populate */
-    .placeholder {
+    /* Sub-panels inside views should match the “black pill / black panel” vibe */
+    .panel {
       border-radius: 14px;
       border: 1px solid rgba(0, 0, 0, 0.9);
       background: rgba(0,0,0,0.55);
       padding: 14px 16px;
-      color: #d0ced4;
-      font-size: 0.92rem;
-      line-height: 1.4;
     }
 
-    /* Notes (minimal, inside same card to preserve rhythm) */
-    .notes-wrap {
-      margin-top: 14px;
+    /* Pair Match layout */
+    .pair-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 760px) {
+      .pair-grid { grid-template-columns: 1fr; }
+      .game-area { margin-top: 90px; padding: 18px 16px 22px; }
+      .mode-toggle-wrapper { top: 18px; }
+    }
+    .pair-col-title {
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 10px;
+      font-size: 0.95rem;
+    }
+    .list {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
+    }
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(0, 0, 0, 0.9);
+      background: #0b0b0b;
+      color: var(--text);
+      padding: 10px 14px;
+      font-size: 0.95rem;
+      line-height: 1.25;
     }
 
-    .notes-row {
+    /* Sliders */
+    .slider-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .slider-axis {
+      color: var(--text);
+      font-size: 0.95rem;
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      gap: 10px;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--gold); }
+
+    /* Buckets */
+    .bucket-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 900px) { .bucket-grid { grid-template-columns: 1fr; } }
+    .bucket-title {
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 10px;
+      font-size: 0.95rem;
+    }
+    .bucket-drop {
+      min-height: 120px;
+      border-radius: 14px;
+      border: 1px solid rgba(0, 0, 0, 0.9);
+      background: rgba(0,0,0,0.4);
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
       gap: 10px;
     }
 
-    .notes-title {
-      color: var(--gold);
-      font-weight: 600;
-    }
-
-    .notes-btn {
-      border: 1px solid rgba(0, 0, 0, 0.9);
-      background: #050505;
-      color: var(--gold);
-      padding: 6px 14px;
-      border-radius: 999px;
-      cursor: pointer;
-      font-size: 0.85rem;
-    }
-
-    .notes-area {
-      width: 100%;
-      min-height: 120px;
-      resize: vertical;
+    /* Spotlights */
+    .spotlight {
       border-radius: 14px;
       border: 1px solid rgba(0, 0, 0, 0.9);
-      background: rgba(0,0,0,0.65);
-      color: var(--text-light);
-      padding: 10px 12px;
+      background: rgba(0,0,0,0.55);
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      color: var(--text);
       font-size: 0.95rem;
       line-height: 1.35;
-      box-sizing: border-box;
+      cursor: pointer;
     }
-
-    .notes-tip {
-      color: #d0ced4;
-      font-size: 0.82rem;
-    }
-
-    @media (max-width: 900px) {
-      .game-area {
-        margin-top: 90px;
-        padding: 18px 16px 22px;
-      }
-      .mode-toggle-wrapper {
-        top: 18px;
-        flex-wrap: wrap;
-        justify-content: center;
-      }
+    .spotlight.selected {
+      outline: 2px solid rgba(189, 155, 64, 0.9);
+      outline-offset: 2px;
     }
   </style>
 </head>
 
 <body class="landing">
   <div class="app-root">
+
     <!-- Landing Screen -->
     <section id="landing-screen" class="landing-screen">
       <img
@@ -397,30 +348,24 @@
 
     <!-- Game Screen -->
     <section id="game-screen" class="game-screen hidden">
-      <div class="mode-toggle-wrapper">
+      <div class="mode-toggle-wrapper" aria-label="Medium toggle">
         <div class="mode-toggle">
-          <button id="mode-film" class="mode-btn" data-mode="film">Film</button>
-          <button id="mode-literature" class="mode-btn active" data-mode="literature">Literature</button>
-        </div>
-
-        <div class="top-actions">
-          <button id="btn-new-scene" class="top-action-btn" type="button">New scene</button>
-          <button id="btn-reset" class="top-action-btn" type="button">Reset</button>
+          <button id="mode-film" class="mode-btn active" data-mode="film" type="button">Film</button>
+          <button id="mode-literature" class="mode-btn" data-mode="literature" type="button">Literature</button>
         </div>
       </div>
 
       <div id="game-area" class="game-area">
         <div class="header-row">
-          <div id="scene-title" class="scene-title">Scene –</div>
+          <div id="scene-title" class="scene-title">Scene —</div>
           <div class="meta-right">
-            <div id="gate-icons" class="gate-icons" title="Attractors"></div>
+            <div id="gate-icons" class="gate-icons" aria-label="Attractors"></div>
             <div id="tier-label" class="tier-label"></div>
           </div>
         </div>
 
         <div id="scene-text" class="scene-text"></div>
 
-        <!-- Mode tabs -->
         <div class="mode-tabs" role="tablist" aria-label="AuthorCraft modes">
           <button id="tab-pair" class="mode-tab active" type="button" role="tab" aria-selected="true">Pair Match</button>
           <button id="tab-sliders" class="mode-tab" type="button" role="tab" aria-selected="false">Sliders</button>
@@ -428,147 +373,139 @@
           <button id="tab-spotlights" class="mode-tab" type="button" role="tab" aria-selected="false">Spotlights</button>
         </div>
 
-        <!-- Mode prompt (replaces old question text) -->
-        <div id="mode-prompt" class="mode-prompt">
-          Set your read using descriptive axes. Sliders are neutral—no “better” direction.
-        </div>
+        <div id="mode-prompt" class="mode-prompt"></div>
 
-        <!-- Views (JS will populate these; no scoring/correctness DOM) -->
+        <!-- Pair Match -->
         <div id="view-pair" class="mode-view active" aria-label="Pair Match view">
-          <div class="placeholder">
-            Pair Match container (JS renders left cards + right cards + placements). No correctness UI.
+          <div class="pair-grid">
+            <div class="panel">
+              <div class="pair-col-title">Micro-moments</div>
+              <div id="pair-left" class="list"></div>
+            </div>
+            <div class="panel">
+              <div class="pair-col-title">Why they land</div>
+              <div id="pair-right" class="list"></div>
+            </div>
           </div>
         </div>
 
+        <!-- Sliders -->
         <div id="view-sliders" class="mode-view" aria-label="Sliders view">
-          <div class="placeholder">
-            Sliders container (JS renders axes + range inputs). Neutral defaults.
+          <div class="panel">
+            <div id="sliders-container"></div>
           </div>
         </div>
 
+        <!-- Buckets -->
         <div id="view-buckets" class="mode-view" aria-label="Buckets view">
-          <div class="placeholder">
-            Buckets container (JS renders Engine/Support/Spice + draggable items).
+          <div class="panel" style="margin-bottom:12px;">
+            <div class="pair-col-title">Elements</div>
+            <div id="bucket-elements" class="list"></div>
+          </div>
+
+          <div class="bucket-grid">
+            <div class="panel">
+              <div class="bucket-title">Engine</div>
+              <div id="bucket-engine" class="bucket-drop"></div>
+            </div>
+            <div class="panel">
+              <div class="bucket-title">Support</div>
+              <div id="bucket-support" class="bucket-drop"></div>
+            </div>
+            <div class="panel">
+              <div class="bucket-title">Spice</div>
+              <div id="bucket-spice" class="bucket-drop"></div>
+            </div>
           </div>
         </div>
 
+        <!-- Spotlights -->
         <div id="view-spotlights" class="mode-view" aria-label="Spotlights view">
-          <div class="placeholder">
-            Spotlights container (JS renders multiple interpretive takes; optional user take).
-          </div>
+          <div id="spotlights-container"></div>
         </div>
 
-        <!-- Notes (kept inside the same card to preserve “feel”) -->
-        <div class="notes-wrap">
-          <div class="notes-row">
-            <div class="notes-title">Notes</div>
-            <button id="btn-copy-notes" class="notes-btn" type="button">Copy</button>
-          </div>
-          <textarea id="notes-area" class="notes-area" placeholder="Write what you noticed..."></textarea>
-          <div class="notes-tip">Tip: jot evidence (“what”) + mechanism (“why”) + effect (“so what”).</div>
-        </div>
-
-        <!-- Tooltip for attractor key (kept, repurpose from gates) -->
-        <div id="gate-tooltip" class="gate-tooltip hidden"></div>
       </div>
     </section>
   </div>
 
-  <!-- Keep your existing runtime file name for now -->
+  <!-- Keep your existing runtime filename for now -->
   <script src="questions.js"></script>
 
-  <!-- Minimal tab switching (safe; no quiz logic) -->
   <script>
-    (function() {
-      const tabs = [
-        { id: "tab-pair", view: "view-pair", prompt: "Match micro-moments to why they land. No scoring—make the strongest read you can defend." },
-        { id: "tab-sliders", view: "view-sliders", prompt: "Set your read using descriptive axes. Sliders are neutral—no “better” direction." },
-        { id: "tab-buckets", view: "view-buckets", prompt: "Sort craft elements into Engine / Support / Spice. You’re arguing what matters most." },
-        { id: "tab-spotlights", view: "view-spotlights", prompt: "Select spotlights that can coexist. Multiple readings can be valid at the same time." }
-      ];
+    (function () {
+      const landingScreen = document.getElementById("landing-screen");
+      const gameScreen = document.getElementById("game-screen");
+      const playBtn = document.getElementById("play-btn");
+
+      const filmBtn = document.getElementById("mode-film");
+      const litBtn  = document.getElementById("mode-literature");
 
       const promptEl = document.getElementById("mode-prompt");
 
-          // ------------------------------------------------------------------
-    // Landing -> Game transition + default medium
-    // ------------------------------------------------------------------
-    const landingScreen = document.getElementById("landing-screen");
-    const gameScreen = document.getElementById("game-screen");
-    const playBtn = document.getElementById("play-btn");
+      const tabDefs = [
+        { id: "tab-pair", view: "view-pair", key: "pairMatch",
+          prompt: "Match micro-moments to why they land. Make the strongest read you can defend." },
+        { id: "tab-sliders", view: "view-sliders", key: "sliders",
+          prompt: "Set your read using descriptive axes." },
+        { id: "tab-buckets", view: "view-buckets", key: "rankBuckets",
+          prompt: "Sort the craft elements by what drives the scene." },
+        { id: "tab-spotlights", view: "view-spotlights", key: "interpretiveTakes",
+          prompt: "Choose the spotlights that can coexist." }
+      ];
 
-    const filmBtn = document.getElementById("mode-film");
-    const litBtn = document.getElementById("mode-literature");
+      function setMedium(medium) {
+        const isFilm = medium === "film";
+        filmBtn.classList.toggle("active", isFilm);
+        litBtn.classList.toggle("active", !isFilm);
 
-    function setMedium(medium) {
-      // Update button active state
-      const isFilm = medium === "film";
-      filmBtn?.classList.toggle("active", isFilm);
-      litBtn?.classList.toggle("active", !isFilm);
+        document.body.classList.remove("landing", "mode-film", "mode-literature");
+        document.body.classList.add(isFilm ? "mode-film" : "mode-literature");
 
-      // Update body class to swap background overlay
-      document.body.classList.remove("mode-film", "mode-literature", "landing");
-      document.body.classList.add(isFilm ? "mode-film" : "mode-literature");
+        document.dispatchEvent(new CustomEvent("sourcechange", { detail: { source: medium } }));
+      }
 
-      // Notify runtime (questions.js / main.js) to load correct packs
-      document.dispatchEvent(new CustomEvent("sourcechange", { detail: { source: medium } }));
-    }
-
-    function enterGame(defaultMedium = "film") {
-      // Show game, hide landing
-      landingScreen?.classList.add("hidden");
-      gameScreen?.classList.remove("hidden");
-
-      // Ensure body background overlay activates
-      setMedium(defaultMedium);
-
-      // Optional: start on a deterministic mode tab
-      setActive("tab-pair");
-
-      // Ask runtime to load first scene
-      document.dispatchEvent(new CustomEvent("scenenext"));
-    }
-
-    // Wire Play button
-    playBtn?.addEventListener("click", () => enterGame("film"));
-
-    // Wire medium toggle buttons (Film / Literature)
-    filmBtn?.addEventListener("click", () => setMedium("film"));
-    litBtn?.addEventListener("click", () => setMedium("literature"));
-
-
-      function setActive(tabId) {
-        tabs.forEach(t => {
+      function setTab(tabId) {
+        for (const t of tabDefs) {
           const tab = document.getElementById(t.id);
           const view = document.getElementById(t.view);
           const active = t.id === tabId;
-          if (tab) {
-            tab.classList.toggle("active", active);
-            tab.setAttribute("aria-selected", active ? "true" : "false");
-          }
-          if (view) view.classList.toggle("active", active);
+          tab.classList.toggle("active", active);
+          tab.setAttribute("aria-selected", active ? "true" : "false");
+          view.classList.toggle("active", active);
           if (active && promptEl) promptEl.textContent = t.prompt;
-        });
 
-        document.dispatchEvent(new CustomEvent("modechange", { detail: { tabId } }));
+          if (active) {
+            document.dispatchEvent(new CustomEvent("modechange", { detail: { modeKey: t.key } }));
+          }
+        }
       }
 
-      tabs.forEach(t => {
-        const tab = document.getElementById(t.id);
-        if (tab) tab.addEventListener("click", () => setActive(t.id));
-      });
+      function enterGame() {
+        landingScreen.classList.add("hidden");
+        gameScreen.classList.remove("hidden");
 
-      document.getElementById("btn-new-scene")?.addEventListener("click", () => {
+        // Default medium: Film (you requested default; no extra buttons)
+        setMedium("film");
+
+        // Default mode tab
+        setTab("tab-pair");
+
+        // Ask runtime to load a scene (your renderer will listen)
         document.dispatchEvent(new CustomEvent("scenenext"));
-      });
+      }
 
-      document.getElementById("btn-reset")?.addEventListener("click", () => {
-        document.dispatchEvent(new CustomEvent("modereset"));
-      });
+      playBtn.addEventListener("click", enterGame);
 
-      document.getElementById("btn-copy-notes")?.addEventListener("click", async () => {
-        const txt = document.getElementById("notes-area")?.value || "";
-        try { await navigator.clipboard.writeText(txt); } catch(e) {}
-      });
+      filmBtn.addEventListener("click", () => setMedium("film"));
+      litBtn.addEventListener("click", () => setMedium("literature"));
+
+      for (const t of tabDefs) {
+        document.getElementById(t.id).addEventListener("click", () => setTab(t.id));
+      }
+
+      // When your renderer decides the user has completed the current mode,
+      // it should dispatch: document.dispatchEvent(new CustomEvent("advance"));
+      // This index file does not implement correctness/advancing logic.
     })();
   </script>
 </body>

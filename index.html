@@ -1,842 +1,526 @@
-// AuthorCraft Appreciation Expansion Pack
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Fox & Owl — AuthorCraft Appreciation</title>
-  <meta name="description" content="Practice noticing craft in film & literature—no scoring, no right answers." />
+  <meta charset="UTF-8" />
+  <title>Fox & Owl Story Studio — AuthorCraft Appreciation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- If your original game loaded specific fonts, keep those <link> tags here. -->
   <style>
-    :root{
-      --bg:#170819;             /* deep plum */
-      --panel:#241027;          /* panel plum */
-      --panel2:#1d0c20;
-      --text:#f4efe9;           /* warm ivory */
-      --muted:#c9bcc6;
-      --accent:#bd9b40;         /* bronze/gold trim */
-      --accent2:#7ad1c4;        /* optional cool accent */
-      --shadow: 0 16px 40px rgba(0,0,0,.45);
-      --radius: 18px;
-      --radius2: 28px;
-      --gap: 16px;
+    :root {
+      --plum: #340c44;
+      --gold: #bd9b40;
+      --text-light: #f7efe3;
     }
 
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      background: radial-gradient(1200px 900px at 20% 10%, rgba(189,155,64,.22), transparent 60%),
-                  radial-gradient(900px 800px at 85% 30%, rgba(122,209,196,.16), transparent 55%),
-                  linear-gradient(180deg, var(--bg), #0f0611 85%);
-      color:var(--text);
-    }
-
-    a{ color:inherit; }
-
-    .app{
-      min-height:100%;
-      display:flex;
-      flex-direction:column;
-      padding: 22px;
-      gap: 18px;
-    }
-
-    .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 14px;
-      padding: 14px 16px;
-      border: 1px solid rgba(189,155,64,.35);
-      border-radius: var(--radius2);
-      background: rgba(36,16,39,.65);
-      backdrop-filter: blur(10px);
-      box-shadow: var(--shadow);
-    }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap: 12px;
-      min-width: 240px;
-    }
-    .brand-mark{
-      width:44px; height:44px;
-      border-radius: 14px;
-      border: 1px solid rgba(189,155,64,.55);
-      background: linear-gradient(135deg, rgba(189,155,64,.18), rgba(255,255,255,.06));
-      display:grid;
-      place-items:center;
-      font-weight:700;
-      letter-spacing:.5px;
-      color: var(--accent);
-    }
-    .brand-title{
-      display:flex;
-      flex-direction:column;
-      line-height:1.1;
-    }
-    .brand-title .name{
-      font-weight: 750;
-      letter-spacing:.2px;
-      font-size: 14px;
-      opacity:.95;
-    }
-    .brand-title .sub{
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .controls{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content:flex-end;
-    }
-
-    .segmented{
-      display:inline-flex;
-      border: 1px solid rgba(189,155,64,.35);
-      border-radius: 999px;
-      overflow:hidden;
-      background: rgba(0,0,0,.18);
-    }
-    .segmented button{
-      appearance:none;
-      border:0;
-      padding: 9px 12px;
-      color: var(--muted);
-      background: transparent;
-      cursor:pointer;
-      font-weight:650;
-      font-size: 13px;
-      letter-spacing:.2px;
-    }
-    .segmented button[aria-pressed="true"]{
-      background: rgba(189,155,64,.18);
-      color: var(--text);
-    }
-
-    .btn{
-      border: 1px solid rgba(189,155,64,.35);
-      background: rgba(0,0,0,.15);
-      color: var(--text);
-      padding: 9px 12px;
-      border-radius: 999px;
-      cursor:pointer;
-      font-weight:650;
-      font-size: 13px;
-      letter-spacing:.2px;
-    }
-    .btn:hover{ background: rgba(255,255,255,.06); }
-    .btn:active{ transform: translateY(1px); }
-
-    .main{
-      flex:1;
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 18px;
-      align-items:start;
-    }
-
-    @media (max-width: 980px){
-      .main{ grid-template-columns: 1fr; }
-    }
-
-    .card{
-      border: 1px solid rgba(189,155,64,.28);
-      border-radius: var(--radius2);
-      background: rgba(36,16,39,.58);
-      backdrop-filter: blur(10px);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-
-    .card-head{
-      padding: 16px 18px;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap: 12px;
-    }
-
-    .scene-meta{
-      display:flex;
-      flex-direction:column;
-      gap: 6px;
-      min-width:0;
-    }
-    .scene-meta .kicker{
-      font-size: 12px;
-      color: var(--muted);
-      letter-spacing:.2px;
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap: 6px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.16);
-      font-size: 12px;
-      color: var(--muted);
-      white-space:nowrap;
-    }
-    .scene-meta h1{
-      margin:0;
-      font-size: 18px;
-      letter-spacing:.2px;
-      line-height:1.2;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-      max-width: 100%;
-    }
-    .scene-meta .scene-line{
-      margin:0;
-      color: rgba(244,239,233,.92);
-      font-size: 14px;
-      line-height: 1.35;
-    }
-
-    .mode-tabs{
-      display:flex;
-      gap: 8px;
-      flex-wrap:wrap;
-      align-items:center;
-      justify-content:flex-end;
-    }
-    .mode-tabs button{
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.18);
-      color: var(--muted);
-      padding: 7px 10px;
-      border-radius: 999px;
-      cursor:pointer;
-      font-weight:700;
-      font-size: 12px;
-    }
-    .mode-tabs button[aria-selected="true"]{
-      border-color: rgba(189,155,64,.50);
-      background: rgba(189,155,64,.18);
-      color: var(--text);
-    }
-
-    .card-body{ padding: 16px 18px 18px; }
-
-    .view{ display:none; }
-    .view[data-active="true"]{ display:block; }
-
-    /* Pair Match (no correctness UI) */
-    .pair-grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    @media (max-width: 680px){
-      .pair-grid{ grid-template-columns: 1fr; }
-    }
-    .pair-col{
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.14);
-      border-radius: var(--radius);
-      padding: 12px;
-      display:flex;
-      flex-direction:column;
-      gap: 10px;
-      min-height: 280px;
-    }
-    .pair-col h3{
-      margin:0;
-      font-size: 13px;
-      letter-spacing:.2px;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-    .pair-list{
-      list-style:none;
-      padding:0;
-      margin:0;
-      display:flex;
-      flex-direction:column;
-      gap: 10px;
-    }
-    .chip{
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.05);
-      border-radius: 14px;
-      padding: 10px 10px;
-      cursor: grab;
-      user-select:none;
-      line-height:1.25;
-      font-size: 13px;
-    }
-    .chip:active{ cursor: grabbing; }
-    .dropzone{
-      border: 1px dashed rgba(189,155,64,.35);
-      border-radius: 14px;
-      padding: 10px;
-      min-height: 44px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-      background: rgba(0,0,0,.10);
-    }
-    .dropzone .label{
-      color: rgba(244,239,233,.92);
-      font-size: 13px;
-      line-height:1.2;
-      flex: 1;
-    }
-    .dropzone .slot{
-      width: 44%;
-      min-height: 34px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      padding: 6px 8px;
-      color: var(--muted);
-      font-size: 12px;
-      display:flex;
-      align-items:center;
-    }
-
-    /* Sliders */
-    .sliders{
-      display:flex;
-      flex-direction:column;
-      gap: 14px;
-    }
-    .slider-row{
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.14);
-      border-radius: var(--radius);
-      padding: 12px;
-      display:flex;
-      flex-direction:column;
-      gap: 10px;
-    }
-    .slider-row .top{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap: 12px;
-    }
-    .slider-row .axis{
-      font-weight:750;
-      font-size: 13px;
-      line-height:1.2;
-    }
-    .slider-row .desc{
-      color: var(--muted);
-      font-size: 12px;
-      line-height:1.25;
-      margin-top: 2px;
-    }
-    input[type="range"]{
-      width:100%;
-      accent-color: var(--accent);
-    }
-    .slider-labels{
-      display:flex;
-      justify-content:space-between;
-      color: var(--muted);
-      font-size: 12px;
-      gap: 12px;
-    }
-
-    /* Rank Buckets */
-    .buckets{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-    }
-    @media (max-width: 780px){
-      .buckets{ grid-template-columns: 1fr; }
-    }
-    .bucket{
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.14);
-      border-radius: var(--radius);
-      padding: 12px;
-      min-height: 260px;
-      display:flex;
-      flex-direction:column;
-      gap: 10px;
-    }
-    .bucket h3{ margin:0; font-size: 13px; color: var(--text); }
-    .bucket p{ margin:0; font-size: 12px; color: var(--muted); line-height:1.3; }
-    .bucket .drop{
-      margin-top: 4px;
-      border: 1px dashed rgba(189,155,64,.30);
-      border-radius: 14px;
-      padding: 10px;
-      min-height: 140px;
-      display:flex;
-      flex-direction:column;
-      gap: 10px;
-      background: rgba(0,0,0,.10);
-    }
-
-    /* Interpretive takes */
-    .takes{
-      display:flex;
-      flex-direction:column;
-      gap: 12px;
-    }
-    .take{
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.14);
-      border-radius: var(--radius);
-      padding: 12px;
-    }
-    .take .title{
-      font-weight: 800;
-      font-size: 13px;
-      letter-spacing:.2px;
-      margin-bottom: 6px;
-    }
-    .take .text{
-      margin:0;
-      color: rgba(244,239,233,.93);
-      font-size: 13px;
-      line-height:1.35;
-    }
-
-    /* Right rail */
-    .rail{
-      display:flex;
-      flex-direction:column;
-      gap: 18px;
-    }
-
-    .rail .card-head{
-      align-items:center;
-    }
-
-    .helper{
-      color: var(--muted);
-      font-size: 13px;
-      line-height:1.35;
+    html, body {
       margin: 0;
+      padding: 0;
+      height: 100%;
     }
 
-    .mini-actions{
-      display:flex;
-      gap: 10px;
-      flex-wrap:wrap;
-      margin-top: 12px;
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background-color: var(--plum);
+      color: var(--text-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      position: relative;
+      overflow: hidden;
     }
 
-    .footer{
-      color: rgba(201,188,198,.85);
-      font-size: 12px;
-      text-align:center;
-      padding: 6px 0 2px;
-    }
-
-    /* “Hidden but accessible” */
-    .sr-only{
-      position:absolute;
-      width:1px; height:1px;
-      padding:0; margin:-1px;
-      overflow:hidden; clip:rect(0,0,0,0);
-      white-space:nowrap; border:0;
-    }
-
-    /* Landing overlay */
-    .overlay{
+    /* Background overlay — only for game modes */
+    body::before {
+      content: "";
       position: fixed;
       inset: 0;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding: 22px;
-      background: radial-gradient(900px 700px at 25% 20%, rgba(189,155,64,.20), transparent 60%),
-                  rgba(0,0,0,.55);
-      z-index: 999;
-      backdrop-filter: blur(6px);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 0.9;
+      pointer-events: none;
+      z-index: 0;
     }
-    .overlay[data-open="true"]{ display:flex; }
-    .overlay .panel{
-      width: min(900px, 100%);
-      border-radius: 26px;
-      border: 1px solid rgba(189,155,64,.35);
-      background: rgba(36,16,39,.72);
-      box-shadow: var(--shadow);
-      overflow:hidden;
+
+    body.mode-film::before { background-image: url("Theater overlay.png"); }
+    body.mode-literature::before { background-image: url("Library overlay.png"); }
+    body.landing::before { background-image: none; }
+
+    .app-root {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 1200px;
+      padding: 24px;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: center;
     }
-    .overlay .panel .hero{
-      padding: 22px;
-      border-bottom: 1px solid rgba(255,255,255,.08);
+
+    .hidden { display: none !important; }
+
+    /* -------- Landing screen -------- */
+    .landing-screen {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
     }
-    .overlay h2{
-      margin:0 0 8px;
-      font-size: 20px;
-      letter-spacing:.2px;
+
+    .landing-logo {
+      max-width: 520px;
+      width: 80%;
+      height: auto;
+      display: block;
     }
-    .overlay .lede{
-      margin:0;
-      color: var(--muted);
-      line-height:1.35;
-      font-size: 14px;
+
+    .play-button {
+      margin-top: 16px;
+      padding: 10px 32px;
+      border-radius: 999px;
+      border: 2px solid var(--gold);
+      background: transparent;
+      color: var(--gold);
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      transition: transform 0.1s ease-out, box-shadow 0.1s ease-out, background 0.1s ease-out;
     }
-    .overlay .panel .actions{
-      padding: 18px 22px 22px;
-      display:flex;
+
+    .play-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.65);
+      background: rgba(0, 0, 0, 0.18);
+    }
+
+    /* -------- Game screen -------- */
+    .game-screen {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    /* Keep original toggle style & position */
+    .mode-toggle-wrapper {
+      position: absolute;
+      top: 26px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: flex;
       gap: 10px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
+      align-items: center;
     }
-    .btn-primary{
-      border-color: rgba(189,155,64,.55);
-      background: rgba(189,155,64,.18);
+
+    .mode-toggle {
+      display: inline-flex;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 999px;
+      padding: 3px;
+      border: 1px solid rgba(0, 0, 0, 0.9);
+    }
+
+    .mode-btn {
+      border: none;
+      padding: 6px 22px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      background: transparent;
+      color: #d0ced4;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .mode-btn.active {
+      background: #101010;
+      color: var(--gold);
+    }
+
+    /* New: small top actions, styled to match */
+    .top-actions {
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+      margin-left: 10px;
+    }
+
+    .top-action-btn {
+      border: 1px solid rgba(0, 0, 0, 0.9);
+      background: rgba(0, 0, 0, 0.7);
+      color: var(--gold);
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out, background 0.08s ease-out;
+      white-space: nowrap;
+    }
+
+    .top-action-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.55);
+      background: rgba(0, 0, 0, 0.78);
+    }
+
+    .game-area {
+      width: 100%;
+      max-width: 900px;
+      margin: 110px auto 40px;
+      padding: 24px 26px 28px;
+      box-sizing: border-box;
+      border-radius: 18px;
+      background: radial-gradient(circle at top, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.85));
+      border: 1px solid rgba(189, 155, 64, 0.9);
+      box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.5),
+        0 24px 50px rgba(0, 0, 0, 0.85);
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: baseline;
+      margin-bottom: 16px;
+    }
+
+    .scene-title {
+      font-size: 1.1rem;
+      color: var(--gold);
+    }
+
+    .tier-label {
+      font-size: 0.95rem;
+      color: var(--gold);
+    }
+
+    .scene-text {
+      font-size: 0.98rem;
+      line-height: 1.5;
+      margin-bottom: 16px;
+      color: var(--text-light);
+    }
+
+    /* This replaces "question-text" with mode prompt text */
+    .mode-prompt {
+      font-size: 1.05rem;
+      font-weight: 500;
+      margin: 6px 0 12px;
+      color: var(--gold);
+    }
+
+    .meta-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+    }
+
+    .gate-icons {
+      font-size: 1.1rem;
+      display: flex;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .gate-icon {
+      filter: drop-shadow(0 0 4px rgba(0,0,0,0.9));
+    }
+
+    /* Tooltip / key */
+    .gate-tooltip {
+      position: absolute;
+      right: 24px;
+      top: 70px;
+      max-width: 280px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.9);
+      border: 1px solid rgba(189, 155, 64, 0.9);
+      color: var(--text-light);
+      font-size: 0.78rem;
+      line-height: 1.35;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.8);
+      z-index: 5;
+    }
+
+    .gate-tooltip .gate-key-title {
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--gold);
+    }
+
+    .gate-tooltip .gate-key-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      margin-bottom: 2px;
+    }
+
+    .gate-tooltip .gate-key-icon { width: 1.1rem; }
+
+    /* -------- New: mode tabs (matches existing pill style) -------- */
+    .mode-tabs {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: flex-start;
+      margin: 4px 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .mode-tab {
+      text-align: center;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 0, 0, 0.9);
+      background: #050505;
+      color: #d0ced4;
+      padding: 7px 14px;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out,
+        border-color 0.08s ease-out, background 0.08s ease-out;
+      user-select: none;
+    }
+
+    .mode-tab:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.65);
+      border-color: var(--gold);
+      background: #111111;
+      color: var(--text-light);
+    }
+
+    .mode-tab.active {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    /* -------- Mode views container -------- */
+    .mode-view { display: none; margin-top: 10px; }
+    .mode-view.active { display: block; }
+
+    /* Keep visuals simple for now; JS will populate */
+    .placeholder {
+      border-radius: 14px;
+      border: 1px solid rgba(0, 0, 0, 0.9);
+      background: rgba(0,0,0,0.55);
+      padding: 14px 16px;
+      color: #d0ced4;
+      font-size: 0.92rem;
+      line-height: 1.4;
+    }
+
+    /* Notes (minimal, inside same card to preserve rhythm) */
+    .notes-wrap {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .notes-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .notes-title {
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    .notes-btn {
+      border: 1px solid rgba(0, 0, 0, 0.9);
+      background: #050505;
+      color: var(--gold);
+      padding: 6px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .notes-area {
+      width: 100%;
+      min-height: 120px;
+      resize: vertical;
+      border-radius: 14px;
+      border: 1px solid rgba(0, 0, 0, 0.9);
+      background: rgba(0,0,0,0.65);
+      color: var(--text-light);
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      line-height: 1.35;
+      box-sizing: border-box;
+    }
+
+    .notes-tip {
+      color: #d0ced4;
+      font-size: 0.82rem;
+    }
+
+    @media (max-width: 900px) {
+      .game-area {
+        margin-top: 90px;
+        padding: 18px 16px 22px;
+      }
+      .mode-toggle-wrapper {
+        top: 18px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
     }
   </style>
 </head>
 
-<body>
-  <!-- Landing / intro overlay (keeps “navigation feel” without quiz assumptions) -->
-  <div class="overlay" id="landingOverlay" data-open="true" role="dialog" aria-modal="true" aria-labelledby="landingTitle">
-    <div class="panel">
-      <div class="hero">
-        <h2 id="landingTitle">AuthorCraft Appreciation</h2>
-        <p class="lede">
-          Practice noticing how scenes work—micro-moments, tone, status, and craft choices.
-          No scoring. No “correct answers.” Just sharper reading & viewing.
-        </p>
+<body class="landing">
+  <div class="app-root">
+    <!-- Landing Screen -->
+    <section id="landing-screen" class="landing-screen">
+      <img
+        src="Fox and Owl Story Studio Logo.png"
+        alt="The Fox & Owl Story Studio"
+        class="landing-logo"
+      />
+      <button id="play-btn" class="play-button">Play!</button>
+    </section>
+
+    <!-- Game Screen -->
+    <section id="game-screen" class="game-screen hidden">
+      <div class="mode-toggle-wrapper">
+        <div class="mode-toggle">
+          <button id="mode-film" class="mode-btn" data-mode="film">Film</button>
+          <button id="mode-literature" class="mode-btn active" data-mode="literature">Literature</button>
+        </div>
+
+        <div class="top-actions">
+          <button id="btn-new-scene" class="top-action-btn" type="button">New scene</button>
+          <button id="btn-reset" class="top-action-btn" type="button">Reset</button>
+        </div>
       </div>
-      <div class="actions">
-        <button class="btn" id="btnAbout" type="button">How it works</button>
-        <button class="btn btn-primary" id="btnStart" type="button">Enter</button>
+
+      <div id="game-area" class="game-area">
+        <div class="header-row">
+          <div id="scene-title" class="scene-title">Scene –</div>
+          <div class="meta-right">
+            <div id="gate-icons" class="gate-icons" title="Attractors"></div>
+            <div id="tier-label" class="tier-label"></div>
+          </div>
+        </div>
+
+        <div id="scene-text" class="scene-text"></div>
+
+        <!-- Mode tabs -->
+        <div class="mode-tabs" role="tablist" aria-label="AuthorCraft modes">
+          <button id="tab-pair" class="mode-tab active" type="button" role="tab" aria-selected="true">Pair Match</button>
+          <button id="tab-sliders" class="mode-tab" type="button" role="tab" aria-selected="false">Sliders</button>
+          <button id="tab-buckets" class="mode-tab" type="button" role="tab" aria-selected="false">Buckets</button>
+          <button id="tab-spotlights" class="mode-tab" type="button" role="tab" aria-selected="false">Spotlights</button>
+        </div>
+
+        <!-- Mode prompt (replaces old question text) -->
+        <div id="mode-prompt" class="mode-prompt">
+          Set your read using descriptive axes. Sliders are neutral—no “better” direction.
+        </div>
+
+        <!-- Views (JS will populate these; no scoring/correctness DOM) -->
+        <div id="view-pair" class="mode-view active" aria-label="Pair Match view">
+          <div class="placeholder">
+            Pair Match container (JS renders left cards + right cards + placements). No correctness UI.
+          </div>
+        </div>
+
+        <div id="view-sliders" class="mode-view" aria-label="Sliders view">
+          <div class="placeholder">
+            Sliders container (JS renders axes + range inputs). Neutral defaults.
+          </div>
+        </div>
+
+        <div id="view-buckets" class="mode-view" aria-label="Buckets view">
+          <div class="placeholder">
+            Buckets container (JS renders Engine/Support/Spice + draggable items).
+          </div>
+        </div>
+
+        <div id="view-spotlights" class="mode-view" aria-label="Spotlights view">
+          <div class="placeholder">
+            Spotlights container (JS renders multiple interpretive takes; optional user take).
+          </div>
+        </div>
+
+        <!-- Notes (kept inside the same card to preserve “feel”) -->
+        <div class="notes-wrap">
+          <div class="notes-row">
+            <div class="notes-title">Notes</div>
+            <button id="btn-copy-notes" class="notes-btn" type="button">Copy</button>
+          </div>
+          <textarea id="notes-area" class="notes-area" placeholder="Write what you noticed..."></textarea>
+          <div class="notes-tip">Tip: jot evidence (“what”) + mechanism (“why”) + effect (“so what”).</div>
+        </div>
+
+        <!-- Tooltip for attractor key (kept, repurpose from gates) -->
+        <div id="gate-tooltip" class="gate-tooltip hidden"></div>
       </div>
-    </div>
+    </section>
   </div>
 
-  <div class="app" id="appRoot">
-    <!-- Top bar: preserve identity + film/lit toggle -->
-    <header class="topbar">
-      <div class="brand" aria-label="Fox and Owl">
-        <div class="brand-mark" aria-hidden="true">F&O</div>
-        <div class="brand-title">
-          <div class="name">Fox & Owl Story Studio</div>
-          <div class="sub">AuthorCraft Appreciation</div>
-        </div>
-      </div>
+  <!-- Keep your existing runtime file name for now -->
+  <script src="questions.js"></script>
 
-      <div class="controls">
-        <!-- Source toggle -->
-        <div class="segmented" role="group" aria-label="Source toggle">
-          <button id="toggleFilm" type="button" aria-pressed="true">Film</button>
-          <button id="toggleLit" type="button" aria-pressed="false">Literature</button>
-        </div>
-
-        <!-- Light navigation controls -->
-        <button class="btn" id="btnShuffleScene" type="button" title="Load another scene">New scene</button>
-        <button class="btn" id="btnResetMode" type="button" title="Clear placements/sliders for this scene">Reset</button>
-      </div>
-    </header>
-
-    <main class="main">
-      <!-- Primary card: scene + mode-driven view -->
-      <section class="card" aria-label="Scene and activity">
-        <div class="card-head">
-          <div class="scene-meta">
-            <div class="kicker">
-              <span class="pill" id="pillSource">Film</span>
-              <span class="pill" id="pillTier">Lantern</span>
-              <span class="pill" id="pillAttractors">Attractors: —</span>
-            </div>
-            <h1 id="sceneTitle">Scene title loads here</h1>
-            <p class="scene-line" id="sceneText">
-              Scene description / passage excerpt loads here. Keep it punchy and concrete.
-            </p>
-          </div>
-
-          <!-- Mode tabs -->
-          <nav class="mode-tabs" aria-label="Mode tabs" role="tablist">
-            <button id="tabPair" role="tab" aria-selected="true" aria-controls="viewPair" type="button">Pair Match</button>
-            <button id="tabSliders" role="tab" aria-selected="false" aria-controls="viewSliders" type="button">Sliders</button>
-            <button id="tabBuckets" role="tab" aria-selected="false" aria-controls="viewBuckets" type="button">Buckets</button>
-            <button id="tabTakes" role="tab" aria-selected="false" aria-controls="viewTakes" type="button">Spotlights</button>
-          </nav>
-        </div>
-
-        <div class="card-body">
-          <!-- VIEW: Pair Match -->
-          <section class="view" id="viewPair" role="tabpanel" aria-labelledby="tabPair" data-active="true">
-            <p class="helper" id="pairInstructions">
-              Drag craft “moments” into the slots that feel like the best-fit “why it lands.”
-              There’s no correctness—just make your strongest matches.
-            </p>
-
-            <div class="pair-grid" style="margin-top:12px;">
-              <div class="pair-col" aria-label="Moments (draggable)">
-                <h3>Moments</h3>
-                <ul class="pair-list" id="pairMoments" aria-label="Moments list">
-                  <!-- JS injects <li class="chip" draggable="true" data-id="..."> -->
-                </ul>
-              </div>
-
-              <div class="pair-col" aria-label="Why it lands (drop targets)">
-                <h3>Why it lands</h3>
-                <div id="pairTargets" aria-label="Target slots">
-                  <!-- JS injects rows like:
-                    <div class="dropzone" data-target-id="T1">
-                      <div class="label">Audience knows it’s a disguise (ironic advantage).</div>
-                      <div class="slot" aria-label="Drop moment here">Drop a moment…</div>
-                    </div>
-                  -->
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <!-- VIEW: Sliders -->
-          <section class="view" id="viewSliders" role="tabpanel" aria-labelledby="tabSliders" data-active="false">
-            <p class="helper">
-              Set your read using descriptive axes. Sliders are neutral—no “better” direction.
-            </p>
-
-            <div class="sliders" id="slidersContainer" style="margin-top:12px;">
-              <!-- JS injects rows like:
-                <div class="slider-row" data-axis-id="tone">
-                  <div class="top">
-                    <div>
-                      <div class="axis">Tone: Earnest ↔ Ironic</div>
-                      <div class="desc">Is the scene asking us to take this straight, or with a wink?</div>
-                    </div>
-                    <div class="pill" aria-label="Current value">50</div>
-                  </div>
-                  <input type="range" min="0" max="100" value="50" />
-                  <div class="slider-labels"><span>Earnest</span><span>Ironic</span></div>
-                </div>
-              -->
-            </div>
-          </section>
-
-          <!-- VIEW: Buckets -->
-          <section class="view" id="viewBuckets" role="tabpanel" aria-labelledby="tabBuckets" data-active="false">
-            <p class="helper">
-              Sort craft elements into buckets: what drives the scene, what supports it, what adds spice.
-            </p>
-
-            <div class="pair-col" style="margin-top:12px;">
-              <h3>Elements to place</h3>
-              <ul class="pair-list" id="bucketElements" aria-label="Elements list">
-                <!-- JS injects draggable chips -->
-              </ul>
-            </div>
-
-            <div class="buckets" style="margin-top:12px;">
-              <div class="bucket" aria-label="Engine bucket">
-                <h3>Engine</h3>
-                <p>Core move that makes the scene work.</p>
-                <div class="drop" id="dropEngine" data-bucket="engine" aria-label="Drop elements here"></div>
-              </div>
-              <div class="bucket" aria-label="Support bucket">
-                <h3>Support</h3>
-                <p>Structure that holds the move up.</p>
-                <div class="drop" id="dropSupport" data-bucket="support" aria-label="Drop elements here"></div>
-              </div>
-              <div class="bucket" aria-label="Spice bucket">
-                <h3>Spice</h3>
-                <p>Flavor, texture, delight—non-essential but memorable.</p>
-                <div class="drop" id="dropSpice" data-bucket="spice" aria-label="Drop elements here"></div>
-              </div>
-            </div>
-          </section>
-
-          <!-- VIEW: Interpretive Spotlights -->
-          <section class="view" id="viewTakes" role="tabpanel" aria-labelledby="tabTakes" data-active="false">
-            <p class="helper">
-              Multiple plausible readings. Pick one that fits, or write your own.
-            </p>
-
-            <div class="takes" id="takesContainer" style="margin-top:12px;">
-              <!-- JS injects:
-                <div class="take">
-                  <div class="title">Spotlight: Status performance</div>
-                  <p class="text">The applause is doing the proof-work; evidence is replaced by reception.</p>
-                </div>
-              -->
-            </div>
-
-            <div class="mini-actions">
-              <button class="btn" id="btnAddTake" type="button">Add my take</button>
-              <button class="btn" id="btnSwapTakes" type="button">Shuffle spotlights</button>
-            </div>
-
-            <div id="takeComposer" style="display:none; margin-top:12px;">
-              <label class="sr-only" for="takeTitle">Take title</label>
-              <input id="takeTitle" type="text" placeholder="Title (e.g., ‘Status via ceremony’)"
-                     style="width:100%; padding:10px 12px; border-radius:14px; border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.16); color:var(--text);" />
-              <div style="height:10px;"></div>
-              <label class="sr-only" for="takeText">Take text</label>
-              <textarea id="takeText" rows="4" placeholder="Your reading—one tight paragraph."
-                        style="width:100%; padding:10px 12px; border-radius:14px; border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.16); color:var(--text); resize:vertical;"></textarea>
-              <div class="mini-actions">
-                <button class="btn btn-primary" id="btnSaveTake" type="button">Save</button>
-                <button class="btn" id="btnCancelTake" type="button">Cancel</button>
-              </div>
-            </div>
-          </section>
-        </div>
-      </section>
-
-      <!-- Right rail: guidance + “no scoring” posture -->
-      <aside class="rail" aria-label="Guidance and notes">
-        <section class="card">
-          <div class="card-head">
-            <div style="font-weight:800; letter-spacing:.2px;">How to play</div>
-            <button class="btn" id="btnOpenLanding" type="button">About</button>
-          </div>
-          <div class="card-body">
-            <p class="helper">
-              You’re not being tested. Your job is to make the most *defensible* read, using concrete evidence from the moment.
-            </p>
-            <ul style="margin:12px 0 0; padding-left: 18px; color: var(--muted); line-height:1.35; font-size: 13px;">
-              <li><strong style="color:var(--text)">Micro before macro:</strong> cite a gesture, cut, phrase, or beat.</li>
-              <li><strong style="color:var(--text)">Name the mechanism:</strong> status, irony, constraint, timing, contrast.</li>
-              <li><strong style="color:var(--text)">Allow two truths:</strong> multiple readings can be valid.</li>
-            </ul>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="card-head">
-            <div style="font-weight:800; letter-spacing:.2px;">Notes</div>
-            <button class="btn" id="btnCopyNotes" type="button">Copy</button>
-          </div>
-          <div class="card-body">
-            <label class="sr-only" for="notesArea">Notes</label>
-            <textarea id="notesArea" rows="10" placeholder="Write what you noticed..."
-              style="width:100%; padding:10px 12px; border-radius:14px; border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.16); color:var(--text); resize:vertical;"></textarea>
-            <p class="helper" style="margin-top:10px;">
-              Tip: jot evidence (“what”) + mechanism (“why”) + effect (“so what”).
-            </p>
-          </div>
-        </section>
-      </aside>
-    </main>
-
-    <footer class="footer">
-      Fox & Owl — AuthorCraft Appreciation • No scoring • Practice noticing
-    </footer>
-  </div>
-
-  <!-- Your app script should mount here. Keep index clean: DOM only, no quiz logic. -->
-  <!-- Example:
-    <script type="module" src="./main.js"></script>
-  -->
+  <!-- Minimal tab switching (safe; no quiz logic) -->
   <script>
-    // Minimal “mode-driven layout” wiring (safe, non-quiz).
-    // Your real logic should live in main.js; this just proves the UI structure.
+    (function() {
+      const tabs = [
+        { id: "tab-pair", view: "view-pair", prompt: "Match micro-moments to why they land. No scoring—make the strongest read you can defend." },
+        { id: "tab-sliders", view: "view-sliders", prompt: "Set your read using descriptive axes. Sliders are neutral—no “better” direction." },
+        { id: "tab-buckets", view: "view-buckets", prompt: "Sort craft elements into Engine / Support / Spice. You’re arguing what matters most." },
+        { id: "tab-spotlights", view: "view-spotlights", prompt: "Select spotlights that can coexist. Multiple readings can be valid at the same time." }
+      ];
 
-    const landing = document.getElementById("landingOverlay");
-    const btnStart = document.getElementById("btnStart");
-    const btnOpenLanding = document.getElementById("btnOpenLanding");
-    const btnAbout = document.getElementById("btnAbout");
+      const promptEl = document.getElementById("mode-prompt");
 
-    function openLanding(){ landing.dataset.open = "true"; }
-    function closeLanding(){ landing.dataset.open = "false"; }
+      function setActive(tabId) {
+        tabs.forEach(t => {
+          const tab = document.getElementById(t.id);
+          const view = document.getElementById(t.view);
+          const active = t.id === tabId;
+          if (tab) {
+            tab.classList.toggle("active", active);
+            tab.setAttribute("aria-selected", active ? "true" : "false");
+          }
+          if (view) view.classList.toggle("active", active);
+          if (active && promptEl) promptEl.textContent = t.prompt;
+        });
 
-    btnStart?.addEventListener("click", closeLanding);
-    btnOpenLanding?.addEventListener("click", openLanding);
-    btnAbout?.addEventListener("click", () => {
-      // Replace with your own modal content later
-      alert("Pick Film/Literature, choose a mode, and make your strongest reading. No scoring—just noticing.");
-    });
-
-    // Source toggle (Film / Literature)
-    const tFilm = document.getElementById("toggleFilm");
-    const tLit  = document.getElementById("toggleLit");
-    const pillSource = document.getElementById("pillSource");
-    function setSource(source){
-      const isFilm = source === "film";
-      tFilm.setAttribute("aria-pressed", String(isFilm));
-      tLit.setAttribute("aria-pressed", String(!isFilm));
-      pillSource.textContent = isFilm ? "Film" : "Literature";
-      // main.js should respond to this and load a scene pack accordingly
-      document.dispatchEvent(new CustomEvent("sourcechange", { detail: { source } }));
-    }
-    tFilm?.addEventListener("click", () => setSource("film"));
-    tLit?.addEventListener("click", () => setSource("literature"));
-
-    // Mode tabs
-    const tabs = [
-      { tab: "tabPair", view: "viewPair" },
-      { tab: "tabSliders", view: "viewSliders" },
-      { tab: "tabBuckets", view: "viewBuckets" },
-      { tab: "tabTakes", view: "viewTakes" }
-    ];
-    function setMode(viewId){
-      for (const t of tabs){
-        const tabEl = document.getElementById(t.tab);
-        const viewEl = document.getElementById(t.view);
-        const active = t.view === viewId;
-        tabEl?.setAttribute("aria-selected", String(active));
-        if (viewEl) viewEl.dataset.active = String(active);
+        document.dispatchEvent(new CustomEvent("modechange", { detail: { tabId } }));
       }
-      document.dispatchEvent(new CustomEvent("modechange", { detail: { mode: viewId } }));
-    }
-    for (const t of tabs){
-      document.getElementById(t.tab)?.addEventListener("click", () => setMode(t.view));
-    }
 
-    // Notes: copy
-    document.getElementById("btnCopyNotes")?.addEventListener("click", async () => {
-      const txt = document.getElementById("notesArea")?.value || "";
-      try{
-        await navigator.clipboard.writeText(txt);
-      }catch(e){
-        // Fallback
-        const ta = document.getElementById("notesArea");
-        ta?.select();
-        document.execCommand("copy");
-      }
-    });
+      tabs.forEach(t => {
+        const tab = document.getElementById(t.id);
+        if (tab) tab.addEventListener("click", () => setActive(t.id));
+      });
 
-    // Take composer show/hide (Spotlights mode)
-    const takeComposer = document.getElementById("takeComposer");
-    document.getElementById("btnAddTake")?.addEventListener("click", () => {
-      if (takeComposer) takeComposer.style.display = "block";
-    });
-    document.getElementById("btnCancelTake")?.addEventListener("click", () => {
-      if (takeComposer) takeComposer.style.display = "none";
-    });
-    document.getElementById("btnSaveTake")?.addEventListener("click", () => {
-      const title = (document.getElementById("takeTitle")?.value || "").trim();
-      const text  = (document.getElementById("takeText")?.value || "").trim();
-      if (!title || !text) return alert("Add a title and a one-paragraph take.");
-      document.dispatchEvent(new CustomEvent("takemade", { detail: { title, text } }));
-      if (takeComposer) takeComposer.style.display = "none";
-      document.getElementById("takeTitle").value = "";
-      document.getElementById("takeText").value = "";
-    });
+      document.getElementById("btn-new-scene")?.addEventListener("click", () => {
+        document.dispatchEvent(new CustomEvent("scenenext"));
+      });
 
-    // Scene controls (placeholders)
-    document.getElementById("btnShuffleScene")?.addEventListener("click", () => {
-      document.dispatchEvent(new CustomEvent("scenenext"));
-    });
-    document.getElementById("btnResetMode")?.addEventListener("click", () => {
-      document.dispatchEvent(new CustomEvent("modereset"));
-    });
+      document.getElementById("btn-reset")?.addEventListener("click", () => {
+        document.dispatchEvent(new CustomEvent("modereset"));
+      });
 
-    // Defaults
-    setSource("film");
-    setMode("viewPair");
+      document.getElementById("btn-copy-notes")?.addEventListener("click", async () => {
+        const txt = document.getElementById("notes-area")?.value || "";
+        try { await navigator.clipboard.writeText(txt); } catch(e) {}
+      });
+    })();
   </script>
 </body>
 </html>

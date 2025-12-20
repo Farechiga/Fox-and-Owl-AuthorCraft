@@ -1,512 +1,712 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Fox & Owl Story Studio — AuthorCraft Appreciation</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
-    :root {
-      --plum: #340c44;
+    :root{
+      --bg:#0b0610;
+      --panel: rgba(0,0,0,.52);
+      --panel2: rgba(0,0,0,.40);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.70);
+      --muted2: rgba(255,255,255,.55);
+
       --gold: #bd9b40;
-      --text: #f7efe3;
-      --muted: #d0ced4;
-      --black: #050505;
+      --gold2: rgba(189,155,64,.65);
+      --ink: rgba(0,0,0,.65);
+
+      --radius-xl: 26px;
+      --radius-lg: 20px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+
+      --shadow: 0 20px 70px rgba(0,0,0,.55);
+      --stroke: 1px solid rgba(189,155,64,.38);
+
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      --fontDisplay: ui-serif, Georgia, "Times New Roman", Times, serif;
     }
 
-    html, body { height: 100%; margin: 0; padding: 0; }
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background-color: var(--plum);
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      position: relative;
-      overflow: hidden;
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      color:var(--text);
+      font-family:var(--font);
+      background: radial-gradient(1000px 600px at 45% 20%, rgba(88,24,120,.55), rgba(11,6,16,.92) 60%, rgba(11,6,16,1) 100%);
+      overflow-x:hidden;
     }
 
-    /* Background overlay — used only for game modes */
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      opacity: 0.9;
-      pointer-events: none;
-      z-index: 0;
+    /* Background overlay (theater/library) */
+    .bg-overlay{
+      position:fixed;
+      inset:0;
+      z-index:-2;
+      background-size:cover;
+      background-position:center;
+      filter: blur(.0px);
+      opacity:.90;
+      transform: scale(1.02);
     }
-    body.mode-film::before { background-image: url("Theater overlay.png"); }
-    body.mode-literature::before { background-image: url("Library overlay.png"); }
-    body.landing::before { background-image: none; }
+    body[data-source="film"] .bg-overlay{ background-image:url("./Theater overlay.png"); }
+    body[data-source="literature"] .bg-overlay{ background-image:url("./Library overlay.png"); }
 
-    .app-root {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      max-width: 1200px;
-      padding: 24px;
-      box-sizing: border-box;
-      display: flex;
-      justify-content: center;
-    }
-    .hidden { display: none !important; }
-
-    /* -------- Landing screen -------- */
-    .landing-screen {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 24px;
-    }
-    .landing-logo {
-      max-width: 520px;
-      width: 80%;
-      height: auto;
-      display: block;
-    }
-    .play-button {
-      margin-top: 16px;
-      padding: 10px 32px;
-      border-radius: 999px;
-      border: 2px solid var(--gold);
-      background: transparent;
-      color: var(--gold);
-      font-size: 1.05rem;
-      font-weight: 600;
-      cursor: pointer;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      transition: transform 0.1s ease-out, box-shadow 0.1s ease-out, background 0.1s ease-out;
-    }
-    .play-button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.65);
-      background: rgba(0, 0, 0, 0.18);
+    .bg-vignette{
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      pointer-events:none;
+      background:
+        radial-gradient(800px 500px at 50% 35%, rgba(0,0,0,.10), rgba(0,0,0,.65) 70%),
+        linear-gradient(180deg, rgba(0,0,0,.20), rgba(0,0,0,.60));
     }
 
-    /* -------- Game screen -------- */
-    .game-screen {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
+    /* Layout shell */
+    .app{
+      min-height:100%;
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+      padding:18px 18px 22px;
     }
 
-    /* Toggle centered at top, like original */
-    .mode-toggle-wrapper {
-      position: absolute;
-      top: 26px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 2;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      justify-content: center;
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding:12px 14px;
+      border-radius: 24px;
+      border: var(--stroke);
+      background: linear-gradient(180deg, rgba(0,0,0,.45), rgba(0,0,0,.30));
+      box-shadow: 0 8px 30px rgba(0,0,0,.35);
     }
 
-    .mode-toggle {
-      display: inline-flex;
-      background: rgba(0, 0, 0, 0.7);
-      border-radius: 999px;
-      padding: 3px;
-      border: 1px solid rgba(0, 0, 0, 0.9);
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:280px;
     }
-
-    .mode-btn {
-      border: none;
-      padding: 6px 22px;
-      border-radius: 999px;
-      font-size: 0.85rem;
-      cursor: pointer;
-      background: transparent;
-      color: var(--muted);
-      transition: background 0.15s ease, color 0.15s ease;
-    }
-    .mode-btn.active {
-      background: #101010;
-      color: var(--gold);
-    }
-
-    .game-area {
-      width: 100%;
-      max-width: 900px;
-      margin: 110px auto 40px;
-      padding: 24px 26px 28px;
-      box-sizing: border-box;
-      border-radius: 18px;
-      background: radial-gradient(circle at top, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.85));
-      border: 1px solid rgba(189, 155, 64, 0.9);
-      box-shadow:
-        0 0 0 1px rgba(0, 0, 0, 0.5),
-        0 24px 50px rgba(0, 0, 0, 0.85);
-    }
-
-    .header-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      align-items: baseline;
-      margin-bottom: 16px;
-    }
-    .scene-title {
-      font-size: 1.1rem;
-      color: var(--gold);
-    }
-    .scene-text {
-      font-size: 0.98rem;
-      line-height: 1.5;
-      margin-bottom: 12px;
-      color: var(--text);
-    }
-
-    .meta-right {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 6px;
-    }
-    .tier-label {
-      font-size: 0.95rem;
-      color: var(--gold);
-    }
-    .gate-icons {
-      font-size: 1.1rem;
-      display: flex;
-      gap: 4px;
-      cursor: default;
-      user-select: none;
-    }
-    .gate-icon {
-      filter: drop-shadow(0 0 4px rgba(0,0,0,0.9));
-    }
-
-    /* Mode tabs: same pill language */
-    .mode-tabs {
-      display: inline-flex;
-      gap: 8px;
-      align-items: center;
-      justify-content: flex-start;
-      margin: 8px 0 12px;
-      flex-wrap: wrap;
-    }
-    .mode-tab {
-      text-align: center;
-      border-radius: 999px;
-      border: 1px solid rgba(0, 0, 0, 0.9);
-      background: var(--black);
-      color: var(--muted);
-      padding: 7px 14px;
-      font-size: 0.88rem;
-      cursor: pointer;
-      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out,
-        border-color 0.08s ease-out, background 0.08s ease-out;
-      user-select: none;
-    }
-    .mode-tab:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.65);
-      border-color: var(--gold);
-      background: #111111;
-      color: var(--text);
-    }
-    .mode-tab.active {
-      border-color: var(--gold);
-      color: var(--gold);
-    }
-
-    /* Mode prompt (short, non-dev) */
-    .mode-prompt {
-      font-size: 1.05rem;
-      font-weight: 500;
-      margin: 6px 0 12px;
-      color: var(--gold);
-    }
-
-    /* Views */
-    .mode-view { display: none; margin-top: 6px; }
-    .mode-view.active { display: block; }
-
-    /* Sub-panels inside views should match the “black pill / black panel” vibe */
-    .panel {
+    .brand img{
+      width:44px;
+      height:44px;
       border-radius: 14px;
-      border: 1px solid rgba(0, 0, 0, 0.9);
-      background: rgba(0,0,0,0.55);
-      padding: 14px 16px;
+      object-fit:cover;
+      border: 1px solid rgba(189,155,64,.35);
+      background: rgba(0,0,0,.35);
+    }
+    .brand h1{
+      margin:0;
+      font-family: var(--fontDisplay);
+      font-weight: 700;
+      letter-spacing: .02em;
+      font-size: 20px;
+      line-height: 1.1;
+    }
+    .brand .sub{
+      margin-top:2px;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing:.02em;
     }
 
-    /* Pair Match layout */
-    .pair-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    @media (max-width: 760px) {
-      .pair-grid { grid-template-columns: 1fr; }
-      .game-area { margin-top: 90px; padding: 18px 16px 22px; }
-      .mode-toggle-wrapper { top: 18px; }
-    }
-    .pair-col-title {
-      color: var(--gold);
-      font-weight: 600;
-      margin-bottom: 10px;
-      font-size: 0.95rem;
-    }
-    .list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .chip {
+    /* Toggle pill */
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:0;
+      padding:6px;
       border-radius: 999px;
-      border: 1px solid rgba(0, 0, 0, 0.9);
-      background: #0b0b0b;
-      color: var(--text);
-      padding: 10px 14px;
-      font-size: 0.95rem;
-      line-height: 1.25;
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(189,155,64,.28);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
     }
+    .pill button{
+      appearance:none;
+      border:0;
+      background:transparent;
+      color:var(--muted);
+      font-weight:600;
+      padding:10px 16px;
+      border-radius:999px;
+      cursor:pointer;
+      transition: all .15s ease;
+      letter-spacing:.01em;
+    }
+    .pill button.active{
+      color:var(--text);
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(189,155,64,.30);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
+    }
+    .pill button:not(.active):hover{ color:rgba(255,255,255,.86); }
+
+    .top-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:280px;
+      justify-content:flex-end;
+    }
+
+    .ghost{
+      appearance:none;
+      border: 1px solid rgba(189,155,64,.28);
+      background: rgba(0,0,0,.45);
+      color: rgba(255,255,255,.86);
+      border-radius: 999px;
+      padding:10px 14px;
+      font-weight:600;
+      cursor:pointer;
+      transition: all .15s ease;
+    }
+    .ghost:hover{ border-color: rgba(189,155,64,.45); }
+
+    /* Main panel */
+    .panel{
+      width:min(1320px, calc(100% - 6px));
+      margin:0 auto;
+      border-radius: var(--radius-xl);
+      border: var(--stroke);
+      background: linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.42));
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .panel-inner{
+      padding: 18px 18px 16px;
+    }
+
+    .scene-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:18px;
+      padding: 8px 6px 10px;
+    }
+
+    .scene-title{
+      font-family: var(--fontDisplay);
+      font-size: 28px;
+      letter-spacing:.01em;
+      margin:0 0 6px;
+      color: rgba(255,255,255,.92);
+    }
+
+    .scene-text{
+      margin:0;
+      color: rgba(255,255,255,.86);
+      font-size: 16px;
+      line-height: 1.55;
+      max-width: 980px;
+    }
+
+    .tier{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:10px;
+      min-width:140px;
+      padding-top: 6px;
+    }
+    .tier-badge{
+      color: var(--gold);
+      font-weight:700;
+      letter-spacing:.03em;
+      font-size: 14px;
+      padding:8px 12px;
+      border-radius:999px;
+      border: 1px solid rgba(189,155,64,.35);
+      background: rgba(0,0,0,.45);
+      white-space:nowrap;
+    }
+
+    /* Modes row */
+    .modes{
+      display:flex;
+      gap:10px;
+      padding: 10px 6px 14px;
+      flex-wrap:wrap;
+    }
+    .mode-btn{
+      appearance:none;
+      border: 1px solid rgba(255,255,255,.06);
+      background: rgba(0,0,0,.55);
+      color: rgba(255,255,255,.82);
+      border-radius:999px;
+      padding:10px 16px;
+      font-weight:700;
+      letter-spacing:.01em;
+      cursor:pointer;
+      transition: all .15s ease;
+    }
+    .mode-btn.active{
+      border-color: rgba(189,155,64,.45);
+      box-shadow: inset 0 0 0 1px rgba(189,155,64,.22);
+      color: var(--gold);
+    }
+    .mode-btn:hover{
+      border-color: rgba(189,155,64,.35);
+    }
+
+    .prompt{
+      padding: 0 6px 12px;
+      color: var(--gold);
+      font-weight:700;
+      font-size: 20px;
+      letter-spacing:.01em;
+    }
+
+    /* Mode sections */
+    .mode-section{ display:none; padding: 2px 6px 10px; }
+    .mode-section.active{ display:block; }
+
+    /* Pair match */
+    .pair-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:18px;
+      padding: 10px 0 6px;
+    }
+    .pair-col{
+      background: rgba(0,0,0,.25);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255,255,255,.05);
+      padding: 12px;
+      min-height: 260px;
+    }
+
+    /* Pair Match column headers: thin rounded rectangle, no fill */
+    .pair-column-title {
+      background: transparent !important;
+      border: 1px solid rgba(189,155,64,0.65);
+      border-radius: 14px;
+      padding: 10px 14px;
+      display:inline-block;
+      color: rgba(255,255,255,.92);
+      font-weight: 800;
+      letter-spacing:.01em;
+      margin: 2px 0 10px;
+    }
+
+    /* Chips (used by runtime) */
+    .chip{
+      user-select:none;
+      border-radius: 18px;
+      padding: 12px 14px;
+      background: rgba(0,0,0,.58);
+      border: 1px solid rgba(255,255,255,.06);
+      margin: 10px 0;
+      color: rgba(255,255,255,.90);
+      line-height: 1.25;
+      box-shadow: 0 10px 26px rgba(0,0,0,.25);
+    }
+    .chip.selected{
+      outline: 2px solid rgba(120,180,255,.95);
+      outline-offset: 2px;
+    }
+    .chip.disabled{
+      opacity:.38;
+      cursor:not-allowed !important;
+    }
+    .chip.dragging{ opacity:.60; }
 
     /* Sliders */
-    .slider-row {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 8px;
-      margin-bottom: 12px;
+    .sliders{
+      background: rgba(0,0,0,.25);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255,255,255,.05);
+      padding: 14px 14px 6px;
     }
-    .slider-axis {
-      color: var(--text);
-      font-size: 0.95rem;
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
+    .slider-row{ margin: 16px 0 18px; }
+    .slider-axis{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      color: rgba(255,255,255,.88);
+      font-weight:700;
+      font-size: 18px;
+      margin-bottom: 10px;
     }
-    input[type="range"] { width: 100%; accent-color: var(--gold); }
+    input[type="range"]{
+      width:100%;
+      accent-color: var(--gold);
+    }
 
     /* Buckets */
-    .bucket-grid {
-      display: grid;
+    .buckets-wrap{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
+    }
+    .elements-row{
+      background: rgba(0,0,0,.25);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255,255,255,.05);
+      padding: 12px 12px 2px;
+    }
+    .bucket-grid{
+      display:grid;
       grid-template-columns: 1fr 1fr 1fr;
-      gap: 12px;
+      gap:16px;
     }
-    @media (max-width: 900px) { .bucket-grid { grid-template-columns: 1fr; } }
-    .bucket-title {
+    .bucket{
+      background: rgba(0,0,0,.25);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255,255,255,.06);
+      min-height: 240px;
+      padding: 12px;
+      position:relative;
+    }
+    .bucket h3{
+      margin: 4px 4px 10px;
       color: var(--gold);
-      font-weight: 600;
-      margin-bottom: 10px;
-      font-size: 0.95rem;
+      font-family: var(--fontDisplay);
+      font-size: 22px;
+      letter-spacing:.01em;
     }
-    .bucket-drop {
-      min-height: 120px;
-      border-radius: 14px;
-      border: 1px solid rgba(0, 0, 0, 0.9);
-      background: rgba(0,0,0,0.4);
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+    .dropzone.dragover{
+      outline: 2px solid rgba(120,180,255,.90);
+      outline-offset: 3px;
     }
 
     /* Spotlights */
-    .spotlight {
-      border-radius: 14px;
-      border: 1px solid rgba(0, 0, 0, 0.9);
-      background: rgba(0,0,0,0.55);
-      padding: 12px 14px;
-      margin-bottom: 10px;
-      color: var(--text);
-      font-size: 0.95rem;
-      line-height: 1.35;
-      cursor: pointer;
+    .spotlights{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:12px;
+      padding: 10px 0 4px;
     }
-    .spotlight.selected {
-      outline: 2px solid rgba(189, 155, 64, 0.9);
-      outline-offset: 2px;
+    .spotlight{
+      border-radius: 18px;
+      padding: 14px 14px;
+      background: rgba(0,0,0,.58);
+      border: 1px solid rgba(255,255,255,.06);
+      color: rgba(255,255,255,.90);
+      box-shadow: 0 10px 26px rgba(0,0,0,.25);
+      cursor:pointer;
+      user-select:none;
+    }
+    .spotlight:hover{ border-color: rgba(189,155,64,.25); }
+    .spotlight.selected{
+      border-color: rgba(189,155,64,.55);
+      box-shadow: inset 0 0 0 1px rgba(189,155,64,.22), 0 14px 30px rgba(0,0,0,.35);
+    }
+
+    /* Footer */
+    .footer{
+      width:min(1320px, calc(100% - 6px));
+      margin:0 auto;
+      padding: 6px 6px 0;
+      color: rgba(255,255,255,.55);
+      font-size: 12px;
+      letter-spacing:.02em;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    /* Landing overlay */
+    .landing{
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 24px;
+      z-index: 50;
+      background: rgba(0,0,0,.35);
+      backdrop-filter: blur(5px);
+    }
+    .landing.hidden{ display:none; }
+
+    .landing-card{
+      width:min(860px, 96vw);
+      border-radius: 28px;
+      border: var(--stroke);
+      background: linear-gradient(180deg, rgba(0,0,0,.58), rgba(0,0,0,.44));
+      box-shadow: 0 30px 90px rgba(0,0,0,.55);
+      overflow:hidden;
+    }
+    .landing-content{
+      padding: 22px 22px 18px;
+    }
+    .landing-title{
+      font-family: var(--fontDisplay);
+      font-size: 34px;
+      margin: 0 0 6px;
+      letter-spacing:.01em;
+    }
+    .landing-desc{
+      margin:0;
+      color: rgba(255,255,255,.82);
+      font-size: 15px;
+      line-height: 1.55;
+      max-width: 720px;
+    }
+    .landing-actions{
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      padding: 14px 22px 20px;
+      border-top: 1px solid rgba(255,255,255,.06);
+    }
+    .primary{
+      appearance:none;
+      border: 1px solid rgba(189,155,64,.55);
+      background: rgba(0,0,0,.55);
+      color: var(--gold);
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-weight: 900;
+      letter-spacing:.03em;
+      cursor:pointer;
+    }
+    .primary:hover{
+      border-color: rgba(189,155,64,.75);
+    }
+
+    @media (max-width: 920px){
+      .pair-grid{ grid-template-columns: 1fr; }
+      .bucket-grid{ grid-template-columns: 1fr; }
+      .brand{ min-width:unset; }
+      .top-actions{ min-width:unset; }
+      .scene-title{ font-size: 24px; }
+      .prompt{ font-size: 18px; }
     }
   </style>
 </head>
 
-<body class="landing">
-  <div class="app-root">
+<body data-source="film" data-mode="pairMatch">
+  <div class="bg-overlay" aria-hidden="true"></div>
+  <div class="bg-vignette" aria-hidden="true"></div>
 
-    <!-- Landing Screen -->
-    <section id="landing-screen" class="landing-screen">
-      <img
-        src="Fox and Owl Story Studio Logo.png"
-        alt="The Fox & Owl Story Studio"
-        class="landing-logo"
-      />
-      <button id="play-btn" class="play-button">Play!</button>
-    </section>
-
-    <!-- Game Screen -->
-    <section id="game-screen" class="game-screen hidden">
-      <div class="mode-toggle-wrapper" aria-label="Medium toggle">
-        <div class="mode-toggle">
-          <button id="mode-film" class="mode-btn active" data-mode="film" type="button">Film</button>
-          <button id="mode-literature" class="mode-btn" data-mode="literature" type="button">Literature</button>
+  <!-- Landing -->
+  <div class="landing" id="landing">
+    <div class="landing-card">
+      <div class="landing-content">
+        <div style="display:flex; align-items:center; gap:14px;">
+          <img src="./Fox and Owl Story Studio Logo.png" alt="Fox & Owl" style="width:56px;height:56px;border-radius:16px;border:1px solid rgba(189,155,64,.35);background:rgba(0,0,0,.35);" />
+          <div>
+            <h2 class="landing-title" style="margin:0;">AuthorCraft Appreciation</h2>
+            <div style="color:rgba(255,255,255,.65); font-size:12px; letter-spacing:.02em; margin-top:4px;">
+              Fox & Owl Story Studio
+            </div>
+          </div>
         </div>
+
+        <p class="landing-desc" style="margin-top:14px;">
+          Practice noticing how scenes work—micro-moments, tone, status, constraint, timing, and contrast.
+          No scoring. No “correct answers.” Just sharper reading & viewing.
+        </p>
       </div>
-
-      <div id="game-area" class="game-area">
-        <div class="header-row">
-          <div id="scene-title" class="scene-title">Scene —</div>
-          <div class="meta-right">
-            <div id="gate-icons" class="gate-icons" aria-label="Attractors"></div>
-            <div id="tier-label" class="tier-label"></div>
-          </div>
-        </div>
-
-        <div id="scene-text" class="scene-text"></div>
-
-        <div class="mode-tabs" role="tablist" aria-label="AuthorCraft modes">
-          <button id="tab-pair" class="mode-tab active" type="button" role="tab" aria-selected="true">Pair Match</button>
-          <button id="tab-sliders" class="mode-tab" type="button" role="tab" aria-selected="false">Sliders</button>
-          <button id="tab-buckets" class="mode-tab" type="button" role="tab" aria-selected="false">Buckets</button>
-          <button id="tab-spotlights" class="mode-tab" type="button" role="tab" aria-selected="false">Spotlights</button>
-        </div>
-
-        <div id="mode-prompt" class="mode-prompt"></div>
-
-        <!-- Pair Match -->
-        <div id="view-pair" class="mode-view active" aria-label="Pair Match view">
-          <div class="pair-grid">
-            <div class="panel">
-              <div class="pair-col-title">Micro-moments</div>
-              <div id="pair-left" class="list"></div>
-            </div>
-            <div class="panel">
-              <div class="pair-col-title">Why they land</div>
-              <div id="pair-right" class="list"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Sliders -->
-        <div id="view-sliders" class="mode-view" aria-label="Sliders view">
-          <div class="panel">
-            <div id="sliders-container"></div>
-          </div>
-        </div>
-
-        <!-- Buckets -->
-        <div id="view-buckets" class="mode-view" aria-label="Buckets view">
-          <div class="panel" style="margin-bottom:12px;">
-            <div class="pair-col-title">Elements</div>
-            <div id="bucket-elements" class="list"></div>
-          </div>
-
-          <div class="bucket-grid">
-            <div class="panel">
-              <div class="bucket-title">Engine</div>
-              <div id="bucket-engine" class="bucket-drop"></div>
-            </div>
-            <div class="panel">
-              <div class="bucket-title">Support</div>
-              <div id="bucket-support" class="bucket-drop"></div>
-            </div>
-            <div class="panel">
-              <div class="bucket-title">Spice</div>
-              <div id="bucket-spice" class="bucket-drop"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Spotlights -->
-        <div id="view-spotlights" class="mode-view" aria-label="Spotlights view">
-          <div id="spotlights-container"></div>
-        </div>
-
+      <div class="landing-actions">
+        <button class="ghost" id="howItWorksBtn" type="button">How it works</button>
+        <button class="primary" id="enterBtn" type="button">Play</button>
       </div>
-    </section>
+    </div>
   </div>
 
-  <!-- Keep your existing runtime filename Updated to module script type -->
-  <script type="module" src="./CraftAppreciation.js"></script>
+  <div class="app" id="appRoot">
+    <!-- Top bar -->
+    <div class="topbar">
+      <div class="brand">
+        <img src="./Fox and Owl Story Studio Logo.png" alt="Fox & Owl Story Studio" />
+        <div>
+          <h1>Fox & Owl Story Studio</h1>
+          <div class="sub">AuthorCraft Appreciation</div>
+        </div>
+      </div>
 
+      <div class="pill" role="tablist" aria-label="Source toggle">
+        <button id="btnFilm" class="active" type="button" role="tab" aria-selected="true">Film</button>
+        <button id="btnLit" type="button" role="tab" aria-selected="false">Literature</button>
+      </div>
+
+      <div class="top-actions">
+        <button class="ghost" id="nextSceneBtn" type="button" title="Next scene">Next</button>
+        <button class="ghost" id="aboutBtn" type="button">About</button>
+      </div>
+    </div>
+
+    <!-- Main panel -->
+    <div class="panel">
+      <div class="panel-inner">
+        <div class="scene-head">
+          <div>
+            <h2 class="scene-title" id="scene-title">Scene —</h2>
+            <p class="scene-text" id="scene-text"></p>
+          </div>
+          <div class="tier">
+            <div class="tier-badge" id="tier-label">Lantern</div>
+          </div>
+        </div>
+
+        <div class="modes" role="tablist" aria-label="Mode toggle">
+          <button class="mode-btn active" data-mode="pairMatch" type="button">Pair Match</button>
+          <button class="mode-btn" data-mode="sliders" type="button">Sliders</button>
+          <button class="mode-btn" data-mode="rankBuckets" type="button">Buckets</button>
+          <button class="mode-btn" data-mode="interpretiveTakes" type="button">Spotlights</button>
+        </div>
+
+        <div class="prompt" id="mode-prompt"></div>
+
+        <!-- Pair Match -->
+        <section class="mode-section active" id="mode-pairMatch" aria-label="Pair Match mode">
+          <div class="pair-grid">
+            <div class="pair-col">
+              <div class="pair-column-title">Micro-moments</div>
+              <div id="pair-left"></div>
+            </div>
+            <div class="pair-col">
+              <div class="pair-column-title">Why they land</div>
+              <div id="pair-right"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Sliders -->
+        <section class="mode-section" id="mode-sliders" aria-label="Sliders mode">
+          <div class="sliders">
+            <div id="sliders-container"></div>
+          </div>
+        </section>
+
+        <!-- Buckets -->
+        <section class="mode-section" id="mode-rankBuckets" aria-label="Buckets mode">
+          <div class="buckets-wrap">
+            <div class="elements-row">
+              <div style="color:var(--gold); font-weight:900; letter-spacing:.02em; padding: 4px 6px 10px; font-size:18px;">
+                Elements
+              </div>
+              <div id="bucket-elements"></div>
+            </div>
+
+            <div class="bucket-grid">
+              <div class="bucket dropzone" id="bucket-engine">
+                <h3>Engine</h3>
+              </div>
+              <div class="bucket dropzone" id="bucket-support">
+                <h3>Support</h3>
+              </div>
+              <div class="bucket dropzone" id="bucket-spice">
+                <h3>Spice</h3>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Spotlights -->
+        <section class="mode-section" id="mode-interpretiveTakes" aria-label="Spotlights mode">
+          <div class="spotlights" id="spotlights-container"></div>
+        </section>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div>Fox & Owl — AuthorCraft Appreciation • No scoring • Practice noticing</div>
+      <div style="color:rgba(255,255,255,.45);">v0.1</div>
+    </div>
+  </div>
+
+  <!-- UI wiring (non-module; safe) -->
   <script>
     (function () {
-      const landingScreen = document.getElementById("landing-screen");
-      const gameScreen = document.getElementById("game-screen");
-      const playBtn = document.getElementById("play-btn");
+      const landing = document.getElementById("landing");
+      const enterBtn = document.getElementById("enterBtn");
+      const howBtn = document.getElementById("howItWorksBtn");
 
-      const filmBtn = document.getElementById("mode-film");
-      const litBtn  = document.getElementById("mode-literature");
+      const btnFilm = document.getElementById("btnFilm");
+      const btnLit = document.getElementById("btnLit");
+      const nextSceneBtn = document.getElementById("nextSceneBtn");
+      const aboutBtn = document.getElementById("aboutBtn");
 
-      const promptEl = document.getElementById("mode-prompt");
+      const modeButtons = Array.from(document.querySelectorAll(".mode-btn"));
+      const modeSections = {
+        pairMatch: document.getElementById("mode-pairMatch"),
+        sliders: document.getElementById("mode-sliders"),
+        rankBuckets: document.getElementById("mode-rankBuckets"),
+        interpretiveTakes: document.getElementById("mode-interpretiveTakes")
+      };
 
-      const tabDefs = [
-        { id: "tab-pair", view: "view-pair", key: "pairMatch",
-          prompt: "Match micro-moments to why they land. Make the strongest read you can defend." },
-        { id: "tab-sliders", view: "view-sliders", key: "sliders",
-          prompt: "Set your read using descriptive axes." },
-        { id: "tab-buckets", view: "view-buckets", key: "rankBuckets",
-          prompt: "Sort the craft elements by what drives the scene." },
-        { id: "tab-spotlights", view: "view-spotlights", key: "interpretiveTakes",
-          prompt: "Choose the spotlights that can coexist." }
-      ];
-
-      function setMedium(medium) {
-        const isFilm = medium === "film";
-        filmBtn.classList.toggle("active", isFilm);
-        litBtn.classList.toggle("active", !isFilm);
-
-        document.body.classList.remove("landing", "mode-film", "mode-literature");
-        document.body.classList.add(isFilm ? "mode-film" : "mode-literature");
-
-        document.dispatchEvent(new CustomEvent("sourcechange", { detail: { source: medium } }));
+      function dispatch(name, detail) {
+        document.dispatchEvent(new CustomEvent(name, { detail }));
       }
 
-      function setTab(tabId) {
-        for (const t of tabDefs) {
-          const tab = document.getElementById(t.id);
-          const view = document.getElementById(t.view);
-          const active = t.id === tabId;
-          tab.classList.toggle("active", active);
-          tab.setAttribute("aria-selected", active ? "true" : "false");
-          view.classList.toggle("active", active);
-          if (active && promptEl) promptEl.textContent = t.prompt;
-
-          if (active) {
-            document.dispatchEvent(new CustomEvent("modechange", { detail: { modeKey: t.key } }));
-          }
-        }
+      function setSource(source) {
+        document.body.setAttribute("data-source", source);
+        const isFilm = source === "film";
+        btnFilm.classList.toggle("active", isFilm);
+        btnFilm.setAttribute("aria-selected", String(isFilm));
+        btnLit.classList.toggle("active", !isFilm);
+        btnLit.setAttribute("aria-selected", String(!isFilm));
+        dispatch("sourcechange", { source });
       }
 
-      function enterGame() {
-        landingScreen.classList.add("hidden");
-        gameScreen.classList.remove("hidden");
+      function setMode(modeKey) {
+        document.body.setAttribute("data-mode", modeKey);
 
-        // Default medium: Film (you requested default; no extra buttons)
-        setMedium("film");
+        modeButtons.forEach(btn => {
+          const active = btn.dataset.mode === modeKey;
+          btn.classList.toggle("active", active);
+          btn.setAttribute("aria-selected", String(active));
+        });
 
-        // Default mode tab
-        setTab("tab-pair");
+        Object.keys(modeSections).forEach(k => {
+          modeSections[k].classList.toggle("active", k === modeKey);
+        });
 
-        // Ask runtime to load a scene (your renderer will listen)
-        document.dispatchEvent(new CustomEvent("scenenext"));
+        dispatch("modechange", { modeKey });
       }
 
-      playBtn.addEventListener("click", enterGame);
+      // Landing
+      enterBtn.addEventListener("click", () => {
+        landing.classList.add("hidden");
+        // default start
+        setSource("film");
+        setMode("pairMatch");
+      });
 
-      filmBtn.addEventListener("click", () => setMedium("film"));
-      litBtn.addEventListener("click", () => setMedium("literature"));
+      howBtn.addEventListener("click", () => {
+        alert(
+          "You’re not being tested.\n\n" +
+          "Make the strongest read you can defend:\n" +
+          "• Micro before macro: cite a gesture, cut, phrase, or beat.\n" +
+          "• Name the mechanism: status, irony, constraint, timing, contrast.\n" +
+          "• Allow two truths: multiple readings can be valid."
+        );
+      });
 
-      for (const t of tabDefs) {
-        document.getElementById(t.id).addEventListener("click", () => setTab(t.id));
-      }
+      // Source toggle
+      btnFilm.addEventListener("click", () => setSource("film"));
+      btnLit.addEventListener("click", () => setSource("literature"));
 
-      // When your renderer decides the user has completed the current mode,
-      // it should dispatch: document.dispatchEvent(new CustomEvent("advance"));
-      // This index file does not implement correctness/advancing logic, which lives in the JS file.
+      // Mode toggle
+      modeButtons.forEach(btn => btn.addEventListener("click", () => setMode(btn.dataset.mode)));
+
+      // Next scene (manual)
+      nextSceneBtn.addEventListener("click", () => dispatch("scenenext", {}));
+
+      // About
+      aboutBtn.addEventListener("click", () => {
+        alert(
+          "AuthorCraft Appreciation\n\n" +
+          "A practice tool for noticing how scenes work.\n" +
+          "No scoring. No correctness feedback.\n" +
+          "Built in Fox & Owl Story Studio."
+        );
+      });
+
+      // If you want to skip the landing during development, uncomment:
+      // landing.classList.add("hidden"); setSource("film"); setMode("pairMatch");
     })();
   </script>
+
+  <!-- Runtime (ES module) -->
+  <script type="module" src="./CraftAppreciation.js?v=1"></script>
 </body>
 </html>

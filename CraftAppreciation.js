@@ -1,93 +1,18 @@
 // CraftAppreciation.js
 // Runtime for AuthorCraft Appreciation
-// Requires ES module exports:
-//   - filmPacks.js exporting FILM_PACKS
-//   - litPacks.js exporting LIT_PACKS
+// Loads packs from filmPacks.js / litPacks.js (ES modules)
+// Implements: Landing → Game, Film/Literature toggle, 4-step scene flow, scoring (scenes completed),
+// PairMatch correctness (with shuffle), Sliders with explicit scope line, Buckets with visible labels + drag/drop,
+// Spotlights = rank top 3 with dusty-rose highlight (#b585b7), auto-advance (no Next button).
 
 import { FILM_PACKS } from "./filmPacks.js";
 import { LIT_PACKS } from "./litPacks.js";
 
-/* ---------------------------
-   Fixed scene workflow
-----------------------------*/
-const MODE_ORDER = ["pairMatch", "sliders", "rankBuckets", "interpretiveTakes"];
-const MODE_LABELS = {
-  pairMatch: "Pair Match",
-  sliders: "Sliders",
-  rankBuckets: "Buckets",
-  interpretiveTakes: "Spotlights",
-};
-
-/* ---------------------------
-   State
-----------------------------*/
-const state = {
-  // "film" | "literature"
-  source: "film",
-
-  // step index into MODE_ORDER
-  stepIndex: 0,
-
-  // current pack
-  pack: null,
-  usedIds: new Set(),
-
-  // scoring
-  scenesCompleted: 0,
-
-  // interaction state
-  pair: {
-    selectedLeftId: null,
-    placed: new Map(), // leftId -> rightId
-    correctLeftIds: new Set(),
-    wrongAttempts: 0,
-  },
-
-  sliders: {
-    touchedIds: new Set(),
-  },
-
-  buckets: {
-    placed: new Map(), // cardId -> bucketId
-  },
-
-  spotlights: {
-    // rank slots: [takeId, takeId, takeId]
-    top3: [null, null, null],
-  },
-};
-
-/* ---------------------------
+/* =========================
    DOM helpers
-----------------------------*/
+========================= */
 const $ = (id) => document.getElementById(id);
-
-function setText(id, text) {
-  const el = $(id);
-  if (el) el.textContent = text ?? "";
-}
-
-function setHTML(id, html) {
-  const el = $(id);
-  if (el) el.innerHTML = html ?? "";
-}
-
-function show(id) {
-  const el = $(id);
-  if (el) el.style.display = "";
-}
-
-function hide(id) {
-  const el = $(id);
-  if (el) el.style.display = "none";
-}
-
-function clear(id) {
-  const el = $(id);
-  if (el) el.innerHTML = "";
-}
-
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const setHidden = (el, hidden) => el.classList.toggle("hidden", !!hidden);
 
 function shuffle(arr) {
   const a = [...arr];
@@ -98,609 +23,725 @@ function shuffle(arr) {
   return a;
 }
 
-/* ---------------------------
-   Pack selection
-----------------------------*/
-function getPool() {
-  return state.source === "film" ? FILM_PACKS : LIT_PACKS;
-}
+/* =========================
+   State
+========================= */
+const state = {
+  mode: "film", // "film" | "literature"
+  stepIndex: 0, // 0..3
+  currentPack: null,
 
-function pickNextPack() {
-  const pool = getPool();
-  if (!Array.isArray(pool) || pool.length === 0) return null;
+  scenesCompleted: 0,
 
-  const available = pool.filter((p) => !state.usedIds.has(p.id));
-  const choicePool = available.length ? available : pool;
+  usedFilm: new Set(),
+  usedLit: new Set(),
 
-  const pack = choicePool[Math.floor(Math.random() * choicePool.length)];
-  if (!available.length) state.usedIds.clear();
+  // PairMatch interaction
+  pair: {
+    selectedLeftId: null,
+    selectedRightId: null,
+    matchedLeft: new Set(),
+    matchedRight: new Set(),
+    pairMap: new Map(), // leftId -> rightId
+  },
 
-  state.usedIds.add(pack.id);
-  return pack;
-}
+  // Sliders interaction
+  sliders: {
+    touched: new Set(), // axis ids touched
+  },
 
-/* ---------------------------
-   Scene lifecycle
-----------------------------*/
-function currentModeKey() {
-  return MODE_ORDER[state.stepIndex] || "pairMatch";
-}
+  // Buckets interaction
+  buckets: {
+    placement: new Map(), // elementId -> bucketId
+  },
 
-function resetForNewScene() {
-  state.stepIndex = 0;
+  // Spotlights interaction
+  spotlights: {
+    rank: [null, null, null], // take ids ranked 1..3
+  },
+};
 
-  state.pair.selectedLeftId = null;
-  state.pair.placed = new Map();
-  state.pair.correctLeftIds = new Set();
-  state.pair.wrongAttempts = 0;
+/* =========================
+   Elements (from index.html)
+========================= */
+const els = {
+  // Screens
+  landingScreen: $("landingScreen"),
+  gameScreen: $("gameScreen"),
 
-  state.sliders.touchedIds = new Set();
+  // Landing
+  playBtn: $("playBtn"),
 
-  state.buckets.placed = new Map();
+  // Mode toggle
+  btnFilm: $("btnFilm"),
+  btnLiterature: $("btnLiterature"),
 
-  state.spotlights.top3 = [null, null, null];
-}
+  // Header / scene
+  sceneTitle: $("sceneTitle"),
+  tierPill: $("tierPill"),
+  sceneText: $("sceneText"),
+  scenesCompleted: $("scenesCompleted"),
 
-function loadNewScene() {
-  state.pack = pickNextPack();
-  resetForNewScene();
-  renderAll();
-}
+  // Stepper
+  stepPair: $("stepPair"),
+  stepSliders: $("stepSliders"),
+  stepBuckets: $("stepBuckets"),
+  stepSpotlights: $("stepSpotlights"),
 
-/* ---------------------------
-   Header / chrome
-----------------------------*/
-function renderHeader(pack) {
-  setText("scene-title", `Scene — ${pack?.sceneTitle || ""}`);
-  setText("scene-text", pack?.scene || "");
-  setText("tier-label", pack?.tier || "");
+  // Panels
+  panelPairMatch: $("panelPairMatch"),
+  panelSliders: $("panelSliders"),
+  panelBuckets: $("panelBuckets"),
+  panelSpotlights: $("panelSpotlights"),
 
-  // remove attractors from UI (editor-only metadata)
-  clear("gate-icons");
+  // Pair Match
+  pairPrompt: $("pairPrompt"),
+  pairLeft: $("pairLeft"),
+  pairRight: $("pairRight"),
 
-  setText("score-label", `Scenes completed: ${state.scenesCompleted}`);
+  // Sliders
+  slidersPrompt: $("slidersPrompt"),
+  slidersScope: $("slidersScope"),
+  slidersContainer: $("slidersContainer"),
 
-  renderModeProgress();
-  renderModePills();
-}
+  // Buckets
+  bucketsPrompt: $("bucketsPrompt"),
+  bucketsContainer: $("bucketsContainer"),
 
-function renderModeProgress() {
-  const wrap = $("mode-progress");
-  if (!wrap) return;
+  // Spotlights
+  spotlightsPrompt: $("spotlightsPrompt"),
+  spotlightsList: $("spotlightsList"),
+};
 
-  wrap.innerHTML = "";
+/* =========================
+   Init
+========================= */
+function init() {
+  // Landing: start in landing mode (no overlay)
+  document.body.classList.add("landing");
+  document.body.classList.remove("mode-film", "mode-literature");
 
-  MODE_ORDER.forEach((mk, idx) => {
-    const step = document.createElement("div");
-    step.className = "step";
-
-    const done = idx < state.stepIndex;
-    const active = idx === state.stepIndex;
-
-    if (done) step.classList.add("done");
-    if (active) step.classList.add("active");
-
-    step.textContent = MODE_LABELS[mk] || mk;
-    wrap.appendChild(step);
+  // Button bindings
+  els.playBtn.addEventListener("click", () => {
+    enterGame();
   });
+
+  els.btnFilm.addEventListener("click", () => switchMode("film"));
+  els.btnLiterature.addEventListener("click", () => switchMode("literature"));
+
+  // Set initial counter
+  updateScenesCompletedUI();
+
+  // Keep on landing until Play
+  setHidden(els.landingScreen, false);
+  setHidden(els.gameScreen, true);
 }
 
-function renderModePills() {
-  // pills are shown but locked to current step (you can’t skip ahead)
-  const pills = [
-    ["mode-pill-pair", "pairMatch"],
-    ["mode-pill-sliders", "sliders"],
-    ["mode-pill-buckets", "rankBuckets"],
-    ["mode-pill-spotlights", "interpretiveTakes"],
-  ];
+window.addEventListener("DOMContentLoaded", init);
 
-  pills.forEach(([id, mk]) => {
-    const el = $(id);
-    if (!el) return;
+/* =========================
+   Navigation / Mode
+========================= */
+function enterGame() {
+  // Show game screen
+  setHidden(els.landingScreen, true);
+  setHidden(els.gameScreen, false);
 
-    const active = mk === currentModeKey();
-    el.classList.toggle("active", active);
+  // Default mode = film
+  state.mode = "film";
+  updateModeUI();
 
-    // lock: only allow going back to earlier completed steps if you want (optional).
-    // For now: hard-lock to current step for a clean 4-step flow.
-    el.onclick = () => {};
-    el.style.cursor = "default";
-    el.style.opacity = active ? "1" : "0.85";
-  });
-}
-
-/* ---------------------------
-   Completion + step advance
-----------------------------*/
-async function advanceStepOrScene() {
-  await sleep(250);
-
-  if (state.stepIndex < MODE_ORDER.length - 1) {
-    state.stepIndex += 1;
-
-    // reset mode-specific transient selection on step change
-    state.pair.selectedLeftId = null;
-
-    renderAll();
-    return;
-  }
-
-  // completed scene
-  state.scenesCompleted += 1;
+  // Load first scene
   loadNewScene();
 }
 
-function setHint(text) {
-  const el = $("hint-line");
-  if (!el) return;
-  el.textContent = text || "";
+function switchMode(mode) {
+  if (state.mode === mode) return;
+
+  // Switching mode abandons current run (as requested)
+  state.mode = mode;
+  updateModeUI();
+  loadNewScene();
 }
 
-/* ---------------------------
-   Mode renderers
-----------------------------*/
-function renderPairMatch(pack) {
-  const m = pack?.modes?.pairMatch;
-  if (!m) return;
+function updateModeUI() {
+  // Body overlay
+  document.body.classList.remove("landing");
+  document.body.classList.toggle("mode-film", state.mode === "film");
+  document.body.classList.toggle("mode-literature", state.mode === "literature");
 
-  setText("mode-prompt", m.prompt || "Match the micro-moments to why they land.");
+  // Toggle button states
+  els.btnFilm.classList.toggle("active", state.mode === "film");
+  els.btnFilm.setAttribute("aria-selected", state.mode === "film" ? "true" : "false");
 
-  // build answer key from pairs
-  const key = new Map((m.pairs || []).map((p) => [p.leftId, p.rightId]));
+  els.btnLiterature.classList.toggle("active", state.mode === "literature");
+  els.btnLiterature.setAttribute("aria-selected", state.mode === "literature" ? "true" : "false");
+}
 
-  // shuffle both columns
-  const left = shuffle(m.leftCards || []);
-  const right = shuffle(m.rightCards || []);
+/* =========================
+   Scene Selection / Header
+========================= */
+function getPackListForMode() {
+  return state.mode === "film" ? FILM_PACKS : LIT_PACKS;
+}
+function getUsedSetForMode() {
+  return state.mode === "film" ? state.usedFilm : state.usedLit;
+}
 
-  const leftWrap = $("pair-left");
-  const rightWrap = $("pair-right");
-  if (!leftWrap || !rightWrap) return;
+function pickNextPack() {
+  const packs = getPackListForMode();
+  const used = getUsedSetForMode();
 
-  leftWrap.innerHTML = "";
-  rightWrap.innerHTML = "";
+  // Filter by momentType AuthorCraft if present (guardrail)
+  const eligible = packs.filter((p) => !p.momentType || p.momentType === "AuthorCraft");
+  const remaining = eligible.filter((p) => !used.has(p.id));
 
-  setHint("");
+  const pool = remaining.length ? remaining : eligible;
+  if (!pool.length) return null;
 
-  // Left list
-  left.forEach((card) => {
-    const row = document.createElement("div");
-    row.className = "chip";
-    row.textContent = card.text;
+  // If exhausted, reset used set
+  if (!remaining.length) used.clear();
 
-    const isCorrectDone = state.pair.correctLeftIds.has(card.id);
-    const isSelected = state.pair.selectedLeftId === card.id;
+  const chosen = pool[Math.floor(Math.random() * pool.length)];
+  used.add(chosen.id);
+  return chosen;
+}
 
-    if (isCorrectDone) row.classList.add("done");
-    if (isSelected) row.classList.add("selected");
+function loadNewScene() {
+  const pack = pickNextPack();
+  if (!pack) return;
 
-    row.onclick = () => {
-      if (isCorrectDone) return;
-      state.pair.selectedLeftId = card.id;
-      setHint("Now choose the best match on the right.");
-      renderAll();
-    };
+  state.currentPack = pack;
 
-    leftWrap.appendChild(row);
-  });
+  // Reset per-scene interaction state
+  resetSceneInteractionState();
 
-  // Right list
-  right.forEach((card) => {
-    const row = document.createElement("div");
-    row.className = "chip";
-    row.textContent = card.text;
+  // Render header
+  renderSceneHeader(pack);
 
-    // optional: prevent using same right card multiple times
-    const usedRight = Array.from(state.pair.placed.values()).includes(card.id);
-    if (usedRight) row.classList.add("disabled");
+  // Start at step 0 (Pair Match)
+  goToStep(0);
+}
 
-    row.onclick = () => {
-      const leftId = state.pair.selectedLeftId;
-      if (!leftId) {
-        setHint("Pick a micro-moment on the left first.");
-        return;
-      }
-      if (state.pair.correctLeftIds.has(leftId)) return;
-      if (usedRight) return;
+function resetSceneInteractionState() {
+  state.stepIndex = 0;
 
-      const correctRightId = key.get(leftId);
+  state.pair.selectedLeftId = null;
+  state.pair.selectedRightId = null;
+  state.pair.matchedLeft = new Set();
+  state.pair.matchedRight = new Set();
+  state.pair.pairMap = new Map();
 
-      if (card.id === correctRightId) {
-        state.pair.placed.set(leftId, card.id);
-        state.pair.correctLeftIds.add(leftId);
-        state.pair.selectedLeftId = null;
-        setHint("✓ Nice. Next one.");
+  state.sliders.touched = new Set();
 
-        // completion
-        const needed = (m.leftCards || []).length;
-        if (needed > 0 && state.pair.correctLeftIds.size >= needed) {
-          setHint("✓ Pair Match complete.");
-          advanceStepOrScene();
-        } else {
-          renderAll();
-        }
-      } else {
-        state.pair.wrongAttempts += 1;
-        setHint("Not quite — try a different ‘why it lands.’");
-        // subtle shake, no red/green
-        row.classList.add("shake");
-        setTimeout(() => row.classList.remove("shake"), 260);
-      }
-    };
+  state.buckets.placement = new Map();
 
-    rightWrap.appendChild(row);
+  state.spotlights.rank = [null, null, null];
+}
+
+function renderSceneHeader(pack) {
+  els.sceneTitle.textContent = `Scene — ${pack.sceneTitle || ""}`.trim();
+  els.tierPill.textContent = pack.tier || "Lantern";
+  els.sceneText.textContent = pack.scene || "";
+}
+
+/* =========================
+   Stepper / Panels
+========================= */
+const STEPS = ["pairMatch", "sliders", "rankBuckets", "spotlights"];
+
+function goToStep(stepIndex) {
+  state.stepIndex = stepIndex;
+  updateStepperUI(stepIndex);
+
+  // Hide all panels, show current
+  setHidden(els.panelPairMatch, stepIndex !== 0);
+  setHidden(els.panelSliders, stepIndex !== 1);
+  setHidden(els.panelBuckets, stepIndex !== 2);
+  setHidden(els.panelSpotlights, stepIndex !== 3);
+
+  // Render current step
+  if (stepIndex === 0) renderPairMatch();
+  if (stepIndex === 1) renderSliders();
+  if (stepIndex === 2) renderBuckets();
+  if (stepIndex === 3) renderSpotlights();
+}
+
+function updateStepperUI(stepIndex) {
+  const stepEls = [els.stepPair, els.stepSliders, els.stepBuckets, els.stepSpotlights];
+
+  stepEls.forEach((el, i) => {
+    el.classList.toggle("active", i === stepIndex);
+    el.classList.toggle("done", i < stepIndex);
   });
 }
 
-function renderSliders(pack) {
-  const m = pack?.modes?.sliders;
-  if (!m) return;
+function completeCurrentStep() {
+  const next = state.stepIndex + 1;
 
-  // REQUIRED: declare scope (scene vs character vs relationship)
-  const scope = m.scopeLabel ? `Scope: ${m.scopeLabel}. ` : "";
-  setText("mode-prompt", `${scope}${m.prompt || "Set your read using descriptive axes."}`);
+  if (next <= 3) {
+    goToStep(next);
+    return;
+  }
 
-  const wrap = $("sliders-container");
-  if (!wrap) return;
-  wrap.innerHTML = "";
+  // Completed Spotlights -> scene complete -> score++ -> auto-advance
+  state.scenesCompleted += 1;
+  updateScenesCompletedUI();
+  loadNewScene();
+}
 
-  setHint("Move each slider at least once.");
+function updateScenesCompletedUI() {
+  els.scenesCompleted.textContent = String(state.scenesCompleted);
+}
 
-  const axes = m.sliders || [];
+/* =========================
+   STEP 1: Pair Match (with correctness + shuffle)
+========================= */
+function renderPairMatch() {
+  const pack = state.currentPack;
+  const mode = pack?.modes?.pairMatch;
+  if (!mode) {
+    // If a pack is missing this mode, skip forward
+    completeCurrentStep();
+    return;
+  }
+
+  // Prompt
+  els.pairPrompt.textContent = mode.prompt || "Pair Match";
+
+  // Build pair map (leftId -> rightId)
+  state.pair.pairMap = new Map((mode.pairs || []).map((p) => [p.leftId, p.rightId]));
+
+  // Shuffle display order (critical fix: no row-by-row alignment)
+  const leftCards = shuffle(mode.leftCards || []);
+  const rightCards = shuffle(mode.rightCards || []);
+
+  // Reset containers
+  els.pairLeft.innerHTML = "";
+  els.pairRight.innerHTML = "";
+
+  // Render left
+  leftCards.forEach((c) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.dataset.side = "left";
+    card.dataset.id = c.id;
+    card.textContent = c.text;
+
+    card.addEventListener("click", () => onPairCardClick("left", c.id, card));
+    els.pairLeft.appendChild(card);
+  });
+
+  // Render right
+  rightCards.forEach((c) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.dataset.side = "right";
+    card.dataset.id = c.id;
+    card.textContent = c.text;
+
+    card.addEventListener("click", () => onPairCardClick("right", c.id, card));
+    els.pairRight.appendChild(card);
+  });
+}
+
+function onPairCardClick(side, id, el) {
+  // Ignore already matched
+  if (side === "left" && state.pair.matchedLeft.has(id)) return;
+  if (side === "right" && state.pair.matchedRight.has(id)) return;
+
+  // Clear previous selection on that side
+  clearPairSelection(side);
+
+  // Select this
+  el.classList.add("selected");
+  if (side === "left") state.pair.selectedLeftId = id;
+  if (side === "right") state.pair.selectedRightId = id;
+
+  // If both selected, evaluate
+  if (state.pair.selectedLeftId && state.pair.selectedRightId) {
+    evaluatePairSelection();
+  }
+}
+
+function clearPairSelection(side) {
+  const container = side === "left" ? els.pairLeft : els.pairRight;
+  container.querySelectorAll(".card.selected").forEach((n) => n.classList.remove("selected"));
+
+  if (side === "left") state.pair.selectedLeftId = null;
+  if (side === "right") state.pair.selectedRightId = null;
+}
+
+function evaluatePairSelection() {
+  const leftId = state.pair.selectedLeftId;
+  const rightId = state.pair.selectedRightId;
+
+  const correctRight = state.pair.pairMap.get(leftId);
+  const isCorrect = correctRight === rightId;
+
+  const leftEl = els.pairLeft.querySelector(`.card[data-id="${CSS.escape(leftId)}"]`);
+  const rightEl = els.pairRight.querySelector(`.card[data-id="${CSS.escape(rightId)}"]`);
+
+  if (isCorrect) {
+    // Mark matched
+    state.pair.matchedLeft.add(leftId);
+    state.pair.matchedRight.add(rightId);
+
+    leftEl?.classList.remove("selected");
+    rightEl?.classList.remove("selected");
+
+    leftEl?.classList.add("matched");
+    rightEl?.classList.add("matched");
+
+    // Disable further interaction for matched cards
+    if (leftEl) leftEl.style.pointerEvents = "none";
+    if (rightEl) rightEl.style.pointerEvents = "none";
+
+    // Clear selection state
+    state.pair.selectedLeftId = null;
+    state.pair.selectedRightId = null;
+
+    // If all pairs matched, step complete
+    const totalPairs = state.pair.pairMap.size;
+    if (state.pair.matchedLeft.size >= totalPairs && totalPairs > 0) {
+      // small pause so it feels earned
+      setTimeout(() => completeCurrentStep(), 250);
+    }
+  } else {
+    // Gentle wrong feedback (no harsh red/green UI)
+    // Briefly deselect both after a short pause
+    if (leftEl) leftEl.classList.remove("selected");
+    if (rightEl) rightEl.classList.remove("selected");
+
+    state.pair.selectedLeftId = null;
+    state.pair.selectedRightId = null;
+  }
+}
+
+/* =========================
+   STEP 2: Sliders (scope line required)
+========================= */
+function renderSliders() {
+  const pack = state.currentPack;
+  const mode = pack?.modes?.sliders;
+  if (!mode) {
+    completeCurrentStep();
+    return;
+  }
+
+  els.slidersPrompt.textContent = mode.prompt || "Sliders";
+
+  // Scope requirement: must be explicit; if not present, we show a safe fallback.
+  // Recommended pack field: modes.sliders.scope (string)
+  const scope = mode.scope || "Scope: the scene overall";
+  els.slidersScope.textContent = scope.startsWith("Scope:") ? scope : `Scope: ${scope}`;
+
+  els.slidersContainer.innerHTML = "";
+
+  const axes = mode.sliders || [];
+  if (!axes.length) {
+    completeCurrentStep();
+    return;
+  }
+
   axes.forEach((axis) => {
     const row = document.createElement("div");
     row.className = "slider-row";
 
-    const labels = document.createElement("div");
-    labels.className = "slider-axis";
-    labels.innerHTML = `<span>${axis.leftLabel || ""}</span><span>${axis.rightLabel || ""}</span>`;
+    const left = document.createElement("div");
+    left.className = "slider-label";
+    left.textContent = axis.leftLabel || "";
 
     const input = document.createElement("input");
     input.type = "range";
-    input.min = "0";
-    input.max = "100";
+    input.min = axis.min ?? 0;
+    input.max = axis.max ?? 100;
+    input.step = axis.step ?? 1;
+    input.value = axis.defaultValue ?? 50;
+    input.dataset.axisId = axis.id;
 
-    // OPTIONAL: range limits for “keep it coherent”
-    // If you set axis.minValue/maxValue in pack, we clamp the starting point + movement.
-    const minV = Number.isFinite(axis.minValue) ? axis.minValue : 0;
-    const maxV = Number.isFinite(axis.maxValue) ? axis.maxValue : 100;
-
-    // native <input range> can’t have dynamic min/max per-axis while still being 0-100 visually,
-    // so we set min/max directly.
-    input.min = String(minV);
-    input.max = String(maxV);
-
-    const def = Number.isFinite(axis.defaultValue) ? axis.defaultValue : 50;
-    input.value = String(Math.min(maxV, Math.max(minV, def)));
-
+    // Touch detection: you must move each axis at least once
     input.addEventListener("input", () => {
-      state.sliders.touchedIds.add(axis.id);
-
-      if (axes.length > 0 && state.sliders.touchedIds.size >= axes.length) {
-        setHint("✓ Sliders complete.");
-        advanceStepOrScene();
+      state.sliders.touched.add(axis.id);
+      if (state.sliders.touched.size >= axes.length) {
+        // Auto-advance once all sliders have been touched
+        setTimeout(() => completeCurrentStep(), 220);
       }
     });
 
-    row.appendChild(labels);
+    const right = document.createElement("div");
+    right.className = "slider-label";
+    right.style.textAlign = "right";
+    right.textContent = axis.rightLabel || "";
+
+    row.appendChild(left);
     row.appendChild(input);
-    wrap.appendChild(row);
+    row.appendChild(right);
+
+    els.slidersContainer.appendChild(row);
   });
 }
 
-function renderBuckets(pack) {
-  const m = pack?.modes?.rankBuckets;
-  if (!m) return;
+/* =========================
+   STEP 3: Buckets (labels + drag/drop)
+========================= */
+function renderBuckets() {
+  const pack = state.currentPack;
+  const mode = pack?.modes?.rankBuckets;
+  if (!mode) {
+    completeCurrentStep();
+    return;
+  }
 
-  setText("mode-prompt", m.prompt || "Sort the craft elements by what drives the scene.");
+  els.bucketsPrompt.textContent = mode.prompt || "Buckets";
 
-  const elementsWrap = $("bucket-elements");
-  const colsWrap = $("bucket-cols");
-  if (!elementsWrap || !colsWrap) return;
+  // Expected pack fields:
+  // mode.buckets: [{id,label}, ...]
+  // mode.cards OR mode.elements: [{id,text}, ...]
+  const buckets = mode.buckets || [];
+  const elements = mode.cards || mode.elements || mode.items || [];
 
-  elementsWrap.innerHTML = "";
-  colsWrap.innerHTML = "";
+  els.bucketsContainer.innerHTML = "";
 
-  setHint("Drag each element into a bucket.");
+  // Build "Elements" bank that spans full width (visible, not sr-only)
+  const bank = document.createElement("div");
+  bank.className = "bucket";
+  bank.style.gridColumn = "1 / -1";
+  const bankTitle = document.createElement("h4");
+  bankTitle.textContent = "Elements";
+  bank.appendChild(bankTitle);
 
-  const buckets = m.buckets || [
-    { id: "engine", label: "Engine" },
-    { id: "support", label: "Support" },
-    { id: "spice", label: "Spice" },
-  ];
+  const bankList = document.createElement("div");
+  bankList.className = "card-list";
+  bank.appendChild(bankList);
 
-  const cards = m.cards || [];
+  // Render draggable element cards into bank
+  elements.forEach((e) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.textContent = e.text;
+    card.draggable = true;
+    card.dataset.elementId = e.id;
 
-  // build columns
+    card.addEventListener("dragstart", (ev) => {
+      ev.dataTransfer.setData("text/plain", e.id);
+      ev.dataTransfer.effectAllowed = "move";
+    });
+
+    bankList.appendChild(card);
+  });
+
+  els.bucketsContainer.appendChild(bank);
+
+  // Render labeled buckets (fix: previously labels missing)
   buckets.forEach((b) => {
-    const col = document.createElement("div");
-    col.className = "bucket-col";
-    col.dataset.bucketId = b.id;
+    const bucket = document.createElement("div");
+    bucket.className = "bucket";
+    bucket.dataset.bucketId = b.id;
 
-    const title = document.createElement("div");
-    title.className = "bucket-title";
-    title.textContent = b.label || b.id;
+    const h = document.createElement("h4");
+    h.textContent = b.label || b.id;
+    bucket.appendChild(h);
 
-    const drop = document.createElement("div");
-    drop.className = "bucket-drop";
+    const dropZone = document.createElement("div");
+    dropZone.className = "card-list";
+    dropZone.dataset.dropZone = "true";
+    bucket.appendChild(dropZone);
 
-    drop.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      drop.classList.add("dragover");
+    // Drag-over / drop handlers
+    bucket.addEventListener("dragover", (ev) => {
+      ev.preventDefault();
+      ev.dataTransfer.dropEffect = "move";
     });
-    drop.addEventListener("dragleave", () => drop.classList.remove("dragover"));
-    drop.addEventListener("drop", (e) => {
-      e.preventDefault();
-      drop.classList.remove("dragover");
 
-      const cardId = e.dataTransfer.getData("text/cardId");
-      if (!cardId) return;
+    bucket.addEventListener("drop", (ev) => {
+      ev.preventDefault();
+      const elementId = ev.dataTransfer.getData("text/plain");
+      if (!elementId) return;
 
-      state.buckets.placed.set(cardId, b.id);
-      renderAll();
+      const card = els.bucketsContainer.querySelector(`.card[data-element-id="${CSS.escape(elementId)}"]`);
+      if (!card) return;
 
-      if (cards.length > 0 && state.buckets.placed.size >= cards.length) {
-        setHint("✓ Buckets complete.");
-        advanceStepOrScene();
+      // Move card into this bucket
+      dropZone.appendChild(card);
+
+      // Save placement
+      state.buckets.placement.set(elementId, b.id);
+
+      // Completion when all elements have a bucket placement
+      if (elements.length && state.buckets.placement.size >= elements.length) {
+        setTimeout(() => completeCurrentStep(), 220);
       }
     });
 
-    col.appendChild(title);
-    col.appendChild(drop);
-    colsWrap.appendChild(col);
+    els.bucketsContainer.appendChild(bucket);
   });
 
-  // unplaced list
-  cards.forEach((c) => {
-    if (state.buckets.placed.has(c.id)) return;
-
-    const chip = document.createElement("div");
-    chip.className = "chip";
-    chip.textContent = c.text;
-    chip.draggable = true;
-
-    chip.addEventListener("dragstart", (e) => {
-      e.dataTransfer.setData("text/cardId", c.id);
-      e.dataTransfer.effectAllowed = "move";
-    });
-
-    elementsWrap.appendChild(chip);
-  });
-
-  // placed chips inside buckets
-  cards.forEach((c) => {
-    const bucketId = state.buckets.placed.get(c.id);
-    if (!bucketId) return;
-
-    const col = colsWrap.querySelector(`.bucket-col[data-bucket-id="${bucketId}"] .bucket-drop`);
-    if (!col) return;
-
-    const chip = document.createElement("div");
-    chip.className = "chip placed";
-    chip.textContent = c.text;
-
-    // click to unplace
-    chip.onclick = () => {
-      state.buckets.placed.delete(c.id);
-      renderAll();
-    };
-
-    col.appendChild(chip);
-  });
+  // If no bucket labels exist, we can still proceed—but this would be a content issue.
+  if (!buckets.length) {
+    // Avoid dead-end
+    setTimeout(() => completeCurrentStep(), 250);
+  }
 }
 
-function renderSpotlights(pack) {
-  const m = pack?.modes?.interpretiveTakes;
-  if (!m) return;
+/* =========================
+   STEP 4: Spotlights (rank top 3)
+========================= */
+function renderSpotlights() {
+  const pack = state.currentPack;
+  const mode = pack?.modes?.spotlights;
+  if (!mode) {
+    completeCurrentStep();
+    return;
+  }
 
-  // gameplay change per your note:
-  setText("mode-prompt", m.prompt || "Rank the top three decisions that make the scene memorable.");
+  // Gameplay change: rank top 3
+  els.spotlightsPrompt.textContent =
+    mode.prompt || "Rank the top three decisions that make the scene memorable.";
 
-  const wrap = $("spotlights-container");
-  if (!wrap) return;
+  els.spotlightsList.innerHTML = "";
 
-  wrap.innerHTML = "";
-  setHint("Drag your top 3 into the slots (1–3). Leave at least one unpicked.");
+  // Add rank slots UI (inline styling to avoid needing index.html edits)
+  const slotsWrap = document.createElement("div");
+  slotsWrap.style.display = "grid";
+  slotsWrap.style.gridTemplateColumns = "repeat(3, 1fr)";
+  slotsWrap.style.gap = "12px";
+  slotsWrap.style.margin = "10px 0 14px";
 
-  const takes = m.takes || [];
-
-  // Top 3 slots
-  const slots = document.createElement("div");
-  slots.className = "top3";
-
-  function slotEl(idx) {
+  const makeSlot = (idx) => {
     const slot = document.createElement("div");
-    slot.className = "top3-slot";
     slot.dataset.slotIndex = String(idx);
+    slot.style.border = "1px solid rgba(189,155,64,0.55)";
+    slot.style.borderRadius = "16px";
+    slot.style.padding = "12px";
+    slot.style.background = "rgba(0,0,0,0.35)";
+    slot.style.minHeight = "68px";
+    slot.style.display = "flex";
+    slot.style.alignItems = "center";
+    slot.style.justifyContent = "center";
+    slot.style.textAlign = "center";
+    slot.style.color = "#bd9b40";
+    slot.style.fontWeight = "900";
+    slot.style.userSelect = "none";
 
-    const label = document.createElement("div");
-    label.className = "top3-label";
-    label.textContent = `#${idx + 1}`;
+    slot.textContent = `#${idx + 1}`;
 
-    const body = document.createElement("div");
-    body.className = "top3-body";
-
-    const takeId = state.spotlights.top3[idx];
-    if (takeId) {
-      const take = takes.find((t) => t.id === takeId);
-      const chip = document.createElement("div");
-      chip.className = "spotlight selected";
-      chip.textContent = take?.text || "";
-
-      chip.draggable = true;
-      chip.addEventListener("dragstart", (e) => {
-        e.dataTransfer.setData("text/takeId", takeId);
-        e.dataTransfer.setData("text/fromSlot", String(idx));
-        e.dataTransfer.effectAllowed = "move";
-      });
-
-      // click removes from slot
-      chip.onclick = () => {
-        state.spotlights.top3[idx] = null;
-        renderAll();
-      };
-
-      body.appendChild(chip);
-    } else {
-      body.classList.add("empty");
-      body.textContent = "Drop here";
-    }
-
-    body.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      body.classList.add("dragover");
+    slot.addEventListener("dragover", (ev) => {
+      ev.preventDefault();
+      ev.dataTransfer.dropEffect = "move";
     });
-    body.addEventListener("dragleave", () => body.classList.remove("dragover"));
-    body.addEventListener("drop", (e) => {
-      e.preventDefault();
-      body.classList.remove("dragover");
 
-      const takeId = e.dataTransfer.getData("text/takeId");
+    slot.addEventListener("drop", (ev) => {
+      ev.preventDefault();
+      const takeId = ev.dataTransfer.getData("text/plain");
       if (!takeId) return;
-
-      // if it already exists in another slot, remove there
-      const existingIdx = state.spotlights.top3.findIndex((x) => x === takeId);
-      if (existingIdx >= 0) state.spotlights.top3[existingIdx] = null;
-
-      // if dragging from a slot, clear that slot
-      const fromSlot = e.dataTransfer.getData("text/fromSlot");
-      if (fromSlot !== "") {
-        const fs = Number(fromSlot);
-        if (Number.isFinite(fs) && fs >= 0 && fs <= 2) {
-          state.spotlights.top3[fs] = null;
-        }
-      }
-
-      state.spotlights.top3[idx] = takeId;
-      renderAll();
-
-      // completion: all 3 filled
-      if (state.spotlights.top3.every(Boolean)) {
-        setHint("✓ Scene complete.");
-        advanceStepOrScene();
-      }
+      placeTakeInRank(takeId, idx);
+      refreshSpotlightSelectionUI();
+      checkSpotlightsComplete();
     });
 
-    slot.appendChild(label);
-    slot.appendChild(body);
+    slot.addEventListener("click", () => {
+      // Clicking a filled slot clears it
+      const takeId = state.spotlights.rank[idx];
+      if (!takeId) return;
+      state.spotlights.rank[idx] = null;
+      refreshSpotlightSelectionUI();
+    });
+
     return slot;
-  }
+  };
 
-  slots.appendChild(slotEl(0));
-  slots.appendChild(slotEl(1));
-  slots.appendChild(slotEl(2));
-  wrap.appendChild(slots);
+  const slotEls = [makeSlot(0), makeSlot(1), makeSlot(2)];
+  slotEls.forEach((s) => slotsWrap.appendChild(s));
+  els.spotlightsList.appendChild(slotsWrap);
 
-  // Remaining takes list
-  const list = document.createElement("div");
-  list.className = "spotlight-list";
-
+  // Takes list
+  const takes = mode.takes || mode.items || [];
   takes.forEach((t) => {
-    const alreadyPicked = state.spotlights.top3.includes(t.id);
+    const div = document.createElement("div");
+    div.className = "spotlight";
+    div.dataset.takeId = t.id;
+    div.textContent = t.text;
 
-    const item = document.createElement("div");
-    item.className = "spotlight";
-    item.textContent = t.text;
-    item.draggable = !alreadyPicked;
-
-    if (alreadyPicked) item.classList.add("disabled");
-
-    item.addEventListener("dragstart", (e) => {
-      if (alreadyPicked) return;
-      e.dataTransfer.setData("text/takeId", t.id);
-      e.dataTransfer.setData("text/fromSlot", "");
-      e.dataTransfer.effectAllowed = "move";
+    div.draggable = true;
+    div.addEventListener("dragstart", (ev) => {
+      ev.dataTransfer.setData("text/plain", t.id);
+      ev.dataTransfer.effectAllowed = "move";
     });
 
-    // click-to-quick-fill next empty slot
-    item.onclick = () => {
-      if (alreadyPicked) return;
-      const emptyIdx = state.spotlights.top3.findIndex((x) => !x);
-      if (emptyIdx === -1) return; // already full
+    div.addEventListener("click", () => {
+      // Click places into first empty slot; clicking again removes from slot
+      toggleTakeRank(t.id);
+      refreshSpotlightSelectionUI();
+      checkSpotlightsComplete();
+    });
 
-      state.spotlights.top3[emptyIdx] = t.id;
-      renderAll();
-
-      if (state.spotlights.top3.every(Boolean)) {
-        setHint("✓ Scene complete.");
-        advanceStepOrScene();
-      }
-    };
-
-    list.appendChild(item);
+    els.spotlightsList.appendChild(div);
   });
 
-  wrap.appendChild(list);
+  // Store rank slot elements for refresh
+  els.spotlightsList._rankSlotEls = slotEls;
+
+  // Initial refresh
+  refreshSpotlightSelectionUI();
 }
 
-/* ---------------------------
-   Main render
-----------------------------*/
-function renderModeContainers() {
-  // show only current mode section
-  const mk = currentModeKey();
-
-  const ids = [
-    ["mode-pair", "pairMatch"],
-    ["mode-sliders", "sliders"],
-    ["mode-buckets", "rankBuckets"],
-    ["mode-spotlights", "interpretiveTakes"],
-  ];
-
-  ids.forEach(([id, key]) => {
-    if (key === mk) show(id);
-    else hide(id);
-  });
-}
-
-function renderAll() {
-  if (!state.pack) return;
-
-  renderHeader(state.pack);
-  renderModeContainers();
-
-  const mk = currentModeKey();
-
-  // clear hint line before mode render (mode sets it)
-  setHint("");
-
-  if (mk === "pairMatch") renderPairMatch(state.pack);
-  if (mk === "sliders") renderSliders(state.pack);
-  if (mk === "rankBuckets") renderBuckets(state.pack);
-  if (mk === "interpretiveTakes") renderSpotlights(state.pack);
-}
-
-/* ---------------------------
-   Events from index.html
-----------------------------*/
-document.addEventListener("sourcechange", (e) => {
-  const source = e?.detail?.source;
-  if (source === "film" || source === "literature") {
-    state.source = source;
-
-    // abandoning current run per your rule:
-    state.usedIds.clear();
-    loadNewScene();
+function toggleTakeRank(takeId) {
+  // If already ranked, remove it
+  const idx = state.spotlights.rank.findIndex((id) => id === takeId);
+  if (idx >= 0) {
+    state.spotlights.rank[idx] = null;
+    return;
   }
-});
 
-document.addEventListener("play", () => {
-  hide("landing");
-  show("app");
-  if (!state.pack) loadNewScene();
-});
+  // Otherwise place into first empty slot
+  const empty = state.spotlights.rank.findIndex((id) => !id);
+  if (empty >= 0) {
+    placeTakeInRank(takeId, empty);
+  }
+}
 
-/* ---------------------------
-   Boot
-----------------------------*/
-(function boot() {
-  // default to film
-  state.source = "film";
+function placeTakeInRank(takeId, slotIndex) {
+  // Remove from any existing slot first
+  const existing = state.spotlights.rank.findIndex((id) => id === takeId);
+  if (existing >= 0) state.spotlights.rank[existing] = null;
 
-  // show landing first
-  show("landing");
-  hide("app");
+  // If slot occupied, swap out (simple behavior)
+  state.spotlights.rank[slotIndex] = takeId;
+}
 
-  // pre-load a scene so play is instant (optional)
-  state.pack = pickNextPack();
-  resetForNewScene();
-})();
+function refreshSpotlightSelectionUI() {
+  const slotEls = els.spotlightsList._rankSlotEls || [];
+  const rank = state.spotlights.rank;
+
+  // Update slot text
+  slotEls.forEach((slotEl, i) => {
+    const id = rank[i];
+    slotEl.textContent = id ? `#${i + 1}` : `#${i + 1}`;
+    slotEl.style.color = id ? "#f7efe3" : "#bd9b40";
+    slotEl.style.borderColor = id ? "rgba(181,133,183,0.95)" : "rgba(189,155,64,0.55)";
+    slotEl.style.boxShadow = id ? "0 0 0 2px rgba(181,133,183,0.18)" : "none";
+    slotEl.style.background = id ? "rgba(181,133,183,0.18)" : "rgba(0,0,0,0.35)";
+
+    // If filled, also show a short preview (without needing extra UI)
+    if (id) {
+      const takeEl = els.spotlightsList.querySelector(`.spotlight[data-take-id="${CSS.escape(id)}"]`);
+      const preview = takeEl ? takeEl.textContent : id;
+      slotEl.textContent = `#${i + 1} — ${preview}`;
+    }
+  });
+
+  // Highlight selected takes in list (dusty rose styling provided by index.html)
+  const selected = new Set(rank.filter(Boolean));
+  els.spotlightsList.querySelectorAll(".spotlight").forEach((el) => {
+    const tid = el.dataset.takeId;
+    el.classList.toggle("selected", selected.has(tid));
+  });
+}
+
+function checkSpotlightsComplete() {
+  const filled = state.spotlights.rank.filter(Boolean).length;
+  if (filled >= 3) {
+    setTimeout(() => completeCurrentStep(), 250);
+  }
+}

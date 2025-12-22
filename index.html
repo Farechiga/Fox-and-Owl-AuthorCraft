@@ -1,4 +1,4 @@
-<!-- index.html — AuthorCraft Appreciation (clean, locked-in design + correct script wiring) -->
+<!-- index.html — AuthorCraft Appreciation (clean, comprehensive, matches CraftAppreciation.js IDs) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,7 +8,7 @@
 
   <style>
     :root{
-      /* slightly brighter “deep plum” (less dark-mode) */
+      /* Brighter deep plum (more “kid-friendly” than dark-mode) */
       --plum: #3e0f53;
 
       --gold: #bd9b40;
@@ -16,8 +16,8 @@
       --muted: #d0ced4;
       --black: #050505;
 
-      /* spotlight selected highlight (dusty rose) */
-      --spotlightHi: #b585b7;
+      /* dusty rose highlight */
+      --rose: #b585b7;
     }
 
     html, body { height:100%; margin:0; padding:0; }
@@ -25,15 +25,12 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background-color: var(--plum);
       color: var(--text);
-      display:flex;
-      align-items:center;
-      justify-content:center;
       min-height:100vh;
       position:relative;
-      overflow:hidden;
+      overflow-x:hidden;
     }
 
-    /* Background overlay — only used for game modes */
+    /* Background overlay: set by body class */
     body::before{
       content:"";
       position:fixed;
@@ -41,7 +38,7 @@
       background-size:cover;
       background-position:center;
       background-repeat:no-repeat;
-      opacity:0.9;
+      opacity:0.92;
       pointer-events:none;
       z-index:0;
     }
@@ -54,62 +51,56 @@
       z-index:1;
       width:100%;
       max-width:1200px;
+      margin:0 auto;
       padding:24px;
       box-sizing:border-box;
-      display:flex;
-      justify-content:center;
     }
     .hidden{ display:none !important; }
 
-    /* -------- Landing screen -------- */
+    /* =========================
+       LANDING
+       ========================= */
     .landing-screen{
-      width:100%;
+      min-height: calc(100vh - 48px);
       display:flex;
       flex-direction:column;
       align-items:center;
       justify-content:center;
       gap:24px;
+      text-align:center;
     }
     .landing-logo{
-      max-width:540px;
-      width:82%;
+      max-width:560px;
+      width:84%;
       height:auto;
       display:block;
-      filter: drop-shadow(0 16px 28px rgba(0,0,0,0.45));
+      filter: drop-shadow(0 18px 30px rgba(0,0,0,0.45));
     }
     .play-button{
-      margin-top:10px;
-      padding:12px 42px;
+      padding:12px 44px;
       border-radius:999px;
       border:2px solid var(--gold);
       background:transparent;
       color:var(--gold);
       font-size:1.05rem;
-      font-weight:700;
+      font-weight:800;
       cursor:pointer;
-      letter-spacing:0.06em;
+      letter-spacing:0.08em;
       text-transform:uppercase;
-      transition: transform 0.1s ease-out, box-shadow 0.1s ease-out, background 0.1s ease-out;
+      transition: transform 0.12s ease-out, box-shadow 0.12s ease-out, background 0.12s ease-out;
     }
     .play-button:hover{
       transform: translateY(-1px);
-      box-shadow: 0 10px 22px rgba(0,0,0,0.55);
-      background: rgba(0,0,0,0.18);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.55);
+      background: rgba(0,0,0,0.16);
     }
 
-    /* -------- Game screen -------- */
-    .game-screen{
-      width:100%;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:flex-start;
-    }
-
-    /* Top toggle centered at top, like original */
+    /* =========================
+       GAME
+       ========================= */
     .mode-toggle-wrapper{
-      position:absolute;
-      top:26px;
+      position:fixed;
+      top:22px;
       left:50%;
       transform: translateX(-50%);
       z-index:2;
@@ -120,41 +111,47 @@
     }
     .mode-toggle{
       display:inline-flex;
-      background: rgba(0,0,0,0.7);
+      background: rgba(0,0,0,0.72);
       border-radius:999px;
       padding:3px;
-      border:1px solid rgba(0,0,0,0.9);
+      border:1px solid rgba(0,0,0,0.95);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.55);
     }
     .mode-btn{
       border:none;
-      padding:6px 22px;
+      padding:7px 24px;
       border-radius:999px;
-      font-size:0.85rem;
+      font-size:0.86rem;
       cursor:pointer;
       background:transparent;
       color:var(--muted);
       transition: background 0.15s ease, color 0.15s ease;
+      font-weight:800;
     }
     .mode-btn.active{
       background:#101010;
       color:var(--gold);
     }
 
+    .game-screen{
+      padding-top:78px; /* space for fixed toggle */
+    }
+
     .game-area{
       width:100%;
-      max-width:1040px; /* a bit wider for 7yo-friendly breathing room */
-      margin:110px auto 44px;
-      padding:24px 26px 28px;
+      max-width:1040px;
+      margin: 22px auto 52px;
+      padding: 24px 26px 28px;
       box-sizing:border-box;
       border-radius:18px;
       background: radial-gradient(circle at top, rgba(0,0,0,0.40), rgba(0,0,0,0.82));
-      border:1px solid rgba(189,155,64,0.9);
+      border:1px solid rgba(189,155,64,0.92);
       box-shadow:
         0 0 0 1px rgba(0,0,0,0.5),
-        0 24px 50px rgba(0,0,0,0.75);
+        0 26px 56px rgba(0,0,0,0.75);
     }
 
-    /* Header row: logo + title on left, scene counter on right */
+    /* topbar */
     .topbar{
       display:flex;
       align-items:center;
@@ -173,7 +170,7 @@
       height:44px;
       border-radius:12px;
       object-fit:cover;
-      border:1px solid rgba(189,155,64,0.65);
+      border:1px solid rgba(189,155,64,0.70);
       background: rgba(0,0,0,0.35);
     }
     .brand-text{
@@ -183,10 +180,10 @@
       min-width:0;
     }
     .brand-title{
-      font-weight:700;
+      font-weight:900;
       font-size:1.02rem;
       color:var(--text);
-      line-height:1.1;
+      line-height:1.12;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
@@ -194,7 +191,7 @@
     .brand-sub{
       font-size:0.86rem;
       color:var(--muted);
-      line-height:1.1;
+      line-height:1.12;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
@@ -203,8 +200,10 @@
       font-size:0.92rem;
       color:var(--gold);
       white-space:nowrap;
+      font-weight:900;
     }
 
+    /* scene header */
     .header-row{
       display:flex;
       justify-content:space-between;
@@ -213,8 +212,8 @@
       margin-bottom:10px;
     }
     .scene-title{
-      font-size:1.65rem;
-      font-weight:800;
+      font-size:1.68rem;
+      font-weight:950;
       letter-spacing:0.01em;
       color:var(--text);
       margin:0;
@@ -225,23 +224,23 @@
       justify-content:center;
       padding:8px 14px;
       border-radius:999px;
-      border:1px solid rgba(189,155,64,0.65);
+      border:1px solid rgba(189,155,64,0.68);
       color:var(--gold);
       background: rgba(0,0,0,0.35);
-      font-weight:700;
+      font-weight:900;
       font-size:0.92rem;
       white-space:nowrap;
     }
 
     .scene-text{
-      font-size:1.02rem;
+      font-size:1.03rem;
       line-height:1.55;
       margin: 0 0 14px 0;
       color:var(--text);
       max-width: 980px;
     }
 
-    /* Step progress (4 steps) */
+    /* stepper */
     .stepper{
       display:flex;
       align-items:center;
@@ -256,14 +255,15 @@
       gap:10px;
       padding:8px 14px;
       border-radius:999px;
-      border:1px solid rgba(0,0,0,0.9);
+      border:1px solid rgba(0,0,0,0.95);
       background: var(--black);
       color:var(--muted);
       font-size:0.90rem;
       user-select:none;
+      font-weight:850;
     }
     .step.active{
-      border-color: rgba(189,155,64,0.9);
+      border-color: rgba(189,155,64,0.92);
       color: var(--gold);
       box-shadow: 0 10px 18px rgba(0,0,0,0.55);
     }
@@ -278,29 +278,24 @@
     .step.active .dot{ background: rgba(189,155,64,0.95); }
     .step.done .dot{ background: rgba(189,155,64,0.75); }
 
-    /* Mode panels */
-    .panel{
-      margin-top:10px;
-      padding-top:10px;
-    }
+    /* panels */
+    .panel{ margin-top:10px; padding-top:10px; }
     .panel-title{
       margin: 0 0 10px 0;
       color: var(--gold);
-      font-weight:800;
+      font-weight:950;
       font-size:1.22rem;
       letter-spacing:0.01em;
     }
 
-    /* ---------- Pair Match ---------- */
+    /* Pair Match */
     .pair-grid{
       display:grid;
       grid-template-columns: 1fr 1fr;
       gap:18px;
       align-items:start;
     }
-    @media (max-width: 860px){
-      .pair-grid{ grid-template-columns: 1fr; }
-    }
+    @media (max-width: 860px){ .pair-grid{ grid-template-columns: 1fr; } }
 
     /* Pair Match column headers: thin rounded rectangle, no fill */
     .pair-column-title{
@@ -309,9 +304,10 @@
       border-radius: 14px;
       padding: 10px 14px;
       color: var(--gold);
-      font-weight: 800;
+      font-weight: 950;
       letter-spacing: 0.01em;
       margin-bottom: 10px;
+      display:inline-block;
     }
 
     .card-list{
@@ -321,7 +317,7 @@
     }
     .card{
       background: rgba(0,0,0,0.45);
-      border: 1px solid rgba(0,0,0,0.9);
+      border: 1px solid rgba(0,0,0,0.95);
       border-radius: 16px;
       padding: 14px 14px;
       color: var(--text);
@@ -334,20 +330,13 @@
       box-shadow: 0 10px 18px rgba(0,0,0,0.55);
       border-color: rgba(189,155,64,0.55);
     }
-    .card.selected{
-      border-color: rgba(181,133,183,0.95);
-      box-shadow: 0 0 0 2px rgba(181,133,183,0.35), 0 10px 18px rgba(0,0,0,0.6);
-    }
-    .card.matched{
-      opacity: 0.80;
-      border-color: rgba(189,155,64,0.45);
-    }
 
-    /* ---------- Sliders ---------- */
+    /* Sliders */
     .scope-line{
       margin: 0 0 12px 0;
       color: var(--muted);
       font-size: 0.98rem;
+      font-weight:750;
     }
     .slider-row{
       display:grid;
@@ -357,44 +346,43 @@
       padding: 14px 14px;
       border-radius: 16px;
       background: rgba(0,0,0,0.35);
-      border: 1px solid rgba(0,0,0,0.9);
+      border: 1px solid rgba(0,0,0,0.95);
       margin-bottom: 12px;
     }
     .slider-label{
-      font-weight:800;
+      font-weight:950;
       color: var(--text);
-      opacity: 0.95;
+      opacity: 0.96;
     }
     input[type="range"]{
       width:100%;
       accent-color: var(--gold);
     }
 
-    /* ---------- Buckets ---------- */
+    /* Buckets */
     .buckets-wrap{
       display:grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: 14px;
       margin-top: 10px;
     }
-    @media (max-width: 980px){
-      .buckets-wrap{ grid-template-columns: 1fr; }
-    }
+    @media (max-width: 980px){ .buckets-wrap{ grid-template-columns: 1fr; } }
+
     .bucket{
       min-height: 210px;
       border-radius: 18px;
       background: rgba(0,0,0,0.35);
-      border: 1px solid rgba(0,0,0,0.9);
+      border: 1px solid rgba(0,0,0,0.95);
       padding: 14px;
     }
     .bucket h4{
       margin: 0 0 10px 0;
       color: var(--gold);
       font-size: 1.05rem;
-      font-weight: 900;
+      font-weight: 950;
     }
 
-    /* ---------- Spotlights ---------- */
+    /* Spotlights */
     .spotlights-list{
       display:flex;
       flex-direction:column;
@@ -402,7 +390,7 @@
     }
     .spotlight{
       background: rgba(0,0,0,0.45);
-      border: 1px solid rgba(0,0,0,0.9);
+      border: 1px solid rgba(0,0,0,0.95);
       border-radius: 16px;
       padding: 14px 14px;
       cursor: pointer;
@@ -414,34 +402,19 @@
       box-shadow: 0 10px 18px rgba(0,0,0,0.55);
       border-color: rgba(189,155,64,0.55);
     }
-    /* selected highlight uses dusty rose */
     .spotlight.selected{
       border-color: rgba(181,133,183,0.98);
       background: rgba(181,133,183,0.22);
       box-shadow: 0 0 0 2px rgba(181,133,183,0.25), 0 10px 18px rgba(0,0,0,0.6);
-    }
-
-    /* Utility */
-    .sr-only{
-      position:absolute;
-      width:1px;
-      height:1px;
-      padding:0;
-      margin:-1px;
-      overflow:hidden;
-      clip:rect(0,0,0,0);
-      border:0;
     }
   </style>
 </head>
 
 <body class="landing">
   <main class="app-root">
-    <!-- =========================
-         LANDING PAGE
-         ========================= -->
+
+    <!-- LANDING -->
     <section id="landingScreen" class="landing-screen" aria-label="Landing screen">
-      <!-- REQUIRED (per your clarification): original full logo -->
       <img
         class="landing-logo"
         src="Fox and Owl Story Studio Logo.png"
@@ -450,10 +423,9 @@
       <button id="playBtn" class="play-button" type="button">Play</button>
     </section>
 
-    <!-- =========================
-         GAME
-         ========================= -->
+    <!-- GAME -->
     <section id="gameScreen" class="game-screen hidden" aria-label="Game screen">
+
       <!-- Film/Literature toggle -->
       <div class="mode-toggle-wrapper" aria-label="Mode toggle">
         <div class="mode-toggle" role="tablist" aria-label="Film or Literature">
@@ -463,12 +435,12 @@
       </div>
 
       <div class="game-area">
-        <!-- Top bar -->
+
+        <!-- Topbar -->
         <div class="topbar">
           <div class="brand-left">
-            <!-- Keep as-is for now; later you’ll swap to “Fox and Owl Story Studio Logo_Characters Only.png” -->
+            <!-- thumb uses full logo for now (you can swap later to characters-only asset) -->
             <img
-              id="brandThumb"
               class="brand-thumb"
               src="Fox and Owl Story Studio Logo.png"
               alt="Fox & Owl thumbnail"
@@ -478,7 +450,8 @@
               <div class="brand-sub">AuthorCraft Appreciation</div>
             </div>
           </div>
-          <div class="scene-counter" aria-label="Scenes completed">
+
+          <div class="scene-counter">
             Scenes: <span id="scenesCompleted">0</span>
           </div>
         </div>
@@ -489,7 +462,6 @@
           <div id="tierPill" class="tier-pill">Lantern</div>
         </div>
 
-        <!-- Scene description -->
         <p id="sceneText" class="scene-text"></p>
 
         <!-- 4-step progress -->
@@ -500,11 +472,7 @@
           <div id="stepSpotlights" class="step"><span class="dot"></span>Spotlights</div>
         </div>
 
-        <!-- =========================
-             PANELS (JS will show/hide)
-             ========================= -->
-
-        <!-- Pair Match Panel -->
+        <!-- Pair Match -->
         <section id="panelPairMatch" class="panel" aria-label="Pair Match">
           <h2 id="pairPrompt" class="panel-title">Pair Match</h2>
           <div class="pair-grid">
@@ -519,38 +487,30 @@
           </div>
         </section>
 
-        <!-- Sliders Panel -->
+        <!-- Sliders -->
         <section id="panelSliders" class="panel hidden" aria-label="Sliders">
           <h2 id="slidersPrompt" class="panel-title">Sliders</h2>
           <p id="slidersScope" class="scope-line"></p>
           <div id="slidersContainer" aria-label="Sliders container"></div>
         </section>
 
-        <!-- Buckets Panel -->
+        <!-- Buckets -->
         <section id="panelBuckets" class="panel hidden" aria-label="Buckets">
           <h2 id="bucketsPrompt" class="panel-title">Buckets</h2>
-          <!-- JS should populate bucket labels + drop zones here -->
           <div id="bucketsContainer" class="buckets-wrap" aria-label="Buckets container"></div>
-          <!-- Optional: an “elements bank” area (if runtime uses it) -->
-          <div id="bucketElementsBank" class="sr-only" aria-hidden="true"></div>
         </section>
 
-        <!-- Spotlights Panel -->
+        <!-- Spotlights -->
         <section id="panelSpotlights" class="panel hidden" aria-label="Spotlights">
           <h2 id="spotlightsPrompt" class="panel-title">Spotlights</h2>
           <div id="spotlightsList" class="spotlights-list" aria-label="Spotlights list"></div>
-          <!-- If runtime uses ranked slots, it can inject them above the list -->
-          <div id="spotlightsRankSlots" class="sr-only" aria-hidden="true"></div>
         </section>
 
       </div>
     </section>
   </main>
 
-  <!-- IMPORTANT:
-       The runtime must be loaded as an ES module.
-       CraftAppreciation.js is expected to import FILM_PACKS / LIT_PACKS from filmPacks.js / litPacks.js.
-  -->
+  <!-- Runtime (ES module) -->
   <script type="module" src="CraftAppreciation.js"></script>
 </body>
 </html>

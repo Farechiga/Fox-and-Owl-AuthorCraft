@@ -305,7 +305,26 @@ function renderPairMatch() {
     completeCurrentStep();
     return;
   }
+  // Build pair map (leftId -> rightId)
+  const allPairs = mode.pairs || [];
 
+  // ✅ HARD CAP: only 4 pairs
+  const pairs = allPairs.slice(0, 4);
+
+  state.pair.pairMap = new Map(pairs.map((p) => [p.leftId, p.rightId]));
+
+  // Only include the cards referenced by these 4 pairs
+  const leftNeeded = new Set(pairs.map(p => p.leftId));
+  const rightNeeded = new Set(pairs.map(p => p.rightId));
+
+  const leftCardsRaw = (mode.leftCards || []).filter(c => leftNeeded.has(c.id));
+  const rightCardsRaw = (mode.rightCards || []).filter(c => rightNeeded.has(c.id));
+
+  // Shuffle display order (critical fix: no row-by-row alignment)
+  const leftCards = shuffle(leftCardsRaw);
+  const rightCards = shuffle(rightCardsRaw);
+
+   
   // Prompt
   els.pairPrompt.textContent = mode.prompt || "Pair Match";
 

@@ -1,9 +1,20 @@
 // CraftAppreciation.js
-// Runtime for AuthorCraft Appreciation
-// Loads packs from filmPacks.js / litPacks.js (ES modules)
-// Implements: Landing → Game, Film/Literature toggle, 4-step scene flow, scoring (scenes completed),
-// PairMatch correctness (with shuffle), Sliders with explicit scope line, Buckets with visible labels + drag/drop,
-// Spotlights = rank top 3 with dusty-rose highlight (#b585b7), auto-advance (no Next button).
+// AuthorCraft Appreciation — runtime (clean, full replacement)
+// Works with the provided index.html IDs.
+// ES module imports:
+//   filmPacks.js exports: export const FILM_PACKS = [ ... ];
+//   litPacks.js exports:  export const LIT_PACKS  = [ ... ];
+//
+// Core behavior:
+// - Landing "Play" button enters game
+// - Film/Literature toggle abandons current run and loads a fresh scene from that mode
+// - 4-step locked scene flow: Pair Match → Sliders → Buckets → Spotlights
+// - Auto-advance only (no Next button)
+// - Scoring: Scenes completed increments only when a full scene completes all 4 steps
+// - Pair Match: correctness required + SHUFFLED + capped to 4 pairs
+// - Sliders: explicit scope line; completion advances to Buckets (fixes jump/reset)
+// - Buckets: visible labeled buckets + drag/drop
+// - Spotlights: rank top 3; selected highlight uses dusty rose via .spotlight.selected CSS
 
 import { FILM_PACKS } from "./filmPacks.js";
 import { LIT_PACKS } from "./litPacks.js";
@@ -12,7 +23,10 @@ import { LIT_PACKS } from "./litPacks.js";
    DOM helpers
 ========================= */
 const $ = (id) => document.getElementById(id);
-const setHidden = (el, hidden) => el.classList.toggle("hidden", !!hidden);
+const setHidden = (el, hidden) => {
+  if (!el) return;
+  el.classList.toggle("hidden", !!hidden);
+};
 
 function shuffle(arr) {
   const a = [...arr];
@@ -36,33 +50,36 @@ const state = {
   usedFilm: new Set(),
   usedLit: new Set(),
 
-  // PairMatch interaction
+  // Step-advance lock to prevent double-fire bugs
+  _advanceLock: false,
+
+  // Pair Match
   pair: {
     selectedLeftId: null,
     selectedRightId: null,
     matchedLeft: new Set(),
     matchedRight: new Set(),
-    pairMap: new Map(), // leftId -> rightId
+    pairMap: new Map(), // leftId -> rightId (only for the 4 chosen pairs)
   },
 
-  // Sliders interaction
+  // Sliders
   sliders: {
-    touched: new Set(), // axis ids touched
+    touched: new Set(), // axis ids
   },
 
-  // Buckets interaction
+  // Buckets
   buckets: {
     placement: new Map(), // elementId -> bucketId
   },
 
-  // Spotlights interaction
+  // Spotlights (rank top 3)
   spotlights: {
-    rank: [null, null, null], // take ids ranked 1..3
+    rank: [null, null, null], // takeIds
   },
 };
 
 /* =========================
-   Elements (from index.html)
+   Elements (must match index.html)
 ========================= */
 const els = {
   // Screens
@@ -114,72 +131,114 @@ const els = {
 };
 
 /* =========================
-   Init
+   Boot
 ========================= */
+function safeWarnMissing() {
+  const requiredIds = [
+    "landingScreen",
+    "gameScreen",
+    "playBtn",
+    "btnFilm",
+    "btnLiterature",
+    "sceneTitle",
+    "tierPill",
+    "sceneText",
+    "scenesCompleted",
+    "stepPair",
+    "stepSliders",
+    "stepBuckets",
+    "stepSpotlights",
+    "panelPairMatch",
+    "panelSliders",
+    "panelBuckets",
+    "panelSpotlights",
+    "pairPrompt",
+    "pairLeft",
+    "pairRight",
+    "slidersPrompt",
+    "slidersScope",
+    "slidersContainer",
+    "bucketsPrompt",
+    "bucketsContainer",
+    "spotlightsPrompt",
+    "spotlightsList",
+  ];
+
+  const missing = requiredIds.filter((k) => !els[k]);
+  if (missing.length) {
+    // This is the #1 cause of “Play doesn’t work”: JS errors due to null elements.
+    console.warn("[CraftAppreciation] Missing DOM elements:", missing);
+  }
+}
+
 function init() {
-  // Landing: start in landing mode (no overlay)
+  safeWarnMissing();
+
+  // Ensure we start on landing
   document.body.classList.add("landing");
   document.body.classList.remove("mode-film", "mode-literature");
-
-  // Button bindings
-  els.playBtn.addEventListener("click", () => {
-    enterGame();
-  });
-
-  els.btnFilm.addEventListener("click", () => switchMode("film"));
-  els.btnLiterature.addEventListener("click", () => switchMode("literature"));
-
-  // Set initial counter
-  updateScenesCompletedUI();
-
-  // Keep on landing until Play
   setHidden(els.landingScreen, false);
   setHidden(els.gameScreen, true);
+
+  updateScenesCompletedUI();
+
+  // Landing → Game
+  if (els.playBtn) {
+    els.playBtn.addEventListener("click", () => {
+      enterGame();
+    });
+  }
+
+  // Mode toggle (abandon run)
+  if (els.btnFilm) els.btnFilm.addEventListener("click", () => switchMode("film"));
+  if (els.btnLiterature) els.btnLiterature.addEventListener("click", () => switchMode("literature"));
 }
 
 window.addEventListener("DOMContentLoaded", init);
 
 /* =========================
-   Navigation / Mode
+   Mode / Navigation
 ========================= */
 function enterGame() {
-  // Show game screen
+  // Show game
   setHidden(els.landingScreen, true);
   setHidden(els.gameScreen, false);
 
-  // Default mode = film
-  state.mode = "film";
+  // Default mode (film) unless already set
+  state.mode = state.mode || "film";
   updateModeUI();
 
-  // Load first scene
+  // Load a scene
   loadNewScene();
 }
 
 function switchMode(mode) {
   if (state.mode === mode) return;
 
-  // Switching mode abandons current run (as requested)
   state.mode = mode;
   updateModeUI();
   loadNewScene();
 }
 
 function updateModeUI() {
-  // Body overlay
+  // Body overlay (index.html uses body::before with .mode-film/.mode-literature)
   document.body.classList.remove("landing");
   document.body.classList.toggle("mode-film", state.mode === "film");
   document.body.classList.toggle("mode-literature", state.mode === "literature");
 
-  // Toggle button states
-  els.btnFilm.classList.toggle("active", state.mode === "film");
-  els.btnFilm.setAttribute("aria-selected", state.mode === "film" ? "true" : "false");
-
-  els.btnLiterature.classList.toggle("active", state.mode === "literature");
-  els.btnLiterature.setAttribute("aria-selected", state.mode === "literature" ? "true" : "false");
+  // Toggle buttons
+  if (els.btnFilm) {
+    els.btnFilm.classList.toggle("active", state.mode === "film");
+    els.btnFilm.setAttribute("aria-selected", state.mode === "film" ? "true" : "false");
+  }
+  if (els.btnLiterature) {
+    els.btnLiterature.classList.toggle("active", state.mode === "literature");
+    els.btnLiterature.setAttribute("aria-selected", state.mode === "literature" ? "true" : "false");
+  }
 }
 
 /* =========================
-   Scene Selection / Header
+   Packs
 ========================= */
 function getPackListForMode() {
   return state.mode === "film" ? FILM_PACKS : LIT_PACKS;
@@ -189,17 +248,16 @@ function getUsedSetForMode() {
 }
 
 function pickNextPack() {
-  const packs = getPackListForMode();
+  const packs = getPackListForMode() || [];
   const used = getUsedSetForMode();
 
-  // Filter by momentType AuthorCraft if present (guardrail)
+  // Guardrail: only AuthorCraft if provided
   const eligible = packs.filter((p) => !p.momentType || p.momentType === "AuthorCraft");
   const remaining = eligible.filter((p) => !used.has(p.id));
 
   const pool = remaining.length ? remaining : eligible;
   if (!pool.length) return null;
 
-  // If exhausted, reset used set
   if (!remaining.length) used.clear();
 
   const chosen = pool[Math.floor(Math.random() * pool.length)];
@@ -207,60 +265,64 @@ function pickNextPack() {
   return chosen;
 }
 
+/* =========================
+   Scene lifecycle
+========================= */
 function loadNewScene() {
   const pack = pickNextPack();
-  if (!pack) return;
+  if (!pack) {
+    console.warn("[CraftAppreciation] No pack available for mode:", state.mode);
+    return;
+  }
 
   state.currentPack = pack;
-
-  // Reset per-scene interaction state
   resetSceneInteractionState();
-
-  // Render header
   renderSceneHeader(pack);
 
-  // Start at step 0 (Pair Match)
+  // Start at Pair Match
   goToStep(0);
 }
 
 function resetSceneInteractionState() {
   state.stepIndex = 0;
+  state._advanceLock = false;
 
+  // Pair
   state.pair.selectedLeftId = null;
   state.pair.selectedRightId = null;
   state.pair.matchedLeft = new Set();
   state.pair.matchedRight = new Set();
   state.pair.pairMap = new Map();
 
+  // Sliders
   state.sliders.touched = new Set();
 
+  // Buckets
   state.buckets.placement = new Map();
 
+  // Spotlights
   state.spotlights.rank = [null, null, null];
 }
 
 function renderSceneHeader(pack) {
-  els.sceneTitle.textContent = `Scene — ${pack.sceneTitle || ""}`.trim();
-  els.tierPill.textContent = pack.tier || "Lantern";
-  els.sceneText.textContent = pack.scene || "";
+  if (els.sceneTitle) els.sceneTitle.textContent = `Scene — ${pack.sceneTitle || ""}`.trim();
+  if (els.tierPill) els.tierPill.textContent = pack.tier || "Lantern";
+  if (els.sceneText) els.sceneText.textContent = pack.scene || "";
 }
 
 /* =========================
-   Stepper / Panels
+   Stepper + panels
 ========================= */
-const STEPS = ["pairMatch", "sliders", "rankBuckets", "spotlights"];
-
 function goToStep(stepIndex) {
   state.stepIndex = stepIndex;
   updateStepperUI(stepIndex);
 
-  // Hide all panels, show current
   setHidden(els.panelPairMatch, stepIndex !== 0);
   setHidden(els.panelSliders, stepIndex !== 1);
   setHidden(els.panelBuckets, stepIndex !== 2);
   setHidden(els.panelSpotlights, stepIndex !== 3);
 
-  // Render current step
+  // Render
   if (stepIndex === 0) renderPairMatch();
   if (stepIndex === 1) renderSliders();
   if (stepIndex === 2) renderBuckets();
@@ -268,15 +330,24 @@ function goToStep(stepIndex) {
 }
 
 function updateStepperUI(stepIndex) {
-  const stepEls = [els.stepPair, els.stepSliders, els.stepBuckets, els.stepSpotlights];
-
-  stepEls.forEach((el, i) => {
+  const steps = [els.stepPair, els.stepSliders, els.stepBuckets, els.stepSpotlights];
+  steps.forEach((el, i) => {
+    if (!el) return;
     el.classList.toggle("active", i === stepIndex);
     el.classList.toggle("done", i < stepIndex);
   });
 }
 
+function lockAdvance(ms = 400) {
+  state._advanceLock = true;
+  setTimeout(() => (state._advanceLock = false), ms);
+}
+
 function completeCurrentStep() {
+  // Prevent double-fire (fixes “sliders completes then resets to pair”)
+  if (state._advanceLock) return;
+  lockAdvance(400);
+
   const next = state.stepIndex + 1;
 
   if (next <= 3) {
@@ -284,60 +355,54 @@ function completeCurrentStep() {
     return;
   }
 
-  // Completed Spotlights -> scene complete -> score++ -> auto-advance
+  // Scene complete
   state.scenesCompleted += 1;
   updateScenesCompletedUI();
   loadNewScene();
 }
 
 function updateScenesCompletedUI() {
-  els.scenesCompleted.textContent = String(state.scenesCompleted);
+  if (els.scenesCompleted) els.scenesCompleted.textContent = String(state.scenesCompleted);
 }
 
 /* =========================
-   STEP 1: Pair Match (with correctness + shuffle)
+   STEP 1: Pair Match
+   - correctness required
+   - shuffle columns
+   - cap to 4 pairs
+   - stronger selection/matched highlighting
 ========================= */
 function renderPairMatch() {
   const pack = state.currentPack;
   const mode = pack?.modes?.pairMatch;
+
   if (!mode) {
-    // If a pack is missing this mode, skip forward
     completeCurrentStep();
     return;
   }
-  // Build pair map (leftId -> rightId)
-  const allPairs = mode.pairs || [];
 
-  // ✅ HARD CAP: only 4 pairs
+  if (els.pairPrompt) els.pairPrompt.textContent = mode.prompt || "Pair Match";
+
+  // Choose only 4 pairs
+  const allPairs = mode.pairs || [];
   const pairs = allPairs.slice(0, 4);
 
+  // Build answer key
   state.pair.pairMap = new Map(pairs.map((p) => [p.leftId, p.rightId]));
 
-  // Only include the cards referenced by these 4 pairs
-  const leftNeeded = new Set(pairs.map(p => p.leftId));
-  const rightNeeded = new Set(pairs.map(p => p.rightId));
+  // Only show cards referenced by chosen pairs
+  const leftNeeded = new Set(pairs.map((p) => p.leftId));
+  const rightNeeded = new Set(pairs.map((p) => p.rightId));
 
-  const leftCardsRaw = (mode.leftCards || []).filter(c => leftNeeded.has(c.id));
-  const rightCardsRaw = (mode.rightCards || []).filter(c => rightNeeded.has(c.id));
+  const leftCardsRaw = (mode.leftCards || []).filter((c) => leftNeeded.has(c.id));
+  const rightCardsRaw = (mode.rightCards || []).filter((c) => rightNeeded.has(c.id));
 
-  // Shuffle display order (critical fix: no row-by-row alignment)
+  // Shuffle both sides
   const leftCards = shuffle(leftCardsRaw);
   const rightCards = shuffle(rightCardsRaw);
 
-   
-  // Prompt
-  els.pairPrompt.textContent = mode.prompt || "Pair Match";
-
-  // Build pair map (leftId -> rightId)
-  state.pair.pairMap = new Map((mode.pairs || []).map((p) => [p.leftId, p.rightId]));
-
-  // Shuffle display order (critical fix: no row-by-row alignment)
-  const leftCards = shuffle(mode.leftCards || []);
-  const rightCards = shuffle(mode.rightCards || []);
-
-  // Reset containers
-  els.pairLeft.innerHTML = "";
-  els.pairRight.innerHTML = "";
+  if (els.pairLeft) els.pairLeft.innerHTML = "";
+  if (els.pairRight) els.pairRight.innerHTML = "";
 
   // Render left
   leftCards.forEach((c) => {
@@ -347,8 +412,8 @@ function renderPairMatch() {
     card.dataset.id = c.id;
     card.textContent = c.text;
 
-    card.addEventListener("click", () => onPairCardClick("left", c.id, card));
-    els.pairLeft.appendChild(card);
+    card.addEventListener("click", () => onPairCardClick("left", c.id));
+    els.pairLeft?.appendChild(card);
   });
 
   // Render right
@@ -359,33 +424,52 @@ function renderPairMatch() {
     card.dataset.id = c.id;
     card.textContent = c.text;
 
-    card.addEventListener("click", () => onPairCardClick("right", c.id, card));
-    els.pairRight.appendChild(card);
+    card.addEventListener("click", () => onPairCardClick("right", c.id));
+    els.pairRight?.appendChild(card);
   });
 }
 
-function onPairCardClick(side, id, el) {
-  // Ignore already matched
+function onPairCardClick(side, id) {
+  // ignore matched
   if (side === "left" && state.pair.matchedLeft.has(id)) return;
   if (side === "right" && state.pair.matchedRight.has(id)) return;
 
-  // Clear previous selection on that side
+  // clear previous selection on that side
   clearPairSelection(side);
 
-  // Select this
-  el.classList.add("selected");
+  // set selection
   if (side === "left") state.pair.selectedLeftId = id;
   if (side === "right") state.pair.selectedRightId = id;
 
-  // If both selected, evaluate
+  // apply stronger selection highlight (dusty rose)
+  const el = getPairCardEl(side, id);
+  if (el) {
+    el.classList.add("selected");
+    el.style.outline = "3px solid rgba(181,133,183,0.95)";
+    el.style.boxShadow = "0 0 0 4px rgba(181,133,183,0.18), 0 10px 18px rgba(0,0,0,0.55)";
+  }
+
+  // if both selected evaluate
   if (state.pair.selectedLeftId && state.pair.selectedRightId) {
     evaluatePairSelection();
   }
 }
 
+function getPairCardEl(side, id) {
+  const container = side === "left" ? els.pairLeft : els.pairRight;
+  if (!container) return null;
+  return container.querySelector(`.card[data-id="${CSS.escape(id)}"]`);
+}
+
 function clearPairSelection(side) {
   const container = side === "left" ? els.pairLeft : els.pairRight;
-  container.querySelectorAll(".card.selected").forEach((n) => n.classList.remove("selected"));
+  if (!container) return;
+
+  container.querySelectorAll(".card.selected").forEach((n) => {
+    n.classList.remove("selected");
+    n.style.outline = "none";
+    n.style.boxShadow = "none";
+  });
 
   if (side === "left") state.pair.selectedLeftId = null;
   if (side === "right") state.pair.selectedRightId = null;
@@ -398,39 +482,40 @@ function evaluatePairSelection() {
   const correctRight = state.pair.pairMap.get(leftId);
   const isCorrect = correctRight === rightId;
 
-  const leftEl = els.pairLeft.querySelector(`.card[data-id="${CSS.escape(leftId)}"]`);
-  const rightEl = els.pairRight.querySelector(`.card[data-id="${CSS.escape(rightId)}"]`);
+  const leftEl = getPairCardEl("left", leftId);
+  const rightEl = getPairCardEl("right", rightId);
 
   if (isCorrect) {
-    // Mark matched
     state.pair.matchedLeft.add(leftId);
     state.pair.matchedRight.add(rightId);
 
-    leftEl?.classList.remove("selected");
-    rightEl?.classList.remove("selected");
+    // Mark matched with strong gold outline
+    [leftEl, rightEl].forEach((node) => {
+      if (!node) return;
+      node.classList.remove("selected");
+      node.classList.add("matched");
+      node.style.outline = "3px solid rgba(189,155,64,0.92)";
+      node.style.boxShadow = "0 0 0 4px rgba(189,155,64,0.18), 0 10px 18px rgba(0,0,0,0.55)";
+      node.style.pointerEvents = "none";
+      node.style.opacity = "1";
+    });
 
-    leftEl?.classList.add("matched");
-    rightEl?.classList.add("matched");
-
-    // Disable further interaction for matched cards
-    if (leftEl) leftEl.style.pointerEvents = "none";
-    if (rightEl) rightEl.style.pointerEvents = "none";
-
-    // Clear selection state
     state.pair.selectedLeftId = null;
     state.pair.selectedRightId = null;
 
-    // If all pairs matched, step complete
+    // complete when all selected pairs matched
     const totalPairs = state.pair.pairMap.size;
-    if (state.pair.matchedLeft.size >= totalPairs && totalPairs > 0) {
-      // small pause so it feels earned
+    if (totalPairs > 0 && state.pair.matchedLeft.size >= totalPairs) {
       setTimeout(() => completeCurrentStep(), 250);
     }
   } else {
-    // Gentle wrong feedback (no harsh red/green UI)
-    // Briefly deselect both after a short pause
-    if (leftEl) leftEl.classList.remove("selected");
-    if (rightEl) rightEl.classList.remove("selected");
+    // Gentle “wrong”: clear highlights and selection; no harsh UI
+    [leftEl, rightEl].forEach((node) => {
+      if (!node) return;
+      node.classList.remove("selected");
+      node.style.outline = "none";
+      node.style.boxShadow = "none";
+    });
 
     state.pair.selectedLeftId = null;
     state.pair.selectedRightId = null;
@@ -438,30 +523,34 @@ function evaluatePairSelection() {
 }
 
 /* =========================
-   STEP 2: Sliders (scope line required)
+   STEP 2: Sliders
+   - prompt + explicit scope line come from pack
+   - completion must advance to Buckets (fix)
 ========================= */
 function renderSliders() {
   const pack = state.currentPack;
   const mode = pack?.modes?.sliders;
+
   if (!mode) {
     completeCurrentStep();
     return;
   }
 
-  els.slidersPrompt.textContent = mode.prompt || "Sliders";
+  // IMPORTANT: do not hardcode “set the axes” — use pack prompt/scope
+  if (els.slidersPrompt) els.slidersPrompt.textContent = mode.prompt || "Sliders";
+  const scopeText = mode.scope ? (mode.scope.startsWith("Scope:") ? mode.scope : `Scope: ${mode.scope}`) : "Scope: the scene overall";
+  if (els.slidersScope) els.slidersScope.textContent = scopeText;
 
-  // Scope requirement: must be explicit; if not present, we show a safe fallback.
-  // Recommended pack field: modes.sliders.scope (string)
-  const scope = mode.scope || "Scope: the scene overall";
-  els.slidersScope.textContent = scope.startsWith("Scope:") ? scope : `Scope: ${scope}`;
-
-  els.slidersContainer.innerHTML = "";
+  if (els.slidersContainer) els.slidersContainer.innerHTML = "";
 
   const axes = mode.sliders || [];
   if (!axes.length) {
     completeCurrentStep();
     return;
   }
+
+  // Reset touched for this step (safety)
+  state.sliders.touched = new Set();
 
   axes.forEach((axis) => {
     const row = document.createElement("div");
@@ -479,12 +568,12 @@ function renderSliders() {
     input.value = axis.defaultValue ?? 50;
     input.dataset.axisId = axis.id;
 
-    // Touch detection: you must move each axis at least once
     input.addEventListener("input", () => {
       state.sliders.touched.add(axis.id);
-      if (state.sliders.touched.size >= axes.length) {
-        // Auto-advance once all sliders have been touched
-        setTimeout(() => completeCurrentStep(), 220);
+
+      // Only advance if we are still on sliders step (prevents weird step resets)
+      if (state.stepIndex === 1 && state.sliders.touched.size >= axes.length) {
+        setTimeout(() => completeCurrentStep(), 150);
       }
     });
 
@@ -497,35 +586,42 @@ function renderSliders() {
     row.appendChild(input);
     row.appendChild(right);
 
-    els.slidersContainer.appendChild(row);
+    els.slidersContainer?.appendChild(row);
   });
 }
 
 /* =========================
-   STEP 3: Buckets (labels + drag/drop)
+   STEP 3: Buckets
+   - visible labeled buckets
+   - drag/drop
 ========================= */
 function renderBuckets() {
   const pack = state.currentPack;
   const mode = pack?.modes?.rankBuckets;
+
   if (!mode) {
     completeCurrentStep();
     return;
   }
 
-  els.bucketsPrompt.textContent = mode.prompt || "Buckets";
+  if (els.bucketsPrompt) els.bucketsPrompt.textContent = mode.prompt || "Buckets";
 
-  // Expected pack fields:
-  // mode.buckets: [{id,label}, ...]
-  // mode.cards OR mode.elements: [{id,text}, ...]
-  const buckets = mode.buckets || [];
+  const buckets = mode.buckets || [
+    { id: "engine", label: "Engine" },
+    { id: "support", label: "Support" },
+    { id: "spice", label: "Spice" },
+  ];
+
   const elements = mode.cards || mode.elements || mode.items || [];
+  if (els.bucketsContainer) els.bucketsContainer.innerHTML = "";
 
-  els.bucketsContainer.innerHTML = "";
+  state.buckets.placement = new Map();
 
-  // Build "Elements" bank that spans full width (visible, not sr-only)
+  // Elements bank (full width)
   const bank = document.createElement("div");
   bank.className = "bucket";
   bank.style.gridColumn = "1 / -1";
+
   const bankTitle = document.createElement("h4");
   bankTitle.textContent = "Elements";
   bank.appendChild(bankTitle);
@@ -534,7 +630,6 @@ function renderBuckets() {
   bankList.className = "card-list";
   bank.appendChild(bankList);
 
-  // Render draggable element cards into bank
   elements.forEach((e) => {
     const card = document.createElement("div");
     card.className = "card";
@@ -550,9 +645,9 @@ function renderBuckets() {
     bankList.appendChild(card);
   });
 
-  els.bucketsContainer.appendChild(bank);
+  els.bucketsContainer?.appendChild(bank);
 
-  // Render labeled buckets (fix: previously labels missing)
+  // Buckets
   buckets.forEach((b) => {
     const bucket = document.createElement("div");
     bucket.className = "bucket";
@@ -564,10 +659,8 @@ function renderBuckets() {
 
     const dropZone = document.createElement("div");
     dropZone.className = "card-list";
-    dropZone.dataset.dropZone = "true";
     bucket.appendChild(dropZone);
 
-    // Drag-over / drop handlers
     bucket.addEventListener("dragover", (ev) => {
       ev.preventDefault();
       ev.dataTransfer.dropEffect = "move";
@@ -578,28 +671,26 @@ function renderBuckets() {
       const elementId = ev.dataTransfer.getData("text/plain");
       if (!elementId) return;
 
-      const card = els.bucketsContainer.querySelector(`.card[data-element-id="${CSS.escape(elementId)}"]`);
+      const card = els.bucketsContainer?.querySelector(`.card[data-element-id="${CSS.escape(elementId)}"]`);
       if (!card) return;
 
-      // Move card into this bucket
       dropZone.appendChild(card);
-
-      // Save placement
       state.buckets.placement.set(elementId, b.id);
 
-      // Completion when all elements have a bucket placement
       if (elements.length && state.buckets.placement.size >= elements.length) {
-        setTimeout(() => completeCurrentStep(), 220);
+        // Must be on buckets step
+        if (state.stepIndex === 2) {
+          setTimeout(() => completeCurrentStep(), 200);
+        }
       }
     });
 
-    els.bucketsContainer.appendChild(bucket);
+    els.bucketsContainer?.appendChild(bucket);
   });
 
-  // If no bucket labels exist, we can still proceed—but this would be a content issue.
-  if (!buckets.length) {
-    // Avoid dead-end
-    setTimeout(() => completeCurrentStep(), 250);
+  if (!elements.length) {
+    // avoid dead-end
+    setTimeout(() => completeCurrentStep(), 200);
   }
 }
 
@@ -608,41 +699,48 @@ function renderBuckets() {
 ========================= */
 function renderSpotlights() {
   const pack = state.currentPack;
-  const mode = pack?.modes?.spotlights;
+  const mode = pack?.modes?.spotlights || pack?.modes?.interpretiveTakes;
+
   if (!mode) {
     completeCurrentStep();
     return;
   }
 
-  // Gameplay change: rank top 3
-  els.spotlightsPrompt.textContent =
-    mode.prompt || "Rank the top three decisions that make the scene memorable.";
+  if (els.spotlightsPrompt) {
+    els.spotlightsPrompt.textContent =
+      mode.prompt || "Rank the top three decisions that make the scene memorable.";
+  }
 
-  els.spotlightsList.innerHTML = "";
+  if (els.spotlightsList) els.spotlightsList.innerHTML = "";
+  state.spotlights.rank = [null, null, null];
 
-  // Add rank slots UI (inline styling to avoid needing index.html edits)
+  const takes = mode.takes || mode.items || [];
+  if (!takes.length) {
+    completeCurrentStep();
+    return;
+  }
+
+  // Rank slots UI (simple, injected here)
   const slotsWrap = document.createElement("div");
   slotsWrap.style.display = "grid";
   slotsWrap.style.gridTemplateColumns = "repeat(3, 1fr)";
   slotsWrap.style.gap = "12px";
   slotsWrap.style.margin = "10px 0 14px";
 
-  const makeSlot = (idx) => {
+  const slotEls = [0, 1, 2].map((idx) => {
     const slot = document.createElement("div");
     slot.dataset.slotIndex = String(idx);
     slot.style.border = "1px solid rgba(189,155,64,0.55)";
     slot.style.borderRadius = "16px";
     slot.style.padding = "12px";
     slot.style.background = "rgba(0,0,0,0.35)";
-    slot.style.minHeight = "68px";
+    slot.style.minHeight = "78px";
     slot.style.display = "flex";
     slot.style.alignItems = "center";
     slot.style.justifyContent = "center";
     slot.style.textAlign = "center";
-    slot.style.color = "#bd9b40";
     slot.style.fontWeight = "900";
     slot.style.userSelect = "none";
-
     slot.textContent = `#${idx + 1}`;
 
     slot.addEventListener("dragover", (ev) => {
@@ -654,105 +752,92 @@ function renderSpotlights() {
       ev.preventDefault();
       const takeId = ev.dataTransfer.getData("text/plain");
       if (!takeId) return;
-      placeTakeInRank(takeId, idx);
-      refreshSpotlightSelectionUI();
+      placeTakeInSlot(takeId, idx, takes);
+      refreshSpotlightUI(takes, slotEls);
       checkSpotlightsComplete();
     });
 
+    // click to clear slot
     slot.addEventListener("click", () => {
-      // Clicking a filled slot clears it
-      const takeId = state.spotlights.rank[idx];
-      if (!takeId) return;
+      if (!state.spotlights.rank[idx]) return;
       state.spotlights.rank[idx] = null;
-      refreshSpotlightSelectionUI();
+      refreshSpotlightUI(takes, slotEls);
     });
 
     return slot;
-  };
+  });
 
-  const slotEls = [makeSlot(0), makeSlot(1), makeSlot(2)];
   slotEls.forEach((s) => slotsWrap.appendChild(s));
-  els.spotlightsList.appendChild(slotsWrap);
+  els.spotlightsList?.appendChild(slotsWrap);
 
   // Takes list
-  const takes = mode.takes || mode.items || [];
   takes.forEach((t) => {
     const div = document.createElement("div");
     div.className = "spotlight";
     div.dataset.takeId = t.id;
     div.textContent = t.text;
-
     div.draggable = true;
+
     div.addEventListener("dragstart", (ev) => {
       ev.dataTransfer.setData("text/plain", t.id);
       ev.dataTransfer.effectAllowed = "move";
     });
 
     div.addEventListener("click", () => {
-      // Click places into first empty slot; clicking again removes from slot
-      toggleTakeRank(t.id);
-      refreshSpotlightSelectionUI();
+      toggleTake(t.id);
+      refreshSpotlightUI(takes, slotEls);
       checkSpotlightsComplete();
     });
 
-    els.spotlightsList.appendChild(div);
+    els.spotlightsList?.appendChild(div);
   });
 
-  // Store rank slot elements for refresh
-  els.spotlightsList._rankSlotEls = slotEls;
-
-  // Initial refresh
-  refreshSpotlightSelectionUI();
+  refreshSpotlightUI(takes, slotEls);
 }
 
-function toggleTakeRank(takeId) {
-  // If already ranked, remove it
-  const idx = state.spotlights.rank.findIndex((id) => id === takeId);
-  if (idx >= 0) {
-    state.spotlights.rank[idx] = null;
+function toggleTake(takeId) {
+  const existing = state.spotlights.rank.findIndex((x) => x === takeId);
+  if (existing >= 0) {
+    state.spotlights.rank[existing] = null;
     return;
   }
-
-  // Otherwise place into first empty slot
-  const empty = state.spotlights.rank.findIndex((id) => !id);
-  if (empty >= 0) {
-    placeTakeInRank(takeId, empty);
-  }
+  const empty = state.spotlights.rank.findIndex((x) => !x);
+  if (empty >= 0) state.spotlights.rank[empty] = takeId;
 }
 
-function placeTakeInRank(takeId, slotIndex) {
-  // Remove from any existing slot first
-  const existing = state.spotlights.rank.findIndex((id) => id === takeId);
+function placeTakeInSlot(takeId, slotIndex) {
+  // remove from any existing slot
+  const existing = state.spotlights.rank.findIndex((x) => x === takeId);
   if (existing >= 0) state.spotlights.rank[existing] = null;
 
-  // If slot occupied, swap out (simple behavior)
   state.spotlights.rank[slotIndex] = takeId;
 }
 
-function refreshSpotlightSelectionUI() {
-  const slotEls = els.spotlightsList._rankSlotEls || [];
-  const rank = state.spotlights.rank;
+function refreshSpotlightUI(takes, slotEls) {
+  const selected = new Set(state.spotlights.rank.filter(Boolean));
 
-  // Update slot text
-  slotEls.forEach((slotEl, i) => {
-    const id = rank[i];
-    slotEl.textContent = id ? `#${i + 1}` : `#${i + 1}`;
-    slotEl.style.color = id ? "#f7efe3" : "#bd9b40";
-    slotEl.style.borderColor = id ? "rgba(181,133,183,0.95)" : "rgba(189,155,64,0.55)";
-    slotEl.style.boxShadow = id ? "0 0 0 2px rgba(181,133,183,0.18)" : "none";
-    slotEl.style.background = id ? "rgba(181,133,183,0.18)" : "rgba(0,0,0,0.35)";
-
-    // If filled, also show a short preview (without needing extra UI)
-    if (id) {
-      const takeEl = els.spotlightsList.querySelector(`.spotlight[data-take-id="${CSS.escape(id)}"]`);
-      const preview = takeEl ? takeEl.textContent : id;
-      slotEl.textContent = `#${i + 1} — ${preview}`;
+  // Update slots with preview text
+  slotEls.forEach((slotEl, idx) => {
+    const takeId = state.spotlights.rank[idx];
+    if (!takeId) {
+      slotEl.textContent = `#${idx + 1}`;
+      slotEl.style.color = "#bd9b40";
+      slotEl.style.borderColor = "rgba(189,155,64,0.55)";
+      slotEl.style.boxShadow = "none";
+      slotEl.style.background = "rgba(0,0,0,0.35)";
+      return;
     }
+
+    const take = takes.find((t) => t.id === takeId);
+    slotEl.textContent = `#${idx + 1} — ${take ? take.text : takeId}`;
+    slotEl.style.color = "#f7efe3";
+    slotEl.style.borderColor = "rgba(181,133,183,0.98)";
+    slotEl.style.boxShadow = "0 0 0 2px rgba(181,133,183,0.18)";
+    slotEl.style.background = "rgba(181,133,183,0.18)";
   });
 
-  // Highlight selected takes in list (dusty rose styling provided by index.html)
-  const selected = new Set(rank.filter(Boolean));
-  els.spotlightsList.querySelectorAll(".spotlight").forEach((el) => {
+  // Update list highlight (CSS uses dusty rose for .spotlight.selected)
+  els.spotlightsList?.querySelectorAll(".spotlight").forEach((el) => {
     const tid = el.dataset.takeId;
     el.classList.toggle("selected", selected.has(tid));
   });
@@ -760,7 +845,7 @@ function refreshSpotlightSelectionUI() {
 
 function checkSpotlightsComplete() {
   const filled = state.spotlights.rank.filter(Boolean).length;
-  if (filled >= 3) {
-    setTimeout(() => completeCurrentStep(), 250);
+  if (filled >= 3 && state.stepIndex === 3) {
+    setTimeout(() => completeCurrentStep(), 220);
   }
 }

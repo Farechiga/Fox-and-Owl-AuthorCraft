@@ -1,200 +1,167 @@
 // litPacks.js
-// AuthorCraft Appreciation — LITERATURE PACKS (Option A: one big file)
-// ES Module: exports LIT_PACKS
-// Standard: momentType must be "AuthorCraft" for all packs.
+// AuthorCraft Appreciation — LITERATURE PACKS
+// ES module: exports LIT_PACKS
+// Drafting standard: concrete, kid-clear, no seminar jargon.
 
 export const LIT_PACKS = [
-  // ============================================================
-  // THE BOXCAR CHILDREN (Book 1) — PACK 01
-  // ============================================================
   {
-    id: "lit-boxcar-01-run-together",
-    source: "The Boxcar Children (Book 1)",
+    id: "lit-boxcar-01-four-kids-one-decision",
+    source: "The Boxcar Children",
     medium: "literature",
     momentType: "AuthorCraft",
-    sceneTitle: "The Boxcar Children — Four Kids, One Decision",
+    sceneTitle: "Four kids, one decision",
     tier: "Lantern",
-
-    passageSelector: {
-      attractors: ["ThresholdMoment", "IdentityTension", "CompetenceReveal", "TendernessUnderStress"],
-      threshold: 2
-    },
-
     scene:
-      "Four siblings realize they can’t rely on adults in the moment. Instead of splitting up or panicking, they choose to stay together and keep moving. The scene shows leadership and trust forming fast, through what they do and what they avoid saying.",
-
+      "After being separated from adult protection, the four siblings decide to stick together. Instead of waiting to be rescued, they make a plan with limited information and rely on each other’s competence.",
     modes: {
       pairMatch: {
-        prompt:
-          "Match the micro-moment to the best ‘why it lands.’ (There is a right answer — point to the text.)",
-        leftCards: [
-          { id: "L1", text: "They choose ‘together’ immediately — no long debate, just alignment." },
-          { id: "L2", text: "An older sibling takes charge through actions (where to go, what to carry)." },
-          { id: "L3", text: "A younger sibling follows, trusting the plan even without full explanation." },
-          { id: "L4", text: "They keep moving instead of waiting to be rescued." }
-        ],
-        rightCards: [
-          { id: "R1", text: "The story builds a team fast: choice replaces speeches." },
-          { id: "R2", text: "Leadership is shown as behavior, not a title." },
-          { id: "R3", text: "Trust is the real engine: someone follows before proof arrives." },
-          { id: "R4", text: "Momentum becomes courage — movement beats fear." }
-        ],
+        prompt: "Match the moment to why it matters.",
         pairs: [
-          { leftId: "L2", rightId: "R2" },
-          { leftId: "L3", rightId: "R3" },
-          { leftId: "L1", rightId: "R1" },
-          { leftId: "L4", rightId: "R4" }
+          {
+            id: "PM1",
+            left: "Henry quietly takes the lead and speaks like a big brother, not a kid.",
+            right:
+              "It tells you the group is choosing leadership, not panic—so the decision feels earned.",
+            isCorrect: true,
+          },
+          {
+            id: "PM2",
+            left: "Jessie checks on Violet and Benny before talking about what to do next.",
+            right:
+              "Care comes first, so their plan feels like family teamwork—not a random adventure.",
+            isCorrect: true,
+          },
+          {
+            id: "PM3",
+            left: "They share what little they know and agree on one direction together.",
+            right:
+              "The scene turns four separate fears into one shared choice—now they move as a unit.",
+            isCorrect: true,
+          },
+          {
+            id: "PM4",
+            left: "They keep walking even though they don’t have a perfect map or adult help.",
+            right:
+              "Action replaces wishing; you feel their courage because they move anyway.",
+            isCorrect: true,
+          },
         ],
-        guardrails: {
-          standaloneLeftCards: true,
-          oneMovePerRightCard: true,
-          noThesisLanguage: true
-        }
       },
 
       sliders: {
-        prompt:
-          "SCOPE: The siblings as a group in this scene. Set your read using descriptive axes.",
-        items: [{ id: "S1", text: "The siblings" }],
-        sliders: [
-          { id: "A1", leftLabel: "Scared", rightLabel: "Steady", defaultValue: 50 },
-          { id: "A2", leftLabel: "Reactive", rightLabel: "Intentional", defaultValue: 50 },
-          { id: "A3", leftLabel: "Dependent", rightLabel: "Capable", defaultValue: 50 },
-          { id: "A4", leftLabel: "Separate", rightLabel: "Unified", defaultValue: 50 }
-        ]
+        scope: "Scope: the siblings' choice to stick together (not the whole book).",
+        prompt: "Set your read on this choice using the axes.",
+        axes: [
+          { id: "a1", left: "Cautious", right: "Bold", defaultValue: 55 },
+          { id: "a2", left: "Scared", right: "Steady", defaultValue: 45 },
+          { id: "a3", left: "Following", right: "Leading", defaultValue: 60 },
+          { id: "a4", left: "Separate", right: "United", defaultValue: 70 },
+        ],
       },
 
       rankBuckets: {
-        prompt:
-          "Drag each element into Engine / Support / Spice based on what drives the scene.",
-        buckets: [
-          { id: "engine", label: "Engine" },
-          { id: "support", label: "Support" },
-          { id: "spice", label: "Spice" }
-        ],
+        prompt: "Drag each craft element into the best bucket.",
+        // NOTE: bucket labels come from CraftAppreciation.js defaults.
         cards: [
-          { id: "B1", text: "A fast decision to stick together." },
-          { id: "B2", text: "A leader who acts first, explains later." },
-          { id: "B3", text: "Younger sibling trust (following the plan)." },
-          { id: "B4", text: "Movement: they keep going instead of freezing." },
-          { id: "B5", text: "Limited information — they commit anyway." },
-          { id: "B6", text: "A quiet agreement that replaces arguing." },
-          { id: "B7", text: "A sense of the adult world being out of reach for now." }
-        ]
+          { id: "B1", text: "A clear leader emerges without anyone announcing it." },
+          { id: "B2", text: "Small check-ins between siblings before big decisions." },
+          { id: "B3", text: "The plan is simple: keep moving, stay together." },
+          { id: "B4", text: "A tiny detail that shows they’re still kids (a worry, a habit, a comfort)." },
+          { id: "B5", text: "Limited information creates tension without a villain." },
+          { id: "B6", text: "Their fear shows, but it doesn’t stop them." },
+        ],
       },
 
       interpretiveTakes: {
-        prompt:
-          "Rank the top 3 decisions that make the scene memorable. Leave the rest unranked.",
-        interaction: "rank",
+        prompt: "Rank the top 3 ideas that best explain why this moment sticks.",
+        pick: 3,
         takes: [
-          { id: "T1", text: "The speed of the decision is the craft move — urgency becomes character." },
-          { id: "T2", text: "Leadership is shown through tasks, not speeches." },
-          { id: "T3", text: "The book builds trust by showing who follows without needing proof." },
-          { id: "T4", text: "The scene avoids melodrama — it stays practical, which makes it believable." },
-          { id: "T5", text: "Togetherness isn’t sentimental; it’s survival math." },
-          { id: "T6", text: "The story makes ‘keep moving’ feel like bravery." }
+          "The choice feels brave because it’s made with incomplete information.",
+          "Family roles snap into place fast—leader, helper, little one—so the group feels real.",
+          "The tension comes from the unknown, not from a monster or a chase.",
+          "The scene is memorable because it’s quiet courage, not a loud victory.",
         ],
-        gentleNudge:
-          "If two feel similar, pick the one that points to the most concrete action."
-      }
-    }
+      },
+    },
   },
 
-  // ============================================================
-  // THE BOXCAR CHILDREN (Book 1) — PACK 02
-  // ============================================================
   {
-    id: "lit-boxcar-02-boxcar-home",
-    source: "The Boxcar Children (Book 1)",
+    id: "lit-boxcar-02-making-a-home",
+    source: "The Boxcar Children",
     medium: "literature",
     momentType: "AuthorCraft",
-    sceneTitle: "The Boxcar Children — Turning a Boxcar into Home",
+    sceneTitle: "Turning a boxcar into home",
     tier: "Lantern",
-
-    passageSelector: {
-      attractors: ["CompetenceReveal", "Resourcefulness", "WarmthInHardship", "WorldbuildingThroughObjects"],
-      threshold: 2
-    },
-
     scene:
-      "The children discover an old boxcar and begin transforming it into a livable home. The scene makes safety feel earned: they clean, organize, gather supplies, and assign roles. The comfort is small, but it feels huge because we watched them build it.",
-
+      "The children find an old boxcar in the woods and decide to make it their shelter. They clean, arrange, and solve problems step-by-step—turning a scary situation into something workable.",
     modes: {
       pairMatch: {
-        prompt:
-          "Match the micro-moment to the best ‘why it lands.’ (There is a right answer — use the concrete details.)",
-        leftCards: [
-          { id: "L1", text: "They clean and arrange the space before relaxing." },
-          { id: "L2", text: "They divide tasks naturally — each kid contributes something different." },
-          { id: "L3", text: "Small comforts (food, bedding, warmth) are treated as major wins." },
-          { id: "L4", text: "The boxcar shifts from ‘abandoned object’ to ‘chosen shelter’." }
-        ],
-        rightCards: [
-          { id: "R1", text: "Competence becomes comfort: we believe in the home because of the work." },
-          { id: "R2", text: "Team identity forms through roles, not announcements." },
-          { id: "R3", text: "Tiny details carry emotional weight because the kids earned them." },
-          { id: "R4", text: "A place becomes ‘theirs’ through choices — it’s adoption, not luck." }
-        ],
+        prompt: "Match the moment to why it matters.",
         pairs: [
-          { leftId: "L2", rightId: "R2" },
-          { leftId: "L1", rightId: "R1" },
-          { leftId: "L4", rightId: "R4" },
-          { leftId: "L3", rightId: "R3" }
+          {
+            id: "PM1",
+            left: "They sweep out the boxcar and claim a corner for each child.",
+            right:
+              "Order calms fear—suddenly it’s a home, not just a hiding place.",
+            isCorrect: true,
+          },
+          {
+            id: "PM2",
+            left: "They solve one small problem at a time (water, food, bedding).",
+            right:
+              "The scene feels believable because it’s practical—progress happens in steps.",
+            isCorrect: true,
+          },
+          {
+            id: "PM3",
+            left: "They celebrate a tiny win, like finding something useful or making a meal.",
+            right:
+              "Small victories feel big when you’re vulnerable—so you feel their relief.",
+            isCorrect: true,
+          },
+          {
+            id: "PM4",
+            left: "They keep watch for adults while still acting like kids in little ways.",
+            right:
+              "That mix—responsibility plus kid-ness—makes the scene warm and tense at once.",
+            isCorrect: true,
+          },
         ],
-        guardrails: {
-          standaloneLeftCards: true,
-          oneMovePerRightCard: true,
-          noThesisLanguage: true
-        }
       },
 
       sliders: {
-        prompt:
-          "SCOPE: The boxcar-as-home (the feeling of the setting). Set your read using descriptive axes.",
-        items: [{ id: "S1", text: "The boxcar home" }],
-        sliders: [
-          { id: "A1", leftLabel: "Temporary", rightLabel: "Real", defaultValue: 50 },
-          { id: "A2", leftLabel: "Bare", rightLabel: "Cozy", defaultValue: 50 },
-          { id: "A3", leftLabel: "Risky", rightLabel: "Safe", defaultValue: 50 },
-          { id: "A4", leftLabel: "Lonely", rightLabel: "Together", defaultValue: 50 }
-        ]
+        scope: "Scope: the boxcar transformation (the mood of this one scene).",
+        prompt: "Set your read on the mood as they build their shelter.",
+        axes: [
+          { id: "a1", left: "Unsafe", right: "Safe", defaultValue: 60 },
+          { id: "a2", left: "Desperate", right: "Resourceful", defaultValue: 70 },
+          { id: "a3", left: "Lonely", right: "Together", defaultValue: 75 },
+          { id: "a4", left: "Temporary", right: "Home-like", defaultValue: 65 },
+        ],
       },
 
       rankBuckets: {
-        prompt:
-          "Drag each element into Engine / Support / Spice based on what drives the scene.",
-        buckets: [
-          { id: "engine", label: "Engine" },
-          { id: "support", label: "Support" },
-          { id: "spice", label: "Spice" }
-        ],
+        prompt: "Drag each craft element into the best bucket.",
         cards: [
-          { id: "B1", text: "Cleaning and organizing before celebrating." },
-          { id: "B2", text: "Task division: roles emerge naturally." },
-          { id: "B3", text: "Concrete objects (food, bedding, tools) that make survival visible." },
-          { id: "B4", text: "A ‘found place’ becoming a chosen home." },
-          { id: "B5", text: "Small wins treated as big victories." },
-          { id: "B6", text: "A sense of secrecy (they’re building a life out of sight)." },
-          { id: "B7", text: "Setting details that make the reader picture the space." }
-        ]
+          { id: "B1", text: "A physical space change (dirty → livable) you can picture." },
+          { id: "B2", text: "Problem-solving shown through actions, not speeches." },
+          { id: "B3", text: "A small comfort detail that makes them feel like kids." },
+          { id: "B4", text: "A realistic tradeoff: building a home also means staying hidden." },
+          { id: "B5", text: "Teamwork that feels natural—each child does something specific." },
+          { id: "B6", text: "Quiet tension: they might be found, but life still continues." },
+        ],
       },
 
       interpretiveTakes: {
-        prompt:
-          "Rank the top 3 decisions that make the scene memorable. Leave the rest unranked.",
-        interaction: "rank",
+        prompt: "Rank the top 3 ideas that best explain why this moment sticks.",
+        pick: 3,
         takes: [
-          { id: "T1", text: "The book makes safety feel earned by showing the work first." },
-          { id: "T2", text: "Objects do the storytelling: tools and routines become character proof." },
-          { id: "T3", text: "The boxcar becomes ‘home’ because the kids choose it, not because it’s perfect." },
-          { id: "T4", text: "Comfort is small but huge — the contrast drives the emotion." },
-          { id: "T5", text: "Roles emerge quietly, which makes the teamwork believable." },
-          { id: "T6", text: "The scene turns survival into pride without becoming preachy." }
+          "You can ‘see’ the home forming, so you feel relief building in your body.",
+          "The scene is satisfying because effort turns into visible change.",
+          "The kids feel capable without feeling unrealistic—each step is small.",
+          "The sweetness lands because danger is nearby, even if it’s off-screen.",
         ],
-        gentleNudge:
-          "Pick the spotlights that point to something you can visualize clearly."
-      }
-    }
-  }
+      },
+    },
+  },
 ];

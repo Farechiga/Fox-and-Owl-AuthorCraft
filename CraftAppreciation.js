@@ -305,7 +305,12 @@ function resetSceneInteractionState() {
 }
 
 function renderSceneHeader(pack) {
-  if (els.sceneTitle) els.sceneTitle.textContent = `Scene — ${pack.sceneTitle || ""}`.trim();
+  if (els.sceneTitle) {
+    // Prefer showing the pack "source" (Zootopia / The Boxcar Children) + the sceneTitle.
+    const source = pack.source || "";
+    const title = pack.sceneTitle || "";
+    els.sceneTitle.textContent = source ? `${source} — ${title}`.trim() : title.trim();
+  }
   if (els.tierPill) els.tierPill.textContent = pack.tier || "Lantern";
   if (els.sceneText) els.sceneText.textContent = pack.scene || "";
 }
@@ -538,8 +543,16 @@ function renderSliders() {
 
   // IMPORTANT: do not hardcode “set the axes” — use pack prompt/scope
   if (els.slidersPrompt) els.slidersPrompt.textContent = mode.prompt || "Sliders";
-  const scopeText = mode.scope ? (mode.scope.startsWith("Scope:") ? mode.scope : `Scope: ${mode.scope}`) : "Scope: the scene overall";
-  if (els.slidersScope) els.slidersScope.textContent = scopeText;
+
+  // Scope line is optional. Do NOT default to "Scope: the scene overall" (too redundant/cluttery).
+  const scopeText = mode.scope
+    ? (mode.scope.startsWith("Scope:") ? mode.scope : `Scope: ${mode.scope}`)
+    : "";
+
+  if (els.slidersScope) {
+    els.slidersScope.textContent = scopeText;
+    els.slidersScope.style.display = scopeText ? "" : "none";
+  }
 
   if (els.slidersContainer) els.slidersContainer.innerHTML = "";
 
@@ -606,12 +619,17 @@ function renderBuckets() {
 
   if (els.bucketsPrompt) els.bucketsPrompt.textContent = mode.prompt || "Buckets";
 
-  const buckets = mode.buckets || [
+  const defaultBuckets = [
     { id: "makes_the_scene", label: "Makes the scene" },
     { id: "strong_support", label: "Strong support" },
     { id: "nice_touches", label: "Nice touches" },
   ];
 
+   const buckets =
+    Array.isArray(mode.buckets) && mode.buckets.length
+      ? mode.buckets
+      : defaultBuckets;
+   
   const elements = mode.cards || mode.elements || mode.items || [];
   if (els.bucketsContainer) els.bucketsContainer.innerHTML = "";
 

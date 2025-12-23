@@ -32,7 +32,7 @@ export const FILM_PACKS = [
       // MODE 1: Pair Match (4 pairs only)
       pairMatch: {
         prompt:
-          "Match the micro-moment to the best ‘why it lands.’ (There is a right answer — use evidence.)",
+          "Match the micro-moment to the best ‘why it lands.’",
         leftCards: [
           { id: "L1", text: "The DMV looks official and procedural: signs, numbers, lines." },
           { id: "L2", text: "The sloth turns toward them at a glacial pace, pausing between moves." },
@@ -133,7 +133,7 @@ export const FILM_PACKS = [
     modes: {
       pairMatch: {
         prompt:
-          "Match the micro-moment to the best ‘why it lands.’ (There is a right answer — use what you see.)",
+          "Match the micro-moment to the best ‘why it lands.’",
         leftCards: [
           { id: "L1", text: "Mr. Big’s size is tiny, but everyone treats him like royalty." },
           { id: "L2", text: "The environment is dramatic: ice, guards, formality, threat." },

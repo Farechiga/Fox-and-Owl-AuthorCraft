@@ -607,9 +607,9 @@ function renderBuckets() {
   if (els.bucketsPrompt) els.bucketsPrompt.textContent = mode.prompt || "Buckets";
 
   const buckets = mode.buckets || [
-    { id: "engine", label: "Engine" },
-    { id: "support", label: "Support" },
-    { id: "spice", label: "Spice" },
+    { id: "makes_the_scene", label: "Makes the scene" },
+    { id: "strong_support", label: "Strong support" },
+    { id: "nice_touches", label: "Nice touches" },
   ];
 
   const elements = mode.cards || mode.elements || mode.items || [];

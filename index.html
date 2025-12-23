@@ -1,358 +1,379 @@
-<!-- index.html — AuthorCraft Appreciation (clean, comprehensive, matches CraftAppreciation.js IDs) -->
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Fox & Owl Story Studio — AuthorCraft Appreciation</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
     :root{
-      /* Brighter deep plum (more “kid-friendly” than dark-mode) */
-      --plum: #3e0f53;
-
-      --gold: #bd9b40;
-      --text: #f7efe3;
-      --muted: #d0ced4;
-      --black: #050505;
-
-      /* dusty rose highlight */
-      --rose: #b585b7;
+      --plum:#2a0a3a;
+      --plum2:#1e072c;
+      --gold:#bd9b40;
+      --text:#f2f2f2;
+      --muted:rgba(255,255,255,0.78);
+      --panel:rgba(0,0,0,0.40);
+      --panel2:rgba(0,0,0,0.52);
+      --line:rgba(189,155,64,0.45);
+      --line2:rgba(189,155,64,0.22);
+      --shadow: 0 18px 40px rgba(0,0,0,0.55);
+      --radius:24px;
     }
 
-    html, body { height:100%; margin:0; padding:0; }
+    *{box-sizing:border-box}
+    html,body{height:100%}
     body{
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background-color: var(--plum);
-      color: var(--text);
-      min-height:100vh;
-      position:relative;
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 50% 20%, rgba(60,18,90,0.78), transparent 70%),
+        radial-gradient(900px 600px at 50% 100%, rgba(30,6,46,0.90), transparent 70%),
+        linear-gradient(180deg, var(--plum), var(--plum2));
       overflow-x:hidden;
     }
 
-    /* Background overlay: set by body class */
-    body::before{
-      content:"";
-      position:fixed;
-      inset:0;
+    /* background overlays (theater/library) */
+    .app-root{
+      min-height:100%;
+      width:100%;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      padding:24px;
+      background-repeat:no-repeat;
       background-size:cover;
       background-position:center;
-      background-repeat:no-repeat;
-      opacity:0.92;
-      pointer-events:none;
-      z-index:0;
     }
-    body.mode-film::before{ background-image:url("Theater overlay.png"); }
-    body.mode-literature::before{ background-image:url("Library overlay.png"); }
-    body.landing::before{ background-image:none; }
-
-    .app-root{
-      position:relative;
-      z-index:1;
-      width:100%;
-      max-width:1200px;
-      margin:0 auto;
-      padding:24px;
-      box-sizing:border-box;
+    body.film .app-root{
+      background-image:
+        linear-gradient(180deg, rgba(18,0,26,0.35), rgba(18,0,26,0.55)),
+        url("Theater overlay.png");
     }
-    .hidden{ display:none !important; }
+    body.literature .app-root{
+      background-image:
+        linear-gradient(180deg, rgba(18,0,26,0.35), rgba(18,0,26,0.55)),
+        url("Library overlay.png");
+    }
 
-    /* =========================
-       CLASSIC LANDING PAGE
-       ========================= */
-    .landing-screen{
-      min-height: calc(100vh - 48px);
+    /* LANDING */
+    body.landing .app-root{
       display:flex;
-      flex-direction:column;
       align-items:center;
       justify-content:center;
-      gap:24px;
+    }
+    .landing-screen{
+      width:min(980px, 92vw);
+      background:rgba(0,0,0,0.45);
+      border:1px solid var(--line2);
+      border-radius: 26px;
+      padding: 34px 28px 26px;
+      box-shadow: var(--shadow);
       text-align:center;
+      backdrop-filter: blur(8px);
     }
     .landing-logo{
-      max-width:560px;
-      width:84%;
+      width:min(680px, 88vw);
       height:auto;
       display:block;
-      filter: drop-shadow(0 18px 30px rgba(0,0,0,0.45));
+      margin:0 auto 20px;
+      filter: drop-shadow(0 16px 30px rgba(0,0,0,0.6));
     }
     .play-button{
-      padding:12px 44px;
-      border-radius:999px;
-      border:2px solid var(--gold);
-      background:transparent;
-      color:var(--gold);
-      font-size:1.05rem;
-      font-weight:800;
+      appearance:none;
+      border:1px solid rgba(189,155,64,0.55);
+      background: rgba(0,0,0,0.35);
+      color: var(--gold);
+      font-weight: 700;
+      letter-spacing: .04em;
+      padding: 14px 28px;
+      border-radius: 999px;
       cursor:pointer;
-      letter-spacing:0.08em;
-      text-transform:uppercase;
-      transition: transform 0.12s ease-out, box-shadow 0.12s ease-out, background 0.12s ease-out;
+      font-size: 18px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.45);
     }
     .play-button:hover{
       transform: translateY(-1px);
-      box-shadow: 0 12px 24px rgba(0,0,0,0.55);
-      background: rgba(0,0,0,0.16);
+      border-color: rgba(189,155,64,0.8);
     }
 
-    /* =========================
-       GAME
-       ========================= */
+    /* GAME SCREEN WRAP */
+    .game-screen{
+      width:min(1280px, 96vw);
+    }
+    .hidden{display:none !important}
+
+    /* Film/Lit toggle */
     .mode-toggle-wrapper{
-      position:fixed;
-      top:22px;
-      left:50%;
-      transform: translateX(-50%);
-      z-index:2;
+      width:100%;
       display:flex;
-      gap:10px;
-      align-items:center;
       justify-content:center;
+      margin: 6px 0 14px;
     }
     .mode-toggle{
       display:inline-flex;
-      background: rgba(0,0,0,0.72);
+      gap:0;
+      padding:6px;
       border-radius:999px;
-      padding:3px;
-      border:1px solid rgba(0,0,0,0.95);
-      box-shadow: 0 12px 24px rgba(0,0,0,0.55);
+      background: rgba(0,0,0,0.45);
+      border:1px solid rgba(189,155,64,0.25);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.35);
+      backdrop-filter: blur(6px);
     }
     .mode-btn{
-      border:none;
-      padding:7px 24px;
-      border-radius:999px;
-      font-size:0.86rem;
+      border:0;
+      background: transparent;
+      color: rgba(255,255,255,0.78);
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 999px;
       cursor:pointer;
-      background:transparent;
-      color:var(--muted);
-      transition: background 0.15s ease, color 0.15s ease;
-      font-weight:800;
+      font-size: 15px;
     }
     .mode-btn.active{
-      background:#101010;
-      color:var(--gold);
+      background: rgba(0,0,0,0.55);
+      border:1px solid rgba(189,155,64,0.35);
+      color: var(--gold);
     }
 
-    .game-screen{
-      padding-top:78px; /* space for fixed toggle */
-    }
-
+    /* MAIN PANEL */
     .game-area{
-      width:100%;
-      max-width:1040px;
-      margin: 22px auto 52px;
-      padding: 24px 26px 28px;
-      box-sizing:border-box;
-      border-radius:18px;
-      background: radial-gradient(circle at top, rgba(0,0,0,0.40), rgba(0,0,0,0.82));
-      border:1px solid rgba(189,155,64,0.92);
-      box-shadow:
-        0 0 0 1px rgba(0,0,0,0.5),
-        0 26px 56px rgba(0,0,0,0.75);
+      border:1px solid rgba(189,155,64,0.32);
+      border-radius: var(--radius);
+      padding: 20px 22px 26px;
+      background: rgba(0,0,0,0.34);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(7px);
     }
 
-    /* topbar */
+    /* TOPBAR */
     .topbar{
       display:flex;
-      align-items:center;
       justify-content:space-between;
-      gap:14px;
-      margin-bottom:14px;
+      align-items:flex-start;
+      gap:16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(189,155,64,0.22);
     }
     .brand-left{
       display:flex;
       align-items:center;
-      gap:12px;
-      min-width:0;
+      gap:14px;
+      min-width: 320px;
     }
     .brand-thumb{
-      width:44px;
-      height:44px;
+      width:52px;
+      height:52px;
       border-radius:12px;
+      border:1px solid rgba(189,155,64,0.25);
       object-fit:cover;
-      border:1px solid rgba(189,155,64,0.70);
-      background: rgba(0,0,0,0.35);
+      box-shadow: 0 10px 18px rgba(0,0,0,0.45);
     }
-    .brand-text{
-      display:flex;
-      flex-direction:column;
-      gap:2px;
-      min-width:0;
-    }
+    .brand-text{line-height:1.08}
     .brand-title{
-      font-weight:900;
-      font-size:1.02rem;
-      color:var(--text);
-      line-height:1.12;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
+      font-weight: 800;
+      letter-spacing: .02em;
     }
     .brand-sub{
-      font-size:0.86rem;
-      color:var(--muted);
-      line-height:1.12;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
+      color: rgba(255,255,255,0.72);
+      font-size: 13px;
+      margin-top: 2px;
     }
     .scene-counter{
-      font-size:0.92rem;
-      color:var(--gold);
+      color: var(--gold);
+      font-weight: 800;
+      font-size: 18px;
+      padding-top: 6px;
       white-space:nowrap;
-      font-weight:900;
     }
 
-    /* scene header */
+    /* SCENE HEADER */
     .header-row{
       display:flex;
+      align-items:flex-start;
       justify-content:space-between;
-      gap:16px;
-      align-items:baseline;
-      margin-bottom:10px;
+      gap:14px;
+      margin-top: 14px;
     }
     .scene-title{
-      font-size:1.68rem;
-      font-weight:950;
-      letter-spacing:0.01em;
-      color:var(--text);
       margin:0;
+      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+      font-weight: 900;
+      letter-spacing: .01em;
+
+      /* CHANGE: smaller title */
+      font-size: 40px;
+      line-height: 1.12;
     }
     .tier-pill{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:8px 14px;
-      border-radius:999px;
-      border:1px solid rgba(189,155,64,0.68);
-      color:var(--gold);
-      background: rgba(0,0,0,0.35);
-      font-weight:900;
-      font-size:0.92rem;
-      white-space:nowrap;
+      border:1px solid rgba(189,155,64,0.35);
+      color: var(--gold);
+      background: rgba(0,0,0,0.30);
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-weight: 800;
+      margin-top: 6px;
+      flex: 0 0 auto;
     }
-
     .scene-text{
-      font-size:1.03rem;
-      line-height:1.55;
-      margin: 0 0 14px 0;
-      color:var(--text);
-      max-width: 980px;
+      margin: 10px 0 14px;
+      color: rgba(255,255,255,0.92);
+
+      /* CHANGE: larger description */
+      font-size: 20px;
+      line-height: 1.48;
+      max-width: 1100px;
     }
 
-    /* stepper */
+    /* 4-step progress */
     .stepper{
       display:flex;
       align-items:center;
-      justify-content:flex-start;
-      gap:10px;
-      margin: 10px 0 14px;
+      gap: 10px;
+      margin: 6px 0 14px;
       flex-wrap:wrap;
     }
+
+    /* CHANGE: remove pill outlines; keep dot; add "/" separators */
     .step{
-      display:inline-flex;
+      display:flex;
       align-items:center;
       gap:10px;
-      padding:8px 14px;
-      border-radius:999px;
-      border:1px solid rgba(0,0,0,0.95);
-      background: var(--black);
-      color:var(--muted);
-      font-size:0.90rem;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      border-radius: 0;
+      font-weight: 800;
+      color: rgba(255,255,255,0.74);
       user-select:none;
-      font-weight:850;
-    }
-    .step.active{
-      border-color: rgba(189,155,64,0.92);
-      color: var(--gold);
-      box-shadow: 0 10px 18px rgba(0,0,0,0.55);
-    }
-    .step.done{
-      border-color: rgba(189,155,64,0.55);
-      color: var(--text);
     }
     .step .dot{
-      width:9px; height:9px; border-radius:50%;
-      background: rgba(208,206,212,0.35);
+      width:10px;
+      height:10px;
+      border-radius:999px;
+      background: rgba(255,255,255,0.20);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
     }
-    .step.active .dot{ background: rgba(189,155,64,0.95); }
-    .step.done .dot{ background: rgba(189,155,64,0.75); }
-
-    /* panels */
-    .panel{ margin-top:10px; padding-top:10px; }
-    .panel-title{
-      margin: 0 0 10px 0;
+    .step.active{
       color: var(--gold);
-      font-weight:950;
-      font-size:1.22rem;
-      letter-spacing:0.01em;
+    }
+    .step.active .dot{
+      background: rgba(189,155,64,0.92);
+      box-shadow: 0 0 0 2px rgba(189,155,64,0.18);
+    }
+    .step.done{
+      color: rgba(189,155,64,0.85);
+    }
+    .step.done .dot{
+      background: rgba(189,155,64,0.70);
+    }
+    .step-sep{
+      color: rgba(255,255,255,0.35);
+      font-weight: 900;
+      margin: 0 2px;
     }
 
-    /* Pair Match */
+    /* PANELS */
+    .panel{
+      margin-top: 10px;
+      padding: 16px 16px 18px;
+      border-radius: 20px;
+      background: rgba(0,0,0,0.40);
+      border: 1px solid rgba(189,155,64,0.16);
+      box-shadow: 0 10px 18px rgba(0,0,0,0.35);
+    }
+    .panel-title{
+      margin:0 0 12px;
+      color: var(--gold);
+      font-weight: 900;
+      font-size: 20px;
+      letter-spacing: .01em;
+    }
+    .scope-line{
+      margin: -6px 0 12px;
+      color: rgba(255,255,255,0.78);
+      font-weight: 700;
+    }
+
+    /* Pair match */
     .pair-grid{
       display:grid;
       grid-template-columns: 1fr 1fr;
-      gap:18px;
-      align-items:start;
+      gap: 14px;
     }
-    @media (max-width: 860px){ .pair-grid{ grid-template-columns: 1fr; } }
+    @media (max-width: 880px){
+      .pair-grid{grid-template-columns:1fr}
+    }
 
-    /* Pair Match column headers: thin rounded rectangle, no fill */
+    /* CHANGE: remove outline boxes around Micro-moments / Why they land labels */
     .pair-column-title{
       background: transparent !important;
-      border: none !important;
+      border: 0;
       border-radius: 0;
       padding: 0;
-      color: var(--gold);
-      font-weight: 950;
-      letter-spacing: 0.01em;
-      margin-bottom: 10px;
-      display:inline-block;
+      margin: 0 0 10px;
+      color: rgba(189,155,64,0.92);
+      font-weight: 900;
+      letter-spacing: .01em;
     }
 
     .card-list{
       display:flex;
       flex-direction:column;
-      gap:10px;
+      gap: 10px;
+      min-height: 220px;
     }
     .card{
-      background: rgba(0,0,0,0.45);
-      border: 1px solid rgba(0,0,0,0.95);
-      border-radius: 16px;
-      padding: 14px 14px;
-      color: var(--text);
-      cursor: pointer;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(0,0,0,0.48);
+      border: 1px solid rgba(255,255,255,0.10);
+      color: rgba(255,255,255,0.92);
+      box-shadow: 0 12px 22px rgba(0,0,0,0.40);
+      cursor:pointer;
       user-select:none;
-      transition: transform .08s ease-out, box-shadow .08s ease-out, border-color .08s ease-out;
+      transition: transform .08s ease, border-color .12s ease, box-shadow .12s ease;
     }
     .card:hover{
       transform: translateY(-1px);
-      box-shadow: 0 10px 18px rgba(0,0,0,0.55);
-      border-color: rgba(189,155,64,0.55);
+      border-color: rgba(189,155,64,0.32);
+    }
+    .card.selected{
+      border-color: rgba(189,155,64,0.78);
+      box-shadow: 0 0 0 2px rgba(189,155,64,0.18), 0 14px 24px rgba(0,0,0,0.55);
+    }
+    .card.locked{
+      opacity: 0.55;
+      cursor: default;
     }
 
     /* Sliders */
-    .scope-line{
-      margin: 0 0 12px 0;
-      color: var(--muted);
-      font-size: 0.98rem;
-      font-weight:750;
+    #slidersContainer{
+      display:flex;
+      flex-direction:column;
+      gap: 16px;
     }
     .slider-row{
       display:grid;
-      grid-template-columns: 140px 1fr 140px;
-      gap: 14px;
+      grid-template-columns: 190px 1fr 190px;
+      gap: 10px;
       align-items:center;
-      padding: 14px 14px;
+      padding: 10px 12px;
       border-radius: 16px;
-      background: rgba(0,0,0,0.35);
-      border: 1px solid rgba(0,0,0,0.95);
-      margin-bottom: 12px;
+      background: rgba(0,0,0,0.34);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    @media (max-width: 900px){
+      .slider-row{grid-template-columns: 1fr}
     }
     .slider-label{
-      font-weight:950;
-      color: var(--text);
-      opacity: 0.96;
+      font-weight: 900;
+      color: rgba(255,255,255,0.92);
+    }
+    .slider-right{
+      text-align:right;
+      font-weight: 900;
+      color: rgba(255,255,255,0.92);
     }
     input[type="range"]{
       width:100%;
@@ -362,24 +383,8 @@
     /* Buckets */
     .buckets-wrap{
       display:grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: 1fr;
       gap: 14px;
-      margin-top: 10px;
-    }
-    @media (max-width: 980px){ .buckets-wrap{ grid-template-columns: 1fr; } }
-
-    .bucket{
-      min-height: 210px;
-      border-radius: 18px;
-      background: rgba(0,0,0,0.35);
-      border: 1px solid rgba(0,0,0,0.95);
-      padding: 14px;
-    }
-    .bucket h4{
-      margin: 0 0 10px 0;
-      color: var(--gold);
-      font-size: 1.05rem;
-      font-weight: 950;
     }
 
     /* Spotlights */
@@ -389,19 +394,20 @@
       gap: 10px;
     }
     .spotlight{
-      background: rgba(0,0,0,0.45);
-      border: 1px solid rgba(0,0,0,0.95);
-      border-radius: 16px;
-      padding: 14px 14px;
-      cursor: pointer;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(0,0,0,0.44);
+      border: 1px solid rgba(255,255,255,0.10);
+      cursor:pointer;
       user-select:none;
-      transition: transform .08s ease-out, box-shadow .08s ease-out, border-color .08s ease-out, background .08s ease-out;
+      transition: transform .08s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
     }
     .spotlight:hover{
       transform: translateY(-1px);
       box-shadow: 0 10px 18px rgba(0,0,0,0.55);
       border-color: rgba(189,155,64,0.55);
     }
+    /* already using dusty rose highlight per your spec */
     .spotlight.selected{
       border-color: rgba(181,133,183,0.98);
       background: rgba(181,133,183,0.22);
@@ -415,9 +421,10 @@
 
     <!-- LANDING -->
     <section id="landingScreen" class="landing-screen" aria-label="Landing screen">
+      <!-- CHANGE: restore original full logo on landing -->
       <img
         class="landing-logo"
-        src="Fox and Owl Story Studio Logo_Characters Only.png"
+        src="Fox and Owl Story Studio Logo.png"
         alt="Fox & Owl Story Studio logo"
       />
       <button id="playBtn" class="play-button" type="button">Play</button>
@@ -439,10 +446,10 @@
         <!-- Topbar -->
         <div class="topbar">
           <div class="brand-left">
-            <!-- thumb uses full logo for now (you can swap later to characters-only asset) -->
+            <!-- CHANGE: thumbnail uses characters-only -->
             <img
               class="brand-thumb"
-              src="Fox and Owl Story Studio Logo.png"
+              src="Fox and Owl Story Studio Logo_Characters Only.png"
               alt="Fox & Owl thumbnail"
             />
             <div class="brand-text">
@@ -451,14 +458,16 @@
             </div>
           </div>
 
+          <!-- CHANGE: Scenes -> Score -->
           <div class="scene-counter">
-            Scenes: <span id="scenesCompleted">0</span>
+            Score: <span id="scenesCompleted">0</span>
           </div>
         </div>
 
         <!-- Scene header -->
         <div class="header-row">
-          <h1 id="sceneTitle" class="scene-title">Scene —</h1>
+          <!-- CHANGE: remove the literal word "Scene" (JS should set full title like "Zootopia — The DMV Gauntlet") -->
+          <h1 id="sceneTitle" class="scene-title"></h1>
           <div id="tierPill" class="tier-pill">Lantern</div>
         </div>
 
@@ -467,8 +476,11 @@
         <!-- 4-step progress -->
         <div class="stepper" aria-label="Scene steps">
           <div id="stepPair" class="step active"><span class="dot"></span>Pair Match</div>
+          <span class="step-sep">/</span>
           <div id="stepSliders" class="step"><span class="dot"></span>Sliders</div>
+          <span class="step-sep">/</span>
           <div id="stepBuckets" class="step"><span class="dot"></span>Buckets</div>
+          <span class="step-sep">/</span>
           <div id="stepSpotlights" class="step"><span class="dot"></span>Spotlights</div>
         </div>
 

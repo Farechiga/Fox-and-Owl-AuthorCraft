@@ -240,11 +240,58 @@ function updateModeUI() {
 /* =========================
    Packs
 ========================= */
-function getPackListForMode() {
-  return state.mode === "film" ? FILM_PACKS : LIT_PACKS;
-}
-function getUsedSetForMode() {
-  return state.mode === "film" ? state.usedFilm : state.usedLit;
+function getPackListForMode(source) {
+  const works = source === "film" ? FILM_PACKS : LIT_PACKS;
+
+  // We support BOTH formats:
+  // (A) legacy flat: [{ id, momentType, sceneTitle, scene, modes, ... }]
+  // (B) new canonical: [{ packId, workTitle, scenes:[{ id, displayTitle, scene:{summary}, modes, ... }] }]
+  const out = [];
+
+  (works || []).forEach((w) => {
+    if (!w) return;
+
+    // Legacy flat pack
+    if (w.momentType === "AuthorCraft" && w.modes) {
+      out.push(w);
+      return;
+    }
+
+    // Canonical work → scenes[]
+    const scenes = Array.isArray(w.scenes) ? w.scenes : [];
+    scenes.forEach((s) => {
+      if (!s) return;
+      if (s.enabled === false) return;
+      if (w.enabled === false) return;
+
+      out.push({
+        // scene-level identity
+        id: s.id,
+        tier: s.tier,
+
+        // UI titles (prefer displayTitle, fallback headerLine)
+        displayTitle: s.displayTitle || s.headerLine || "",
+        headerLine: s.headerLine || s.displayTitle || "",
+
+        // attach work-level metadata for reference/debug (optional)
+        packId: w.packId,
+        workTitle: w.workTitle,
+        workType: w.workType,
+        author: w.author,
+        studio: w.studio,
+        year: w.year,
+
+        // Normalize scene text into what the runtime expects
+        // (your UI uses els.sceneText.textContent = pack.scene)
+        scene: (s.scene && (s.scene.summary || s.scene.text)) || s.summary || "",
+
+        // Modes live on the scene in the canonical format
+        modes: s.modes || {},
+      });
+    });
+  });
+
+  return out;
 }
 
 function pickNextPack() {
@@ -304,10 +351,16 @@ function resetSceneInteractionState() {
   state.spotlights.rank = [null, null, null];
 }
 
-function renderSceneHeader(pack) {
-  if (els.sceneTitle) els.sceneTitle.textContent = `Scene — ${pack.sceneTitle || ""}`.trim();
-  if (els.tierPill) els.tierPill.textContent = pack.tier || "Lantern";
+function renderSceneHeader() {
+  const pack = state.currentPack;
+  if (!pack) return;
+
+  // Prefer displayTitle/headerLine from canonical packs
+  const title = pack.displayTitle || pack.headerLine || pack.sceneTitle || "";
+  if (els.sceneTitle) els.sceneTitle.textContent = title;
+
   if (els.sceneText) els.sceneText.textContent = pack.scene || "";
+  if (els.tierBadge) els.tierBadge.textContent = pack.tier || "";
 }
 
 /* =========================

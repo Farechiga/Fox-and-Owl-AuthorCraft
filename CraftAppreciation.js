@@ -222,9 +222,9 @@ function switchMode(mode) {
 
 function updateModeUI() {
   // Body overlay (index.html uses body::before with .mode-film/.mode-literature)
-  document.body.classList.remove("landing");
-  document.body.classList.toggle("mode-film", state.mode === "film");
-  document.body.classList.toggle("mode-literature", state.mode === "literature");
+   document.body.classList.remove("landing");
+   document.body.classList.toggle("film", state.mode === "film");
+   document.body.classList.toggle("literature", state.mode === "literature");
 
   // Toggle buttons
   if (els.btnFilm) {

@@ -1,6 +1,6 @@
 // CraftAppreciation.js
-// AuthorCraft Appreciation — Robust Runtime
-// Standard: Concrete, kid-clear, no seminar jargon [cite: 95, 116]
+// AuthorCraft Appreciation — Definitive Unified Runtime
+// Standard: Concrete, kid-clear, no seminar jargon
 
 import { FILM_PACKS } from "./filmPacks.js";
 import { LIT_PACKS } from "./litPacks.js";
@@ -20,7 +20,7 @@ const state = {
   pair: { selectedLeft: null, selectedRight: null, matchedCount: 0 },
   slidersTouched: new Set(),
   bucketCount: 0,
-  spotlightCount: 0
+  spotlightRank: [] 
 };
 
 const $ = (id) => document.getElementById(id);
@@ -29,27 +29,16 @@ const $ = (id) => document.getElementById(id);
    2. Lifecycle & Navigation
 ========================= */
 function init() {
-  // Use a null-check to ensure playBtn exists before adding listener
   const playBtn = $("playBtn");
   if (playBtn) {
-    playBtn.onclick = enterGame; // Use direct assignment for robustness
+    playBtn.onclick = enterGame; 
   }
 
   $("btnFilm")?.addEventListener("click", () => switchMode("film"));
   $("btnLiterature")?.addEventListener("click", () => switchMode("literature"));
 
-  // Ensure landing state on load 
   document.body.classList.add("landing");
-  console.log("Fox & Owl Story Studio: Play Button Initialized.");
-}
-
-// ... (keep enterGame and switchMode functions as they are) ...
-
-// BOTTOM OF FILE: Replace window.onload or DOMContentLoaded with this:
-if (document.readyState === "complete" || document.readyState === "interactive") {
-  init();
-} else {
-  window.addEventListener("DOMContentLoaded", init);
+  console.log("Fox & Owl Story Studio: Systems Ready.");
 }
 
 function enterGame() {
@@ -72,12 +61,11 @@ function switchMode(mode) {
 }
 
 /* =========================
-   3. The "Deep Scan" Content Loader
+   3. Content Loader (Deep Scan)
 ========================= */
 function loadNewScene() {
   const pool = state.mode === "film" ? FILM_PACKS : LIT_PACKS;
   
-  // 1. Flatten all scenes from all packs into a single array
   const allAvailable = [];
   pool.forEach(pack => {
     if (pack.scenes && Array.isArray(pack.scenes)) {
@@ -87,12 +75,8 @@ function loadNewScene() {
     }
   });
 
-  if (allAvailable.length === 0) {
-    console.error("Critical Error: No scenes found in data files.");
-    return;
-  }
+  if (allAvailable.length === 0) return;
 
-  // 2. Pick a random scene not yet used
   let eligible = allAvailable.filter(item => !state.usedIds.has(item.scene.id));
   if (eligible.length === 0) {
     state.usedIds.clear();
@@ -112,12 +96,9 @@ function loadNewScene() {
 function renderHeader() {
   const p = state.currentPack;
   const s = state.currentScene;
-  
-  // Requirement: "Work Name — Scene Label"
+  // Standard: "Work Name — Scene Label"
   $("sceneTitle").textContent = s.displayTitle || `${p.workTitle} — ${s.headerLine}`;
   $("tierPill").textContent = s.tier || "Lantern";
-  
-  // Accessing the nested 'summary' property
   $("sceneText").textContent = s.scene?.summary || "Scene summary missing.";
   $("scenesCompleted").textContent = state.scenesCompleted;
 }
@@ -127,7 +108,7 @@ function resetSceneState() {
   state.pair = { selectedLeft: null, selectedRight: null, matchedCount: 0 };
   state.slidersTouched.clear();
   state.bucketCount = 0;
-  state.spotlightCount = 0;
+  state.spotlightRank = [];
 }
 
 /* =========================
@@ -147,15 +128,10 @@ function goToStep(index) {
     }
   });
 
-  // Safe Mode Execution
-  try {
-    if (index === 0) renderPairMatch();
-    if (index === 1) renderSliders();
-    if (index === 2) renderBuckets();
-    if (index === 3) renderSpotlights();
-  } catch (err) {
-    console.error("Step Render Fail:", err);
-  }
+  if (index === 0) renderPairMatch();
+  if (index === 1) renderSliders();
+  if (index === 2) renderBuckets();
+  if (index === 3) renderSpotlights();
 }
 
 function advance() {
@@ -174,7 +150,7 @@ function advance() {
 }
 
 /* =========================
-   Mode A: Pair Match [cite: 63]
+   Mode A: Pair Match
 ========================= */
 function renderPairMatch() {
   const mode = state.currentScene.modes.pairMatch;
@@ -185,7 +161,6 @@ function renderPairMatch() {
 
   $("pairPrompt").textContent = mode.prompt;
 
-  // Shuffle logic for taste formation [cite: 50]
   const lefts = [...mode.pairs].sort(() => Math.random() - 0.5);
   const rights = [...mode.pairs].sort(() => Math.random() - 0.5);
 
@@ -240,9 +215,8 @@ function renderSliders() {
   $("slidersScope").textContent = mode.scopeLabel || "The scene overall"; 
 
   const axes = mode.axes || [];
-
   axes.forEach((axis, idx) => {
-    // 1. Randomly flip the labels to ensure no "correct" side bias
+    // Randomize poles to ensure player focus on description [cite: 77, 154]
     const flip = Math.random() > 0.5;
     const leftText = flip ? (axis.rightLabel || axis.right) : (axis.leftLabel || axis.left);
     const rightText = flip ? (axis.leftLabel || axis.left) : (axis.rightLabel || axis.right);
@@ -250,8 +224,6 @@ function renderSliders() {
     const row = document.createElement("div");
     row.className = "slider-row";
     const axisId = `slider-${idx}`;
-    
-    // 2. Force default to 50 [cite: 75, 152]
     row.innerHTML = `
       <div class="slider-label">${leftText}</div>
       <input type="range" min="0" max="100" value="50">
@@ -259,24 +231,6 @@ function renderSliders() {
     `;
     
     row.querySelector("input").onchange = () => {
-      state.slidersTouched.add(axisId);
-      if (state.slidersTouched.size === axes.length) advance();
-    };
-    container.appendChild(row);
-  });
-}
-
-  axes.forEach((axis, idx) => {
-    const row = document.createElement("div");
-    row.className = "slider-row";
-    const axisId = `slider-${idx}`;
-    row.innerHTML = `
-      <div class="slider-label">${axis.leftLabel || axis.left}</div>
-      <input type="range" min="0" max="100" value="${mode.defaults ? mode.defaults[idx] : 50}">
-      <div class="slider-right">${axis.rightLabel || axis.right}</div>
-    `;
-    
-    row.querySelector("input").oninput = () => {
       state.slidersTouched.add(axisId);
       if (state.slidersTouched.size === axes.length) advance();
     };
@@ -293,7 +247,7 @@ function renderBuckets() {
   container.innerHTML = "";
   $("bucketsPrompt").textContent = mode.prompt;
 
-  // Set grid to 3 columns for side-by-side layout
+  // Horizontal layout for editorial judgment [cite: 73]
   container.style.display = "grid";
   container.style.gridTemplateColumns = "1fr 1fr 1fr";
   container.style.gap = "14px";
@@ -301,11 +255,10 @@ function renderBuckets() {
   const labels = ["Engine", "Support", "Spice"]; 
   const deck = document.createElement("div");
   deck.className = "card-list";
-  deck.style.gridColumn = "1 / -1"; // Element bank spans full width at top
+  deck.style.gridColumn = "1 / -1";
   deck.style.marginBottom = "20px";
 
   const items = mode.elements || mode.cards || [];
-
   items.forEach(item => {
     const text = typeof item === "string" ? item : item.text;
     const card = document.createElement("div");
@@ -320,9 +273,8 @@ function renderBuckets() {
   labels.forEach(l => {
     const b = document.createElement("div");
     b.className = "panel";
-    b.style.marginTop = "0"; // Override default panel margin for alignment
+    b.style.marginTop = "0";
     b.innerHTML = `<div class="pair-column-title">${l}</div><div class="card-list" style="min-height:120px; border: 1px dashed var(--line2)"></div>`;
-    
     b.ondragover = (e) => e.preventDefault();
     b.ondrop = (e) => {
       e.preventDefault();
@@ -330,27 +282,8 @@ function renderBuckets() {
       const el = Array.from(document.querySelectorAll(".card")).find(c => c.textContent === txt);
       if (el) {
         b.querySelector(".card-list").appendChild(el);
-        // Only advance if the starting deck is now empty
+        // Only advance if the element bank is now empty
         if (deck.children.length === 0) advance();
-      }
-    };
-    container.appendChild(b);
-  });
-}
-
-  labels.forEach(l => {
-    const b = document.createElement("div");
-    b.className = "panel";
-    b.innerHTML = `<div class="pair-column-title">${l}</div><div class="card-list" style="min-height:80px; border: 1px dashed var(--line2)"></div>`;
-    b.ondragover = (e) => e.preventDefault();
-    b.ondrop = (e) => {
-      e.preventDefault();
-      const txt = e.dataTransfer.getData("text");
-      const el = Array.from(document.querySelectorAll(".card")).find(c => c.textContent === txt);
-      if (el) {
-        b.querySelector(".card-list").appendChild(el);
-        state.bucketCount = container.querySelectorAll(".panel .card").length;
-        if (state.bucketCount === items.length) advance();
       }
     };
     container.appendChild(b);
@@ -365,12 +298,9 @@ function renderSpotlights() {
   const list = $("spotlightsList");
   list.innerHTML = "";
   $("spotlightsPrompt").textContent = mode.prompt;
-  
-  // Track ranking order
   state.spotlightRank = []; 
 
   const options = mode.options || [];
-
   options.forEach(text => {
     const div = document.createElement("div");
     div.className = "spotlight";
@@ -381,17 +311,15 @@ function renderSpotlights() {
     
     div.onclick = () => {
       if (div.classList.contains("selected")) {
-        // Remove from rank
         div.classList.remove("selected");
         state.spotlightRank = state.spotlightRank.filter(item => item !== div);
         div.querySelector(".rank-num").style.opacity = "0";
       } else if (state.spotlightRank.length < 3) {
-        // Add to rank
         div.classList.add("selected");
         state.spotlightRank.push(div);
       }
 
-      // Update numbers for all selected cards
+      // Visual ranking 1, 2, 3 [cite: 80, 84]
       state.spotlightRank.forEach((item, index) => {
         const num = item.querySelector(".rank-num");
         num.textContent = index + 1;
@@ -404,18 +332,9 @@ function renderSpotlights() {
   });
 }
 
-  options.forEach(opt => {
-    const text = typeof opt === "string" ? opt : opt.text;
-    const div = document.createElement("div");
-    div.className = "spotlight";
-    div.textContent = text;
-    div.onclick = () => {
-      div.classList.toggle("selected");
-      const selectedCount = list.querySelectorAll(".selected").length;
-      if (selectedCount === 3) advance(); 
-    };
-    list.appendChild(div);
-  });
+// Global Initialization
+if (document.readyState === "complete" || document.readyState === "interactive") {
+  init();
+} else {
+  window.addEventListener("DOMContentLoaded", init);
 }
-
-window.addEventListener("DOMContentLoaded", init);

@@ -29,11 +29,27 @@ const $ = (id) => document.getElementById(id);
    2. Lifecycle & Navigation
 ========================= */
 function init() {
-  $("playBtn")?.addEventListener("click", enterGame);
+  // Use a null-check to ensure playBtn exists before adding listener
+  const playBtn = $("playBtn");
+  if (playBtn) {
+    playBtn.onclick = enterGame; // Use direct assignment for robustness
+  }
+
   $("btnFilm")?.addEventListener("click", () => switchMode("film"));
   $("btnLiterature")?.addEventListener("click", () => switchMode("literature"));
 
+  // Ensure landing state on load 
   document.body.classList.add("landing");
+  console.log("Fox & Owl Story Studio: Play Button Initialized.");
+}
+
+// ... (keep enterGame and switchMode functions as they are) ...
+
+// BOTTOM OF FILE: Replace window.onload or DOMContentLoaded with this:
+if (document.readyState === "complete" || document.readyState === "interactive") {
+  init();
+} else {
+  window.addEventListener("DOMContentLoaded", init);
 }
 
 function enterGame() {

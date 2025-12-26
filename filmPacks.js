@@ -67,7 +67,7 @@ export const FILM_PACKS = [
               { leftLabel: "Childish", rightLabel: "Competent" },
               { leftLabel: "Small", rightLabel: "In charge" }
             ],
-            defaults: [45, 65, 55, 60]
+            defaults: [50, 50, 50, 50]
           },
 
           buckets: {
@@ -146,7 +146,7 @@ export const FILM_PACKS = [
               { leftLabel: "One gag", rightLabel: "Escalating run" },
               { leftLabel: "Random", rightLabel: "Cause-and-effect" }
             ],
-            defaults: [75, 70, 80, 75]
+            defaults: [50, 50, 50, 50]
           },
 
           buckets: {

@@ -5,7 +5,7 @@
 // Authoring goal: concrete, kid-friendly, no seminar jargon. Prefer vivid specifics.
 // FAIR USE: For modern books, summarize in your own words; no direct quotes.
 
-export const FAMOUS_FIVE_PACKS = [
+export const LIT_PACKS = [
   {
     packId: "lit-famous-five",
     workTitle: "The Famous Five",

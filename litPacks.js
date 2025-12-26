@@ -5,68 +5,66 @@
 // Authoring goal: concrete, kid-friendly, no seminar jargon. Prefer vivid specifics.
 // FAIR USE: For modern books, summarize in your own words; no direct quotes.
 
-export const LIT_PACKS = [
+export const FAMOUS_FIVE_PACKS = [
   {
-    packId: "lit-secret-garden",
-    workTitle: "The Secret Garden",
+    packId: "lit-famous-five",
+    workTitle: "The Famous Five",
     workType: "literature",
-    author: "Frances Hodgson Burnett",
-    year: 1911,
+    author: "Enid Blyton",
+    year: 1942,
     enabled: true,
 
     scenes: [
       {
-        id: "lit-secret-garden-01-the-key-and-the-door",
+        id: "lit-famous-five-01-the-wreck-discovery",
         tier: "Owl",
-
-        headerLine: "The Secret Garden — The Key and the Door",
-        displayTitle: "The Secret Garden — The Key and the Door",
+        headerLine: "The Famous Five — The Wreck in the Bay",
+        displayTitle: "The Famous Five — The Wreck in the Bay",
 
         scene: {
           summary:
-            "Mary follows the robin through the gardens, poking around the walls and plants like she’s on a private mission. When she finds a buried key and then spots a hidden door covered by vines, she freezes—half thrilled, half nervous—because it feels like she’s found a secret meant to stay secret.",
-          sourceContext: "Early-middle: Mary exploring the grounds at Misselthwaite.",
+            "After a massive storm, the cousins look out at the bay and see something new. A giant, dark shape has been dragged up from the bottom of the sea and stuck onto the rocks. George realizes it’s the old shipwreck everyone thought was gone forever. They scramble down the cliffs, slipping on wet rocks, desperate to reach it before the tide comes back in.",
+          sourceContext: "Early: The discovery of the core mystery.",
           fairUseNote: "Paraphrase; avoid quoting the text."
         },
 
-        tags: ["secrecy", "curiosity", "discovery", "setting"],
+        tags: ["discovery", "urgency", "setting"],
 
         modes: {
           pairMatch: {
-            prompt: "Match the moment to why it matters.",
+            prompt: "Match the moment to why it lands.",
             pairs: [
               {
                 id: "PM1",
-                left: "Mary trails the robin instead of wandering randomly.",
-                right: "The story gives her a “guide,” making discovery feel earned and magical."
+                left: "The storm changes the look of the bay overnight.",
+                right: "It gives the kids a fresh reason to go exploring right away."
               },
               {
                 id: "PM2",
-                left: "The key is found in the dirt, not handed over.",
-                right: "The secret feels real because it’s hidden in a believable place."
+                left: "The kids slip on wet rocks and seaweed while climbing.",
+                right: "The mess makes the wreck feel like it belongs in the wild sea."
               },
               {
                 id: "PM3",
-                left: "The door is covered by vines and blends into the wall.",
-                right: "The setting itself is guarding the secret—nature becomes the lock."
+                left: "George points and shouts because she recognized the ship first.",
+                right: "It shows she knows this island better than any of the visitors."
               },
               {
                 id: "PM4",
-                left: "Mary hesitates before trying the door.",
-                right: "Her fear-and-excitement mix shows the moment has stakes, even without danger."
+                left: "The tide is mentioned as 'creeping back in' while they work.",
+                right: "It creates a ticking clock so the kids have to move fast."
               }
             ]
           },
 
           sliders: {
-            // Make scope explicit and coherent for the player
-            scopeLabel: "Mary’s experience in this moment",
+            scopeLabel: "the scene overall",
             prompt: "Set your read using descriptive axes.",
             axes: [
-              { leftLabel: "Cautious", rightLabel: "Daring" },
-              { leftLabel: "Curious", rightLabel: "Obsessed" },
-              { leftLabel: "Small", rightLabel: "Monumental" },
-              { leftLabel: "Private", rightLabel: "Public" }
+              { leftLabel: "Quiet", rightLabel: "Loud" },
+              { leftLabel: "Safe", rightLabel: "Risky" },
+              { leftLabel: "Slow", rightLabel: "Fast" },
+              { leftLabel: "Ordinary", rightLabel: "Magical" }
             ],
             defaults: [50, 50, 50, 50]
           },
@@ -74,79 +72,76 @@ export const LIT_PACKS = [
           buckets: {
             prompt: "Sort the elements by what drives this moment.",
             elements: [
-              "The robin acting like a guide",
-              "The buried key in the dirt",
-              "The vine-covered door in the wall",
-              "Mary’s pause before she tries it",
-              "The quiet, empty garden paths"
+              "The giant shipwreck stuck on the rocks",
+              "George’s local knowledge of the bay",
+              "The rising tide coming back in",
+              "The slippery, wet climb down the cliff",
+              "The morning sun after the big storm"
             ]
-            // Bucket labels come from CraftAppreciation.js defaults
           },
 
           spotlights: {
-            prompt: "Rank the top 3 choices that make this moment memorable.",
+            prompt: "Rank the top 3 choices that make this moment stick.",
             options: [
-              "Using the robin to pull Mary (and us) forward without explaining everything",
-              "Hiding the key in the dirt so the discovery feels physical and real",
-              "Making the door blend in so the wall feels like it’s keeping a secret",
-              "Letting Mary hesitate so the “yes/no” moment lands",
-              "Keeping the garden quiet so every tiny detail matters"
+              "Using a storm to bring a hidden secret up to the surface",
+              "Making the kids struggle over wet rocks so the goal feels hard to reach",
+              "Letting George be the leader because it’s her home turf",
+              "Adding the tide as a threat to make the scene feel urgent",
+              "Describing the ship as a 'dark shape' at first to build the mystery"
             ]
           }
         }
       },
-
       {
-        id: "lit-secret-garden-02-colin-stands",
+        id: "lit-famous-five-02-george-boat-rules",
         tier: "Lantern",
-
-        headerLine: "The Secret Garden — Colin Tries to Stand",
-        displayTitle: "The Secret Garden — Colin Tries to Stand",
+        headerLine: "The Famous Five — George’s Island Rules",
+        displayTitle: "The Famous Five — George’s Island Rules",
 
         scene: {
           summary:
-            "In the garden, Colin insists on trying to stand and take steps. Mary and Dickon set up the moment carefully—watching his breathing, positioning themselves near him without crowding him. Colin’s face shifts between panic and pride as he forces himself up, and everyone goes very still because one wrong wobble could end it.",
-          sourceContext: "Later: the garden becomes a place where change happens.",
+            "George stands by her boat on the beach, looking at her cousins with a serious face. She tells them that Kirrin Island is her island, and they can only go there if they follow her lead. She doesn't smile or offer to help them with their bags; she just waits to see if they’ll listen. Timmy the dog stands right next to her, looking just as tough.",
+          sourceContext: "Middle: George establishing her authority.",
           fairUseNote: "Paraphrase; avoid quoting the text."
         },
 
-        tags: ["courage", "pressure", "physicality", "change"],
+        tags: ["status", "character", "confrontation"],
 
         modes: {
           pairMatch: {
-            prompt: "Match the moment to why it matters.",
+            prompt: "Match the moment to why it lands.",
             pairs: [
               {
                 id: "PM1",
-                left: "Mary and Dickon stay close, but don’t grab him immediately.",
-                right: "Support is present without stealing his agency—he has to do it."
+                left: "George stands with her arms crossed by her boat.",
+                right: "She acts like a guard to show the island has a boss."
               },
               {
                 id: "PM2",
-                left: "Everyone gets quiet and watches his balance.",
-                right: "Silence makes the risk feel bigger; the room becomes the drumbeat."
+                left: "She calls it 'my' island instead of 'the' island.",
+                right: "That one word tells the cousins they are just guests."
               },
               {
                 id: "PM3",
-                left: "Colin’s expression flips between fear and determination.",
-                right: "The scene shows the fight inside him, not just the action outside."
+                left: "Timmy the dog stands perfectly still by her side.",
+                right: "His posture makes George look more serious and protected."
               },
               {
                 id: "PM4",
-                left: "The garden setting contrasts with the “sickroom” mindset.",
-                right: "The place itself signals a new identity: not fragile, not trapped."
+                left: "She doesn't smile or help them with their things.",
+                right: "Her coldness makes the cousins realize they have to earn her trust."
               }
             ]
           },
 
           sliders: {
-            scopeLabel: "Colin’s inner state during the attempt",
+            scopeLabel: "George’s stance here",
             prompt: "Set your read using descriptive axes.",
             axes: [
-              { leftLabel: "Terrified", rightLabel: "Brave" },
-              { leftLabel: "Fragile", rightLabel: "Strong" },
-              { leftLabel: "Wobbling", rightLabel: "Steady" },
-              { leftLabel: "Doubtful", rightLabel: "Certain" }
+              { leftLabel: "Friendly", rightLabel: "Strict" },
+              { leftLabel: "Weak", rightLabel: "Strong" },
+              { leftLabel: "Shy", rightLabel: "Bold" },
+              { leftLabel: "Playful", rightLabel: "Serious" }
             ],
             defaults: [50, 50, 50, 50]
           },
@@ -154,22 +149,22 @@ export const LIT_PACKS = [
           buckets: {
             prompt: "Sort the elements by what drives this moment.",
             elements: [
-              "Mary and Dickon’s careful positioning",
-              "Colin forcing himself upright",
-              "The sudden quiet as everyone watches",
-              "Colin’s fear/pride facial shifts",
-              "The garden air and space (not the sickroom)"
+              "George calling the island 'mine'",
+              "Timmy standing guard by her legs",
+              "George’s crossed-arms posture",
+              "The cousins standing on the sand listening",
+              "The boat acting as the bridge to the secret"
             ]
           },
 
           spotlights: {
-            prompt: "Rank the top 3 choices that make this moment memorable.",
+            prompt: "Rank the top 3 choices that make this moment stick.",
             options: [
-              "Keeping help nearby but not grabbing him—so the attempt stays his",
-              "Using silence to make the balance feel like the whole world is watching",
-              "Letting Colin’s face show the fight before the body does",
-              "Making the garden feel like a new ‘self’ is possible",
-              "Staging the attempt step-by-step so tension builds instead of rushing"
+              "Using the word 'my' to show George is in charge",
+              "Using a dog to make a kid look more powerful and scary",
+              "Making George act cold so the cousins have to try harder to fit in",
+              "Staging the scene by her boat because that's her source of power",
+              "Letting her stay quiet while they react so she keeps the control"
             ]
           }
         }

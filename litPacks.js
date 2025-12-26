@@ -68,7 +68,7 @@ export const LIT_PACKS = [
               { leftLabel: "Small", rightLabel: "Monumental" },
               { leftLabel: "Private", rightLabel: "Public" }
             ],
-            defaults: [35, 60, 70, 20]
+            defaults: [50, 50, 50, 50]
           },
 
           buckets: {
@@ -148,7 +148,7 @@ export const LIT_PACKS = [
               { leftLabel: "Wobbling", rightLabel: "Steady" },
               { leftLabel: "Doubtful", rightLabel: "Certain" }
             ],
-            defaults: [45, 40, 30, 35]
+            defaults: [50, 50, 50, 50]
           },
 
           buckets: {

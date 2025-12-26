@@ -5,67 +5,66 @@
 // Authoring goal: concrete, kid-friendly, no seminar jargon. Prefer vivid specifics.
 // FAIR USE: Describe scenes in your own words; do not quote dialogue.
 
-export const FILM_PACKS = [
+export const SECRET_LIFE_PETS_PACKS = [
   {
-    packId: "film-home-alone",
-    workTitle: "Home Alone",
+    packId: "film-secret-life-pets",
+    workTitle: "The Secret Life of Pets",
     workType: "film",
-    year: 1990,
-    studio: "20th Century Fox",
+    year: 2016,
+    studio: "Illumination",
     enabled: true,
 
     scenes: [
       {
-        id: "film-home-alone-01-house-becomes-a-plan",
+        id: "film-pets-01-max-waiting",
         tier: "Owl",
-
-        headerLine: "Home Alone — The House Becomes a Plan",
-        displayTitle: "Home Alone — The House Becomes a Plan",
+        headerLine: "The Secret Life of Pets — Waiting by the Door",
+        displayTitle: "The Secret Life of Pets — Waiting by the Door",
 
         scene: {
           summary:
-            "Kevin realizes he’s truly alone and starts treating the house like a puzzle he can control. He checks doors and windows, moves with purpose from room to room, and tests little ideas like he’s running experiments. The mood shifts: fear is still there, but it turns into focus as he prepares for trouble.",
-          sourceContext: "Middle: Kevin prepares for the burglars.",
+            "After Katie leaves for work, Max drags a pillow over to the front door. He sits there perfectly still, staring at the handle. The clock on the wall ticks loudly. A fly buzzes past his ear, but he doesn't chase it. He only reacts when he hears a noise in the hallway, causing his tail to give one tiny, hopeful wag before settling back down.",
+          sourceContext: "Opening: Establishing Max's world.",
           fairUseNote: "Describe; do not quote dialogue."
         },
 
-        tags: ["setup", "resourcefulness", "tension", "space"],
+        tags: ["loyalty", "timing", "patience"],
 
         modes: {
           pairMatch: {
-            prompt: "Match the moment to why it matters.",
+            prompt: "Match the moment to why it lands.",
             pairs: [
               {
                 id: "PM1",
-                left: "Kevin checks the house like he’s doing an inspection.",
-                right: "It turns the setting into a tool—this place will matter later."
+                left: "Max drags a pillow to the door and just sits.",
+                right: "It shows his whole day is built around one person."
               },
               {
                 id: "PM2",
-                left: "He tests ideas in small, controlled ways.",
-                right: "Practice makes the later chaos feel earned, not random."
+                left: "The clock ticks loudly in the empty room.",
+                right: "The sound makes the house feel too quiet and lonely."
               },
               {
                 id: "PM3",
-                left: "He moves with new confidence instead of hiding.",
-                right: "The scene shows a shift in identity: scared kid → planner."
+                left: "He ignores a buzzing fly that passes his head.",
+                right: "It shows how focused he is—nothing else matters but the door."
               },
               {
                 id: "PM4",
-                left: "Normal rooms start to look like “spots” and “routes.”",
-                right: "The film quietly teaches you a map so you can follow the action later."
+                left: "One tiny tail-wag happens when he hears a noise.",
+                right: "It shows he’s always 'on alert' even when he looks bored."
               }
             ]
           },
 
           sliders: {
-            scopeLabel: "Kevin’s mindset while preparing",
+            scopeLabel: "Max’s experience",
             prompt: "Set your read using descriptive axes.",
             axes: [
-              { leftLabel: "Scared", rightLabel: "Focused" },
-              { leftLabel: "Improvising", rightLabel: "Planning" },
-              { leftLabel: "Childish", rightLabel: "Competent" },
-              { leftLabel: "Small", rightLabel: "In charge" }
+              { leftLabel: "Bored", rightLabel: "Excited" },
+              { leftLabel: "Active", rightLabel: "Still" },
+              { leftLabel: "Sad", rightLabel: "Happy" },
+              { leftLabel: "Brief", rightLabel: "Forever" }
             ],
             defaults: [50, 50, 50, 50]
           },
@@ -73,78 +72,76 @@ export const FILM_PACKS = [
           buckets: {
             prompt: "Sort the elements by what drives this moment.",
             elements: [
-              "Kevin inspecting doors and windows",
-              "Testing ideas like mini-experiments",
-              "The house layout becoming a “map”",
-              "Kevin moving with purpose",
-              "Fear turning into focus"
+              "Max sitting perfectly still on a pillow",
+              "The loud ticking of the wall clock",
+              "The tiny tail-wag at the hallway noise",
+              "Max ignoring the buzzing fly",
+              "The closed front door as the main focus"
             ]
           },
 
           spotlights: {
-            prompt: "Rank the top 3 choices that make this moment memorable.",
+            prompt: "Rank the top 3 choices that make this moment stick.",
             options: [
-              "Turning the house into a map the audience learns",
-              "Showing practice so later chaos feels earned",
-              "Letting fear transform into focus onscreen",
-              "Using ordinary rooms as future action ‘stations’",
-              "Making Kevin’s confidence shift visible in how he moves"
+              "Using a ticking clock to make time feel slow for the audience too",
+              "Letting Max stay still to show how much he loves his owner",
+              "Using a tiny tail-wag to show a big emotion without a loud noise",
+              "Making the door the biggest thing in the room so we know it’s important",
+              "Having Max ignore a fly to show he has a 'mission'"
             ]
           }
         }
       },
-
       {
-        id: "film-home-alone-02-the-trap-chain-reaction",
+        id: "film-pets-02-snowball-funeral",
         tier: "Lantern",
-
-        headerLine: "Home Alone — The Trap Chain Reaction",
-        displayTitle: "Home Alone — The Trap Chain Reaction",
+        headerLine: "The Secret Life of Pets — The Sewer Funeral",
+        displayTitle: "The Secret Life of Pets — The Sewer Funeral",
 
         scene: {
           summary:
-            "When the burglars finally enter, Kevin’s preparations snap into motion like a domino run. The burglars keep charging forward and keep getting punished for it: one mistake leads into the next, and the house seems to ‘answer back’ with new surprises. Kevin stays just ahead of them, using timing and distance instead of strength.",
-          sourceContext: "Late: the burglars’ break-in and trap sequence.",
+            "In the dark sewer, Snowball the bunny stands over a fallen viper. He starts a very loud, very dramatic speech about how the viper was a 'warrior.' He encourages the other animals to howl and cry. Snowball is tiny and fluffy, but he’s shouting like a movie general, and the other large, scary animals follow his lead, acting totally heartbroken.",
+          sourceContext: "Middle: Snowball's leadership in the sewers.",
           fairUseNote: "Describe; do not quote dialogue."
         },
 
-        tags: ["timing", "cause-effect", "comedy", "chase"],
+        tags: ["humor", "contrast", "leadership"],
 
         modes: {
           pairMatch: {
-            prompt: "Match the moment to why it matters.",
+            prompt: "Match the moment to why it lands.",
             pairs: [
               {
                 id: "PM1",
-                left: "The burglars rush in without stopping to read the space.",
-                right: "Their impatience becomes the engine—speed makes them vulnerable."
+                left: "A tiny, cute bunny shouts like a war general.",
+                right: "The joke comes from a small thing acting like a big thing."
               },
               {
                 id: "PM2",
-                left: "Traps trigger in a chain instead of one isolated gag.",
-                right: "Cause-and-effect builds momentum; the scene feels like one big machine."
+                left: "The giant sewer animals cry and howl on command.",
+                right: "Their reaction makes the bunny look much more powerful."
               },
               {
                 id: "PM3",
-                left: "Kevin uses distance and timing, not fighting.",
-                right: "The underdog wins by brains; the logic stays kid-believable."
+                left: "Snowball uses big words for a snake he barely knew.",
+                right: "The over-acting makes the 'mission' feel silly instead of scary."
               },
               {
                 id: "PM4",
-                left: "The house keeps ‘surprising’ them from different angles.",
-                right: "Variety prevents repetition—the comedy escalates instead of looping."
+                left: "The setting is a dark, messy sewer pipe.",
+                right: "The gross place makes the formal 'funeral' look even weirder."
               }
             ]
           },
 
           sliders: {
-            scopeLabel: "How the trap sequence plays as a scene",
+            scopeLabel: "the scene overall",
             prompt: "Set your read using descriptive axes.",
             axes: [
-              { leftLabel: "Simple", rightLabel: "Chain-reaction" },
-              { leftLabel: "Slow", rightLabel: "Whiplash-fast" },
-              { leftLabel: "One gag", rightLabel: "Escalating run" },
-              { leftLabel: "Random", rightLabel: "Cause-and-effect" }
+              { leftLabel: "Scary", rightLabel: "Silly" },
+              { leftLabel: "Quiet", rightLabel: "Wild" },
+              { leftLabel: "Serious", rightLabel: "Fake" },
+              { leftLabel: "Small", rightLabel: "Huge" }
             ],
             defaults: [50, 50, 50, 50]
           },
@@ -152,22 +149,22 @@ export const FILM_PACKS = [
           buckets: {
             prompt: "Sort the elements by what drives this moment.",
             elements: [
-              "The burglars’ impatient forward-charging",
-              "Traps triggering in sequence",
-              "Kevin staying just out of reach",
-              "Surprises from different parts of the house",
-              "Timing (beats) that keep escalation climbing"
+              "A tiny bunny acting like a general",
+              "Big, scary animals crying like babies",
+              "Snowball’s loud, dramatic shouting",
+              "The dark, gross sewer pipes",
+              "The 'fallen warrior' speech for a snake"
             ]
           },
 
           spotlights: {
-            prompt: "Rank the top 3 choices that make this moment memorable.",
+            prompt: "Rank the top 3 choices that make this moment stick.",
             options: [
-              "Building traps into a chain so the scene feels like one big run",
-              "Making the burglars’ impatience cause their own problems",
-              "Letting Kevin win with timing and distance instead of strength",
-              "Keeping variety so the comedy escalates instead of repeating",
-              "Teaching the house map earlier so the chaos stays readable"
+              "Putting a cute animal in a tough spot to create a funny contrast",
+              "Using dramatic music and shouting for a tiny event",
+              "Letting huge animals be scared of a small bunny to show his status",
+              "Using the sewer setting to make the 'ceremony' feel out of place",
+              "Making the bunny over-act so we know he loves the spotlight"
             ]
           }
         }

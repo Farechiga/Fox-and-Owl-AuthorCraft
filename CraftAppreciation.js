@@ -43,6 +43,8 @@ function init() {
 
 function enterGame() {
   document.body.classList.remove("landing");
+  // FIX: Apply the mode class immediately so the overlay appears
+  document.body.classList.add(state.mode); 
   $("landingScreen").classList.add("hidden");
   $("gameScreen").classList.remove("hidden");
   loadNewScene();
@@ -56,6 +58,7 @@ function switchMode(mode) {
   $("btnFilm").classList.toggle("active", mode === "film");
   $("btnLiterature").classList.toggle("active", mode === "literature");
   
+  // Update body class for background overlays
   document.body.className = mode; 
   loadNewScene();
 }
@@ -161,8 +164,11 @@ function renderPairMatch() {
 
   $("pairPrompt").textContent = mode.prompt;
 
-  const lefts = [...mode.pairs].sort(() => Math.random() - 0.5);
-  const rights = [...mode.pairs].sort(() => Math.random() - 0.5);
+  // Robust Shuffle: Fisher-Yates style to ensure true randomization
+  const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
+  
+  const lefts = shuffle(mode.pairs);
+  const rights = shuffle(mode.pairs);
 
   lefts.forEach(p => {
     const card = document.createElement("div");

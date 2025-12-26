@@ -5,7 +5,7 @@
 // Authoring goal: concrete, kid-friendly, no seminar jargon. Prefer vivid specifics.
 // FAIR USE: Describe scenes in your own words; do not quote dialogue.
 
-export const SECRET_LIFE_PETS_PACKS = [
+export const FILM_PACKS = [
   {
     packId: "film-secret-life-pets",
     workTitle: "The Secret Life of Pets",

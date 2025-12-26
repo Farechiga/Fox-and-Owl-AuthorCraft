@@ -1,166 +1,179 @@
 // filmPacks.js
 // AuthorCraft Appreciation — FILM PACKS
-// ES module: exports FILM_PACKS
-// Drafting standard: concrete, kid-clear, no seminar jargon.
+// Canonical format (LOCKED): work-level pack -> scenes[]
+// Tiers: "Fox" | "Owl" | "Lantern" (Lantern = hardest)
+// Authoring goal: concrete, kid-friendly, no seminar jargon.
+// FAIR USE: Describe in your own words; do not quote dialogue.
 
 export const FILM_PACKS = [
   {
-    id: "film-zootopia-01-dmv-gauntlet",
-    source: "Zootopia",
-    medium: "film",
-    momentType: "AuthorCraft",
-    sceneTitle: "The DMV Gauntlet",
-    tier: "Lantern",
-    scene:
-      "Judy and Nick enter the DMV to request vehicle owner information. The clerk at the desk is a sloth who moves and speaks painfully slowly while a long line waits behind them. Judy tries to stay polite and efficient as minutes stretch into an ordeal.",
-    modes: {
-      pairMatch: {
-        prompt: "Match the moment to why it lands.",
-        pairs: [
-          {
-            id: "PM1",
-            left: "The DMV looks official and organized—numbers, counters, rules—so you expect speed.",
-            right:
-              "It sets you up for the joke: everything looks efficient… then reality hits.",
-            isCorrect: true,
+    packId: "film-home-alone",
+    workTitle: "Home Alone",
+    workType: "film",
+    year: 1990,
+    studio: "20th Century Fox",
+    enabled: true,
+
+    scenes: [
+      {
+        id: "film-home-alone-01-morning-alone",
+        tier: "Owl",
+        enabled: true,
+
+        headerLine: "Home Alone — The morning he realizes it",
+        displayTitle: "Home Alone — The morning he realizes it",
+
+        scene: {
+          summary:
+            "Kevin wakes up expecting chaos, but the house is strangely quiet. He walks room to room calling out, and the silence answers back. At first he looks excited—like the world finally obeyed him—then his face shifts as he realizes quiet can mean something scary. The kitchen and the big empty rooms make him look small.",
+          sourceContext: "Early in the film, after the family leaves for the trip.",
+          fairUseNote: "Describe; do not quote dialogue."
+        },
+
+        tags: ["silence", "reversal", "space", "emotion-shift"],
+
+        modes: {
+          pairMatch: {
+            prompt: "Match each detail to what it shows.",
+            pairs: [
+              {
+                id: "PM1",
+                left: "The house is quiet in a way that feels unusual, not peaceful.",
+                right: "Silence becomes a clue that something is wrong."
+              },
+              {
+                id: "PM2",
+                left: "Kevin moves through different rooms looking for voices.",
+                right: "The scene turns into a search instead of a celebration."
+              },
+              {
+                id: "PM3",
+                left: "His expression shifts from thrilled to uneasy.",
+                right: "The feeling changes without needing a speech."
+              },
+              {
+                id: "PM4",
+                left: "The big rooms make him look small.",
+                right: "The setting shows he’s alone before the plot explains it."
+              }
+            ]
           },
-          {
-            id: "PM2",
-            left: "The sloth clerk takes forever to do a tiny action—turning, blinking, speaking.",
-            right:
-              "Timing becomes the punchline: every beat stretches past what feels human.",
-            isCorrect: true,
+
+          sliders: {
+            scopeLine: "SCOPE: Kevin’s experience in this moment.",
+            prompt: "Set your read using these descriptive axes.",
+            axes: [
+              { id: "A1", left: "Excited", right: "Worried", min: 0, max: 100, default: 45 },
+              { id: "A2", left: "Brave", right: "Spooked", min: 0, max: 100, default: 40 },
+              { id: "A3", left: "Free", right: "Abandoned", min: 0, max: 100, default: 55 },
+              { id: "A4", left: "Playing", right: "Listening", min: 0, max: 100, default: 60 }
+            ]
           },
-          {
-            id: "PM3",
-            left: "Judy keeps a customer-service smile while her patience drains.",
-            right:
-              "You can see her self-control working in real time—so the pressure feels real.",
-            isCorrect: true,
+
+          rankBuckets: {
+            prompt: "Drag each element into the best bucket.",
+            elements: [
+              { id: "E1", text: "The unusually quiet house." },
+              { id: "E2", text: "Kevin walking room to room searching." },
+              { id: "E3", text: "His face changing when the quiet lasts too long." },
+              { id: "E4", text: "Big empty rooms that swallow his voice." },
+              { id: "E5", text: "Small everyday sounds suddenly feeling loud." },
+              { id: "E6", text: "The moment he pauses, realizing nobody answers back." }
+            ]
           },
-          {
-            id: "PM4",
-            left: "The waiting line behind them becomes a silent audience to the delay.",
-            right:
-              "Public waiting adds heat—everyone’s stuck together in the same slow-motion moment.",
-            isCorrect: true,
-          },
-        ],
+
+          interpretiveTakes: {
+            prompt: "Rank the top three decisions that make the scene memorable.",
+            options: [
+              { id: "S1", text: "The scene lets silence do most of the work." },
+              { id: "S2", text: "Kevin’s emotion flips before anyone explains the situation." },
+              { id: "S3", text: "The house feels bigger than usual, making him seem smaller." },
+              { id: "S4", text: "The moment is funny and scary at the same time." },
+              { id: "S5", text: "The scene turns a normal home into a giant empty stage." }
+            ]
+          }
+        }
       },
 
-      sliders: {
-        scope: "Scope: Judy's experience in this scene (not Nick's).",
-        prompt: "Set your read on Judy’s reaction using the axes.",
-        axes: [
-          { id: "a1", left: "Calm", right: "Fuming", defaultValue: 60 },
-          { id: "a2", left: "Polite", right: "Snapping", defaultValue: 45 },
-          { id: "a3", left: "In control", right: "Unraveling", defaultValue: 55 },
-          { id: "a4", left: "Hopeful", right: "Defeated", defaultValue: 50 },
-        ],
-      },
+      {
+        id: "film-home-alone-02-first-trap-test",
+        tier: "Lantern",
+        enabled: true,
 
-      rankBuckets: {
-        prompt: "Drag each craft element into the best bucket.",
-        cards: [
-          { id: "B1", text: "Expectation → reality switch (official place, totally slow result)." },
-          { id: "B2", text: "Comedy from pacing: long pauses, stretched beats, slow delivery." },
-          { id: "B3", text: "Judy’s face working hard to stay professional." },
-          { id: "B4", text: "The line behind them creates social pressure." },
-          { id: "B5", text: "Nick’s calm makes Judy’s urgency look extra intense." },
-          { id: "B6", text: "Tiny actions treated like big events (a stamp feels like a marathon)." },
-        ],
-      },
+        headerLine: "Home Alone — The first trap works",
+        displayTitle: "Home Alone — The first trap works",
 
-      interpretiveTakes: {
-        prompt: "Rank the top 3 ideas that best explain why this moment sticks.",
-        pick: 3,
-        takes: [
-          "The scene makes waiting feel physical—you almost feel time stretch.",
-          "Judy’s politeness is the comedy engine because it’s forced under pressure.",
-          "Nick works like a mirror: his calm makes Judy’s urgency pop.",
-          "The line behind them turns the moment into group embarrassment and group suffering.",
-        ],
-      },
-    },
-  },
+        scene: {
+          summary:
+            "Kevin sets up a simple trap and waits, watching and listening like the house is a puzzle box. When the intruder triggers it, the result is immediate and loud—pain, surprise, chaos. Kevin’s body language shows a strange mix: he’s scared, but he also looks proud that his plan had real power. The scene keeps moving fast so you feel both danger and comedy in the same breath.",
+          sourceContext: "Mid-film; Kevin begins actively defending the house with traps.",
+          fairUseNote: "Describe; do not quote dialogue."
+        },
 
-  {
-    id: "film-zootopia-02-mr-big-ice-",
-    source: "Zootopia",
-    medium: "film",
-    momentType: "AuthorCraft",
-    sceneTitle: "Mr. Big’s tiny power",
-    tier: "Lantern",
-    scene:
-      "Judy and Nick are taken to Mr. Big, a tiny shrew mob boss. The room is dramatic and intimidating—guards, slow music, serious faces—yet the ‘boss’ is physically small. The scene balances threat and humor at the same time.",
-    modes: {
-      pairMatch: {
-        prompt: "Match the moment to why it lands.",
-        pairs: [
-          {
-            id: "PM1",
-            left: "The room is staged like a scary crime movie—serious guards and ceremony.",
-            right:
-              "The seriousness makes the contrast funnier when you realize who’s in charge.",
-            isCorrect: true,
+        tags: ["planning", "timing", "cause-effect", "tone-mix"],
+
+        modes: {
+          pairMatch: {
+            prompt: "Match each detail to what it shows.",
+            pairs: [
+              {
+                id: "PM1",
+                left: "Kevin waits and listens before the trap goes off.",
+                right: "Tension comes from anticipation, not action."
+              },
+              {
+                id: "PM2",
+                left: "The trap result is loud and immediate.",
+                right: "You feel cause-and-effect instantly."
+              },
+              {
+                id: "PM3",
+                left: "Kevin looks scared and proud at the same time.",
+                right: "Winning can still feel dangerous."
+              },
+              {
+                id: "PM4",
+                left: "The scene moves quickly after the trigger.",
+                right: "Fast pace keeps it funny without feeling slow or mean."
+              }
+            ]
           },
-          {
-            id: "PM2",
-            left: "Mr. Big is tiny, but everyone treats him like the most powerful person present.",
-            right:
-              "Power feels real because people act like it’s real—size doesn’t matter here.",
-            isCorrect: true,
-          },
-          {
-            id: "PM3",
-            left: "Judy’s confidence wobbles when she realizes she might have made a big mistake.",
-            right:
-              "Her shift from brave to nervous raises the stakes without needing a chase.",
-            isCorrect: true,
-          },
-          {
-            id: "PM4",
-            left: "Nick reads the room quickly and adjusts—jokes less, listens more.",
-            right:
-              "You see street-smarts: he survives by switching gears fast.",
-            isCorrect: true,
-          },
-        ],
-      },
 
-      sliders: {
-        scope: "Scope: the room's tone (threat + humor together).",
-        prompt: "Set your read on the tone using the axes.",
-        axes: [
-          { id: "a1", left: "Silly", right: "Scary", defaultValue: 55 },
-          { id: "a2", left: "Loose", right: "Formal", defaultValue: 70 },
-          { id: "a3", left: "Playful", right: "Dangerous", defaultValue: 60 },
-          { id: "a4", left: "Small-stakes", right: "High-stakes", defaultValue: 65 },
-        ],
-      },
+          sliders: {
+            scopeLine: "SCOPE: Kevin’s experience in this moment.",
+            prompt: "Set your read using these descriptive axes.",
+            axes: [
+              { id: "A1", left: "Panicking", right: "Focused", min: 0, max: 100, default: 70 },
+              { id: "A2", left: "Luck", right: "Skill", min: 0, max: 100, default: 60 },
+              { id: "A3", left: "Hiding", right: "Controlling", min: 0, max: 100, default: 55 },
+              { id: "A4", left: "Mean", right: "Justified", min: 0, max: 100, default: 75 }
+            ]
+          },
 
-      rankBuckets: {
-        prompt: "Drag each craft element into the best bucket.",
-        cards: [
-          { id: "B1", text: "Big serious setup for a surprising ‘boss’ reveal." },
-          { id: "B2", text: "Everyone’s behavior proves the power structure." },
-          { id: "B3", text: "Judy’s confidence slips—stakes rise through emotion." },
-          { id: "B4", text: "Nick’s quick adjustment shows survival instinct." },
-          { id: "B5", text: "Tiny details (music, pacing, looks) keep the scene dramatic." },
-          { id: "B6", text: "Humor and threat co-exist without canceling each other." },
-        ],
-      },
+          rankBuckets: {
+            prompt: "Drag each element into the best bucket.",
+            elements: [
+              { id: "E1", text: "Kevin planning and setting the trap ahead of time." },
+              { id: "E2", text: "The quiet wait before anything happens." },
+              { id: "E3", text: "The trap firing with instant consequences." },
+              { id: "E4", text: "Kevin’s proud-but-scared reaction." },
+              { id: "E5", text: "The intruder’s shocked stumble and confusion." },
+              { id: "E6", text: "The fast pacing that keeps danger and comedy together." }
+            ]
+          },
 
-      interpretiveTakes: {
-        prompt: "Rank the top 3 ideas that best explain why this moment sticks.",
-        pick: 3,
-        takes: [
-          "The contrast (serious room, tiny boss) makes the humor sharp and instant.",
-          "The scene shows that authority is social—people ‘agree’ someone is powerful.",
-          "Judy’s emotion shift is what makes the moment feel risky, not just funny.",
-          "Nick’s read-the-room skill adds realism: he knows when to stop performing.",
-        ],
-      },
-    },
-  },
+          interpretiveTakes: {
+            prompt: "Rank the top three decisions that make the scene memorable.",
+            options: [
+              { id: "S1", text: "The scene makes you wait, then pays off fast." },
+              { id: "S2", text: "Kevin’s face shows two feelings at once: fear and pride." },
+              { id: "S3", text: "The traps feel like clever problem-solving, not just chaos." },
+              { id: "S4", text: "The pacing keeps the moment funny while still feeling risky." },
+              { id: "S5", text: "The house turns into a playground and a battlefield at the same time." }
+            ]
+          }
+        }
+      }
+    ]
+  }
 ];

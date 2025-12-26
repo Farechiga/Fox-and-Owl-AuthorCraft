@@ -1,6 +1,6 @@
 // CraftAppreciation.js
-// AuthorCraft Appreciation — Full Comprehensive Runtime (Final Fix)
-// Standard: Concrete, kid-clear, no seminar jargon
+// AuthorCraft Appreciation — Robust Runtime
+// Standard: Concrete, kid-clear, no seminar jargon [cite: 95, 116]
 
 import { FILM_PACKS } from "./filmPacks.js";
 import { LIT_PACKS } from "./litPacks.js";
@@ -26,7 +26,7 @@ const state = {
 const $ = (id) => document.getElementById(id);
 
 /* =========================
-   2. Initialization & Navigation
+   2. Lifecycle & Navigation
 ========================= */
 function init() {
   $("playBtn")?.addEventListener("click", enterGame);
@@ -34,7 +34,6 @@ function init() {
   $("btnLiterature")?.addEventListener("click", () => switchMode("literature"));
 
   document.body.classList.add("landing");
-  console.log("Runtime Initialized. Ready to load scenes.");
 }
 
 function enterGame() {
@@ -57,35 +56,34 @@ function switchMode(mode) {
 }
 
 /* =========================
-   3. Content Loader
+   3. The "Deep Scan" Content Loader
 ========================= */
 function loadNewScene() {
   const pool = state.mode === "film" ? FILM_PACKS : LIT_PACKS;
   
-  // Flatten all scenes from all packs into one list
-  const allScenes = [];
+  // 1. Flatten all scenes from all packs into a single array
+  const allAvailable = [];
   pool.forEach(pack => {
     if (pack.scenes && Array.isArray(pack.scenes)) {
       pack.scenes.forEach(scene => {
-        allScenes.push({ pack, scene });
+        allAvailable.push({ pack, scene });
       });
     }
   });
 
-  // Filter out used scenes if possible, otherwise reset
-  let eligible = allScenes.filter(item => !state.usedIds.has(item.scene.id));
-  if (eligible.length === 0) {
-    state.usedIds.clear();
-    eligible = allScenes;
-  }
-
-  const selected = eligible[Math.floor(Math.random() * eligible.length)];
-  
-  if (!selected) {
-    console.error("No scenes found in the current mode pool.");
+  if (allAvailable.length === 0) {
+    console.error("Critical Error: No scenes found in data files.");
     return;
   }
 
+  // 2. Pick a random scene not yet used
+  let eligible = allAvailable.filter(item => !state.usedIds.has(item.scene.id));
+  if (eligible.length === 0) {
+    state.usedIds.clear();
+    eligible = allAvailable;
+  }
+
+  const selected = eligible[Math.floor(Math.random() * eligible.length)];
   state.currentPack = selected.pack;
   state.currentScene = selected.scene;
   state.usedIds.add(state.currentScene.id);
@@ -99,12 +97,12 @@ function renderHeader() {
   const p = state.currentPack;
   const s = state.currentScene;
   
-  // Requirement: Work name + Scene Label
-  $("sceneTitle").textContent = s.displayTitle || `${p.workTitle} — ${s.headerLine || 'Untitled'}`;
+  // Requirement: "Work Name — Scene Label"
+  $("sceneTitle").textContent = s.displayTitle || `${p.workTitle} — ${s.headerLine}`;
   $("tierPill").textContent = s.tier || "Lantern";
   
-  // Handle nested scene.summary
-  $("sceneText").textContent = s.scene?.summary || "No summary available.";
+  // Accessing the nested 'summary' property
+  $("sceneText").textContent = s.scene?.summary || "Scene summary missing.";
   $("scenesCompleted").textContent = state.scenesCompleted;
 }
 
@@ -117,7 +115,7 @@ function resetSceneState() {
 }
 
 /* =========================
-   4. Step/Panel Controller
+   4. Step Controller
 ========================= */
 function goToStep(index) {
   state.stepIndex = index;
@@ -133,13 +131,14 @@ function goToStep(index) {
     }
   });
 
+  // Safe Mode Execution
   try {
     if (index === 0) renderPairMatch();
     if (index === 1) renderSliders();
     if (index === 2) renderBuckets();
     if (index === 3) renderSpotlights();
   } catch (err) {
-    console.error("Step rendering error:", err);
+    console.error("Step Render Fail:", err);
   }
 }
 
@@ -159,7 +158,7 @@ function advance() {
 }
 
 /* =========================
-   Mode A: Pair Match
+   Mode A: Pair Match [cite: 63]
 ========================= */
 function renderPairMatch() {
   const mode = state.currentScene.modes.pairMatch;
@@ -170,6 +169,7 @@ function renderPairMatch() {
 
   $("pairPrompt").textContent = mode.prompt;
 
+  // Shuffle logic for taste formation [cite: 50]
   const lefts = [...mode.pairs].sort(() => Math.random() - 0.5);
   const rights = [...mode.pairs].sort(() => Math.random() - 0.5);
 
@@ -213,7 +213,7 @@ function handlePairClick(el, side, id) {
 }
 
 /* =========================
-   Mode B: Tone Sliders
+   Mode B: Tone Sliders [cite: 74]
 ========================= */
 function renderSliders() {
   const mode = state.currentScene.modes.sliders;
@@ -221,8 +221,8 @@ function renderSliders() {
   container.innerHTML = "";
 
   $("slidersPrompt").textContent = mode.prompt;
-  // Use scopeLabel from data
-  $("slidersScope").textContent = mode.scopeLabel || ""; 
+  // Use scopeLabel from current data
+  $("slidersScope").textContent = mode.scopeLabel || "The scene overall"; 
 
   const axes = mode.axes || [];
 
@@ -231,9 +231,9 @@ function renderSliders() {
     row.className = "slider-row";
     const axisId = `slider-${idx}`;
     row.innerHTML = `
-      <div class="slider-label">${axis.leftLabel}</div>
+      <div class="slider-label">${axis.leftLabel || axis.left}</div>
       <input type="range" min="0" max="100" value="${mode.defaults ? mode.defaults[idx] : 50}">
-      <div class="slider-right">${axis.rightLabel}</div>
+      <div class="slider-right">${axis.rightLabel || axis.right}</div>
     `;
     
     row.querySelector("input").oninput = () => {
@@ -245,29 +245,30 @@ function renderSliders() {
 }
 
 /* =========================
-   Mode C: Rank Buckets
+   Mode C: Rank Buckets [cite: 68]
 ========================= */
 function renderBuckets() {
-  const mode = state.currentScene.modes.buckets; 
+  const mode = state.currentScene.modes.buckets || state.currentScene.modes.rankBuckets; 
   const container = $("bucketsContainer");
   container.innerHTML = "";
   $("bucketsPrompt").textContent = mode.prompt;
 
+  // Define buckets [cite: 70, 71, 72]
   const labels = ["Engine", "Support", "Spice"]; 
-  
   const deck = document.createElement("div");
   deck.className = "card-list";
   deck.style.gridColumn = "1 / -1";
   deck.style.marginBottom = "20px";
 
-  const elements = mode.elements || [];
+  const items = mode.elements || mode.cards || [];
 
-  elements.forEach(txt => {
+  items.forEach(item => {
+    const text = typeof item === "string" ? item : item.text;
     const card = document.createElement("div");
     card.className = "card";
-    card.textContent = txt;
+    card.textContent = text;
     card.draggable = true;
-    card.ondragstart = (e) => e.dataTransfer.setData("text", txt);
+    card.ondragstart = (e) => e.dataTransfer.setData("text", text);
     deck.appendChild(card);
   });
   container.appendChild(deck);
@@ -284,7 +285,7 @@ function renderBuckets() {
       if (el) {
         b.querySelector(".card-list").appendChild(el);
         state.bucketCount = container.querySelectorAll(".panel .card").length;
-        if (state.bucketCount === elements.length) advance();
+        if (state.bucketCount === items.length) advance();
       }
     };
     container.appendChild(b);
@@ -292,7 +293,7 @@ function renderBuckets() {
 }
 
 /* =========================
-   Mode D: Interpretive Spotlights
+   Mode D: Interpretive Spotlights [cite: 79]
 ========================= */
 function renderSpotlights() {
   const mode = state.currentScene.modes.spotlights;
@@ -300,9 +301,10 @@ function renderSpotlights() {
   list.innerHTML = "";
   $("spotlightsPrompt").textContent = mode.prompt;
 
-  const options = mode.options || [];
+  const options = mode.options || mode.takes || [];
 
-  options.forEach(text => {
+  options.forEach(opt => {
+    const text = typeof opt === "string" ? opt : opt.text;
     const div = document.createElement("div");
     div.className = "spotlight";
     div.textContent = text;

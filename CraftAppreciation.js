@@ -1,6 +1,6 @@
 // CraftAppreciation.js
-// AuthorCraft Appreciation — Full Comprehensive Runtime
-[cite_start]// Standard: Concrete, kid-clear, no seminar jargon [cite: 93, 116]
+// AuthorCraft Appreciation — Full Comprehensive Runtime (Final Fix)
+// Standard: Concrete, kid-clear, no seminar jargon
 
 import { FILM_PACKS } from "./filmPacks.js";
 import { LIT_PACKS } from "./litPacks.js";
@@ -9,10 +9,10 @@ import { LIT_PACKS } from "./litPacks.js";
    1. App State
 ========================= */
 const state = {
-  mode: "film", // "film" | "literature"
+  mode: "film", 
   stepIndex: 0, 
-  currentPack: null,  // The overall work (e.g., Home Alone)
-  currentScene: null, // The specific scene (e.g., The Trap Chain)
+  currentPack: null,
+  currentScene: null,
   scenesCompleted: 0,
   usedIds: new Set(),
   _advanceLock: false,
@@ -34,7 +34,7 @@ function init() {
   $("btnLiterature")?.addEventListener("click", () => switchMode("literature"));
 
   document.body.classList.add("landing");
-  console.log("Fox & Owl Story Studio: Runtime Initialized.");
+  console.log("Runtime Initialized. Ready to load scenes.");
 }
 
 function enterGame() {
@@ -57,43 +57,54 @@ function switchMode(mode) {
 }
 
 /* =========================
-   3. Content Loader (FIXED)
+   3. Content Loader
 ========================= */
 function loadNewScene() {
   const pool = state.mode === "film" ? FILM_PACKS : LIT_PACKS;
   
-  // Flatten the packs so we can pick a random scene from any available pack
-  const allAvailableScenes = [];
+  // Flatten all scenes from all packs into one list
+  const allScenes = [];
   pool.forEach(pack => {
-    pack.scenes.forEach(scene => {
-      if (!state.usedIds.has(scene.id)) {
-        allAvailableScenes.push({ pack, scene });
-      }
-    });
+    if (pack.scenes && Array.isArray(pack.scenes)) {
+      pack.scenes.forEach(scene => {
+        allScenes.push({ pack, scene });
+      });
+    }
   });
 
-  // Fallback if all are used
-  const source = allAvailableScenes.length > 0 ? allAvailableScenes : 
-    pool.flatMap(pack => pack.scenes.map(scene => ({ pack, scene })));
+  // Filter out used scenes if possible, otherwise reset
+  let eligible = allScenes.filter(item => !state.usedIds.has(item.scene.id));
+  if (eligible.length === 0) {
+    state.usedIds.clear();
+    eligible = allScenes;
+  }
 
-  const selected = source[Math.floor(Math.random() * source.length)];
+  const selected = eligible[Math.floor(Math.random() * eligible.length)];
+  
+  if (!selected) {
+    console.error("No scenes found in the current mode pool.");
+    return;
+  }
+
   state.currentPack = selected.pack;
   state.currentScene = selected.scene;
   state.usedIds.add(state.currentScene.id);
 
   resetSceneState();
   renderHeader();
-  goToStep(0); [cite_start]// Primary Mode: Pair Match [cite: 63]
+  goToStep(0); 
 }
 
 function renderHeader() {
   const p = state.currentPack;
   const s = state.currentScene;
   
-  // Formatting Requirement: include work name in title
-  $("sceneTitle").textContent = s.displayTitle || `${p.workTitle} — ${s.id}`;
+  // Requirement: Work name + Scene Label
+  $("sceneTitle").textContent = s.displayTitle || `${p.workTitle} — ${s.headerLine || 'Untitled'}`;
   $("tierPill").textContent = s.tier || "Lantern";
-  $("sceneText").textContent = s.scene.summary; // Fixed: accessing nested summary
+  
+  // Handle nested scene.summary
+  $("sceneText").textContent = s.scene?.summary || "No summary available.";
   $("scenesCompleted").textContent = state.scenesCompleted;
 }
 
@@ -128,7 +139,7 @@ function goToStep(index) {
     if (index === 2) renderBuckets();
     if (index === 3) renderSpotlights();
   } catch (err) {
-    console.error("Error rendering step:", index, err);
+    console.error("Step rendering error:", err);
   }
 }
 
@@ -165,7 +176,7 @@ function renderPairMatch() {
   lefts.forEach(p => {
     const card = document.createElement("div");
     card.className = "card";
-    [cite_start]card.textContent = p.left; // Objective Micro-beat [cite: 122]
+    card.textContent = p.left; 
     card.onclick = () => handlePairClick(card, "left", p.id);
     leftBox.appendChild(card);
   });
@@ -173,7 +184,7 @@ function renderPairMatch() {
   rights.forEach(p => {
     const card = document.createElement("div");
     card.className = "card";
-    [cite_start]card.textContent = p.right; // Why-it-lands [cite: 126]
+    card.textContent = p.right; 
     card.onclick = () => handlePairClick(card, "right", p.id);
     rightBox.appendChild(card);
   });
@@ -210,9 +221,12 @@ function renderSliders() {
   container.innerHTML = "";
 
   $("slidersPrompt").textContent = mode.prompt;
-  $("slidersScope").textContent = mode.scopeLabel; // Fixed key mapping
+  // Use scopeLabel from data
+  $("slidersScope").textContent = mode.scopeLabel || ""; 
 
-  mode.axes.forEach((axis, idx) => {
+  const axes = mode.axes || [];
+
+  axes.forEach((axis, idx) => {
     const row = document.createElement("div");
     row.className = "slider-row";
     const axisId = `slider-${idx}`;
@@ -224,7 +238,7 @@ function renderSliders() {
     
     row.querySelector("input").oninput = () => {
       state.slidersTouched.add(axisId);
-      if (state.slidersTouched.size === mode.axes.length) advance();
+      if (state.slidersTouched.size === axes.length) advance();
     };
     container.appendChild(row);
   });
@@ -234,19 +248,21 @@ function renderSliders() {
    Mode C: Rank Buckets
 ========================= */
 function renderBuckets() {
-  const mode = state.currentScene.modes.buckets; // Fixed key mapping
+  const mode = state.currentScene.modes.buckets; 
   const container = $("bucketsContainer");
   container.innerHTML = "";
   $("bucketsPrompt").textContent = mode.prompt;
 
-  const labels = ["Engine", "Support", "Spice"]; [cite_start]// Based on Buckets logic [cite: 70, 71, 72]
+  const labels = ["Engine", "Support", "Spice"]; 
   
   const deck = document.createElement("div");
   deck.className = "card-list";
   deck.style.gridColumn = "1 / -1";
   deck.style.marginBottom = "20px";
 
-  mode.elements.forEach(txt => {
+  const elements = mode.elements || [];
+
+  elements.forEach(txt => {
     const card = document.createElement("div");
     card.className = "card";
     card.textContent = txt;
@@ -268,7 +284,7 @@ function renderBuckets() {
       if (el) {
         b.querySelector(".card-list").appendChild(el);
         state.bucketCount = container.querySelectorAll(".panel .card").length;
-        if (state.bucketCount === mode.elements.length) advance();
+        if (state.bucketCount === elements.length) advance();
       }
     };
     container.appendChild(b);
@@ -284,14 +300,16 @@ function renderSpotlights() {
   list.innerHTML = "";
   $("spotlightsPrompt").textContent = mode.prompt;
 
-  mode.options.forEach(text => {
+  const options = mode.options || [];
+
+  options.forEach(text => {
     const div = document.createElement("div");
     div.className = "spotlight";
     div.textContent = text;
     div.onclick = () => {
       div.classList.toggle("selected");
       const selectedCount = list.querySelectorAll(".selected").length;
-      [cite_start]if (selectedCount === 3) advance(); // Fixed requirement: pick top 3 [cite: 80]
+      if (selectedCount === 3) advance(); 
     };
     list.appendChild(div);
   });

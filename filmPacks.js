@@ -1,9 +1,9 @@
 // filmPacks.js
 // AuthorCraft Appreciation — FILM PACKS
-// Canonical format (LOCKED): work-level pack -> scenes[]
+// ES module: exports FILM_PACKS
 // Tiers: "Fox" | "Owl" | "Lantern" (Lantern = hardest)
-// Authoring goal: concrete, kid-friendly, no seminar jargon.
-// FAIR USE: Describe in your own words; do not quote dialogue.
+// Authoring goal: concrete, kid-friendly, no seminar jargon. Prefer vivid specifics.
+// FAIR USE: Describe scenes in your own words; do not quote dialogue.
 
 export const FILM_PACKS = [
   {
@@ -16,160 +16,158 @@ export const FILM_PACKS = [
 
     scenes: [
       {
-        id: "film-home-alone-01-morning-alone",
+        id: "film-home-alone-01-house-becomes-a-plan",
         tier: "Owl",
-        enabled: true,
 
-        headerLine: "Home Alone — The morning he realizes it",
-        displayTitle: "Home Alone — The morning he realizes it",
+        headerLine: "Home Alone — The House Becomes a Plan",
+        displayTitle: "Home Alone — The House Becomes a Plan",
 
         scene: {
           summary:
-            "Kevin wakes up expecting chaos, but the house is strangely quiet. He walks room to room calling out, and the silence answers back. At first he looks excited—like the world finally obeyed him—then his face shifts as he realizes quiet can mean something scary. The kitchen and the big empty rooms make him look small.",
-          sourceContext: "Early in the film, after the family leaves for the trip.",
+            "Kevin realizes he’s truly alone and starts treating the house like a puzzle he can control. He checks doors and windows, moves with purpose from room to room, and tests little ideas like he’s running experiments. The mood shifts: fear is still there, but it turns into focus as he prepares for trouble.",
+          sourceContext: "Middle: Kevin prepares for the burglars.",
           fairUseNote: "Describe; do not quote dialogue."
         },
 
-        tags: ["silence", "reversal", "space", "emotion-shift"],
+        tags: ["setup", "resourcefulness", "tension", "space"],
 
         modes: {
           pairMatch: {
-            prompt: "Match each detail to what it shows.",
+            prompt: "Match the moment to why it matters.",
             pairs: [
               {
                 id: "PM1",
-                left: "The house is quiet in a way that feels unusual, not peaceful.",
-                right: "Silence becomes a clue that something is wrong."
+                left: "Kevin checks the house like he’s doing an inspection.",
+                right: "It turns the setting into a tool—this place will matter later."
               },
               {
                 id: "PM2",
-                left: "Kevin moves through different rooms looking for voices.",
-                right: "The scene turns into a search instead of a celebration."
+                left: "He tests ideas in small, controlled ways.",
+                right: "Practice makes the later chaos feel earned, not random."
               },
               {
                 id: "PM3",
-                left: "His expression shifts from thrilled to uneasy.",
-                right: "The feeling changes without needing a speech."
+                left: "He moves with new confidence instead of hiding.",
+                right: "The scene shows a shift in identity: scared kid → planner."
               },
               {
                 id: "PM4",
-                left: "The big rooms make him look small.",
-                right: "The setting shows he’s alone before the plot explains it."
+                left: "Normal rooms start to look like “spots” and “routes.”",
+                right: "The film quietly teaches you a map so you can follow the action later."
               }
             ]
           },
 
           sliders: {
-            scopeLine: "SCOPE: Kevin’s experience in this moment.",
-            prompt: "Set your read using these descriptive axes.",
+            scopeLabel: "Kevin’s mindset while preparing",
+            prompt: "Set your read using descriptive axes.",
             axes: [
-              { id: "A1", left: "Excited", right: "Worried", min: 0, max: 100, default: 45 },
-              { id: "A2", left: "Brave", right: "Spooked", min: 0, max: 100, default: 40 },
-              { id: "A3", left: "Free", right: "Abandoned", min: 0, max: 100, default: 55 },
-              { id: "A4", left: "Playing", right: "Listening", min: 0, max: 100, default: 60 }
-            ]
+              { leftLabel: "Scared", rightLabel: "Focused" },
+              { leftLabel: "Improvising", rightLabel: "Planning" },
+              { leftLabel: "Childish", rightLabel: "Competent" },
+              { leftLabel: "Small", rightLabel: "In charge" }
+            ],
+            defaults: [45, 65, 55, 60]
           },
 
-          rankBuckets: {
-            prompt: "Drag each element into the best bucket.",
+          buckets: {
+            prompt: "Sort the elements by what drives this moment.",
             elements: [
-              { id: "E1", text: "The unusually quiet house." },
-              { id: "E2", text: "Kevin walking room to room searching." },
-              { id: "E3", text: "His face changing when the quiet lasts too long." },
-              { id: "E4", text: "Big empty rooms that swallow his voice." },
-              { id: "E5", text: "Small everyday sounds suddenly feeling loud." },
-              { id: "E6", text: "The moment he pauses, realizing nobody answers back." }
+              "Kevin inspecting doors and windows",
+              "Testing ideas like mini-experiments",
+              "The house layout becoming a “map”",
+              "Kevin moving with purpose",
+              "Fear turning into focus"
             ]
           },
 
-          interpretiveTakes: {
-            prompt: "Rank the top three decisions that make the scene memorable.",
+          spotlights: {
+            prompt: "Rank the top 3 choices that make this moment memorable.",
             options: [
-              { id: "S1", text: "The scene lets silence do most of the work." },
-              { id: "S2", text: "Kevin’s emotion flips before anyone explains the situation." },
-              { id: "S3", text: "The house feels bigger than usual, making him seem smaller." },
-              { id: "S4", text: "The moment is funny and scary at the same time." },
-              { id: "S5", text: "The scene turns a normal home into a giant empty stage." }
+              "Turning the house into a map the audience learns",
+              "Showing practice so later chaos feels earned",
+              "Letting fear transform into focus onscreen",
+              "Using ordinary rooms as future action ‘stations’",
+              "Making Kevin’s confidence shift visible in how he moves"
             ]
           }
         }
       },
 
       {
-        id: "film-home-alone-02-first-trap-test",
+        id: "film-home-alone-02-the-trap-chain-reaction",
         tier: "Lantern",
-        enabled: true,
 
-        headerLine: "Home Alone — The first trap works",
-        displayTitle: "Home Alone — The first trap works",
+        headerLine: "Home Alone — The Trap Chain Reaction",
+        displayTitle: "Home Alone — The Trap Chain Reaction",
 
         scene: {
           summary:
-            "Kevin sets up a simple trap and waits, watching and listening like the house is a puzzle box. When the intruder triggers it, the result is immediate and loud—pain, surprise, chaos. Kevin’s body language shows a strange mix: he’s scared, but he also looks proud that his plan had real power. The scene keeps moving fast so you feel both danger and comedy in the same breath.",
-          sourceContext: "Mid-film; Kevin begins actively defending the house with traps.",
+            "When the burglars finally enter, Kevin’s preparations snap into motion like a domino run. The burglars keep charging forward and keep getting punished for it: one mistake leads into the next, and the house seems to ‘answer back’ with new surprises. Kevin stays just ahead of them, using timing and distance instead of strength.",
+          sourceContext: "Late: the burglars’ break-in and trap sequence.",
           fairUseNote: "Describe; do not quote dialogue."
         },
 
-        tags: ["planning", "timing", "cause-effect", "tone-mix"],
+        tags: ["timing", "cause-effect", "comedy", "chase"],
 
         modes: {
           pairMatch: {
-            prompt: "Match each detail to what it shows.",
+            prompt: "Match the moment to why it matters.",
             pairs: [
               {
                 id: "PM1",
-                left: "Kevin waits and listens before the trap goes off.",
-                right: "Tension comes from anticipation, not action."
+                left: "The burglars rush in without stopping to read the space.",
+                right: "Their impatience becomes the engine—speed makes them vulnerable."
               },
               {
                 id: "PM2",
-                left: "The trap result is loud and immediate.",
-                right: "You feel cause-and-effect instantly."
+                left: "Traps trigger in a chain instead of one isolated gag.",
+                right: "Cause-and-effect builds momentum; the scene feels like one big machine."
               },
               {
                 id: "PM3",
-                left: "Kevin looks scared and proud at the same time.",
-                right: "Winning can still feel dangerous."
+                left: "Kevin uses distance and timing, not fighting.",
+                right: "The underdog wins by brains; the logic stays kid-believable."
               },
               {
                 id: "PM4",
-                left: "The scene moves quickly after the trigger.",
-                right: "Fast pace keeps it funny without feeling slow or mean."
+                left: "The house keeps ‘surprising’ them from different angles.",
+                right: "Variety prevents repetition—the comedy escalates instead of looping."
               }
             ]
           },
 
           sliders: {
-            scopeLine: "SCOPE: Kevin’s experience in this moment.",
-            prompt: "Set your read using these descriptive axes.",
+            scopeLabel: "How the trap sequence plays as a scene",
+            prompt: "Set your read using descriptive axes.",
             axes: [
-              { id: "A1", left: "Panicking", right: "Focused", min: 0, max: 100, default: 70 },
-              { id: "A2", left: "Luck", right: "Skill", min: 0, max: 100, default: 60 },
-              { id: "A3", left: "Hiding", right: "Controlling", min: 0, max: 100, default: 55 },
-              { id: "A4", left: "Mean", right: "Justified", min: 0, max: 100, default: 75 }
-            ]
+              { leftLabel: "Simple", rightLabel: "Chain-reaction" },
+              { leftLabel: "Slow", rightLabel: "Whiplash-fast" },
+              { leftLabel: "One gag", rightLabel: "Escalating run" },
+              { leftLabel: "Random", rightLabel: "Cause-and-effect" }
+            ],
+            defaults: [75, 70, 80, 75]
           },
 
-          rankBuckets: {
-            prompt: "Drag each element into the best bucket.",
+          buckets: {
+            prompt: "Sort the elements by what drives this moment.",
             elements: [
-              { id: "E1", text: "Kevin planning and setting the trap ahead of time." },
-              { id: "E2", text: "The quiet wait before anything happens." },
-              { id: "E3", text: "The trap firing with instant consequences." },
-              { id: "E4", text: "Kevin’s proud-but-scared reaction." },
-              { id: "E5", text: "The intruder’s shocked stumble and confusion." },
-              { id: "E6", text: "The fast pacing that keeps danger and comedy together." }
+              "The burglars’ impatient forward-charging",
+              "Traps triggering in sequence",
+              "Kevin staying just out of reach",
+              "Surprises from different parts of the house",
+              "Timing (beats) that keep escalation climbing"
             ]
           },
 
-          interpretiveTakes: {
-            prompt: "Rank the top three decisions that make the scene memorable.",
+          spotlights: {
+            prompt: "Rank the top 3 choices that make this moment memorable.",
             options: [
-              { id: "S1", text: "The scene makes you wait, then pays off fast." },
-              { id: "S2", text: "Kevin’s face shows two feelings at once: fear and pride." },
-              { id: "S3", text: "The traps feel like clever problem-solving, not just chaos." },
-              { id: "S4", text: "The pacing keeps the moment funny while still feeling risky." },
-              { id: "S5", text: "The house turns into a playground and a battlefield at the same time." }
+              "Building traps into a chain so the scene feels like one big run",
+              "Making the burglars’ impatience cause their own problems",
+              "Letting Kevin win with timing and distance instead of strength",
+              "Keeping variety so the comedy escalates instead of repeating",
+              "Teaching the house map earlier so the chaos stays readable"
             ]
           }
         }

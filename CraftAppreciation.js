@@ -1,6 +1,6 @@
 // CraftAppreciation.js
 // AuthorCraft Appreciation — Full Comprehensive Runtime
-// Standard: Concrete, kid-clear, no seminar jargon
+[cite_start]// Standard: Concrete, kid-clear, no seminar jargon [cite: 93, 116]
 
 import { FILM_PACKS } from "./filmPacks.js";
 import { LIT_PACKS } from "./litPacks.js";
@@ -11,31 +11,28 @@ import { LIT_PACKS } from "./litPacks.js";
 const state = {
   mode: "film", // "film" | "literature"
   stepIndex: 0, 
-  currentScene: null,
+  currentPack: null,  // The overall work (e.g., Home Alone)
+  currentScene: null, // The specific scene (e.g., The Trap Chain)
   scenesCompleted: 0,
   usedIds: new Set(),
   _advanceLock: false,
 
-  // Mode-specific interaction tracking
   pair: { selectedLeft: null, selectedRight: null, matchedCount: 0 },
   slidersTouched: new Set(),
   bucketCount: 0,
   spotlightCount: 0
 };
 
-// DOM Helper
 const $ = (id) => document.getElementById(id);
 
 /* =========================
    2. Initialization & Navigation
 ========================= */
 function init() {
-  // Navigation listeners
   $("playBtn")?.addEventListener("click", enterGame);
   $("btnFilm")?.addEventListener("click", () => switchMode("film"));
   $("btnLiterature")?.addEventListener("click", () => switchMode("literature"));
 
-  // Ensure landing state on load
   document.body.classList.add("landing");
   console.log("Fox & Owl Story Studio: Runtime Initialized.");
 }
@@ -50,42 +47,53 @@ function enterGame() {
 function switchMode(mode) {
   if (state.mode === mode) return;
   state.mode = mode;
-  state.usedIds.clear(); // Reset history for the new mode
+  state.usedIds.clear(); 
   
-  // UI updates for toggle buttons
   $("btnFilm").classList.toggle("active", mode === "film");
   $("btnLiterature").classList.toggle("active", mode === "literature");
   
-  // Update body class for background overlays
   document.body.className = mode; 
   loadNewScene();
 }
 
 /* =========================
-   3. Content Loader
+   3. Content Loader (FIXED)
 ========================= */
 function loadNewScene() {
   const pool = state.mode === "film" ? FILM_PACKS : LIT_PACKS;
   
-  // Rule: Only AuthorCraft moment types for this fork
-  const eligible = pool.filter(p => p.momentType === "AuthorCraft" && !state.usedIds.has(p.id));
-  
-  // Fallback to pool if all scenes are used
-  const source = eligible.length > 0 ? eligible : pool;
-  state.currentScene = source[Math.floor(Math.random() * source.length)];
+  // Flatten the packs so we can pick a random scene from any available pack
+  const allAvailableScenes = [];
+  pool.forEach(pack => {
+    pack.scenes.forEach(scene => {
+      if (!state.usedIds.has(scene.id)) {
+        allAvailableScenes.push({ pack, scene });
+      }
+    });
+  });
+
+  // Fallback if all are used
+  const source = allAvailableScenes.length > 0 ? allAvailableScenes : 
+    pool.flatMap(pack => pack.scenes.map(scene => ({ pack, scene })));
+
+  const selected = source[Math.floor(Math.random() * source.length)];
+  state.currentPack = selected.pack;
+  state.currentScene = selected.scene;
   state.usedIds.add(state.currentScene.id);
 
   resetSceneState();
   renderHeader();
-  goToStep(0); // Always start at Pair Match [cite: 63]
+  goToStep(0); [cite_start]// Primary Mode: Pair Match [cite: 63]
 }
 
 function renderHeader() {
+  const p = state.currentPack;
   const s = state.currentScene;
-  // Display standard: "Source — Scene Title"
-  $("sceneTitle").textContent = `${s.source} — ${s.sceneTitle}`;
+  
+  // Formatting Requirement: include work name in title
+  $("sceneTitle").textContent = s.displayTitle || `${p.workTitle} — ${s.id}`;
   $("tierPill").textContent = s.tier || "Lantern";
-  $("sceneText").textContent = s.scene;
+  $("sceneText").textContent = s.scene.summary; // Fixed: accessing nested summary
   $("scenesCompleted").textContent = state.scenesCompleted;
 }
 
@@ -105,7 +113,6 @@ function goToStep(index) {
   const panels = ["panelPairMatch", "panelSliders", "panelBuckets", "panelSpotlights"];
   const steps = ["stepPair", "stepSliders", "stepBuckets", "stepSpotlights"];
 
-  // Toggle visible panels and stepper styles
   panels.forEach((id, i) => $(id).classList.toggle("hidden", i !== index));
   steps.forEach((id, i) => {
     const el = $(id);
@@ -115,7 +122,6 @@ function goToStep(index) {
     }
   });
 
-  // Load appropriate mode logic
   try {
     if (index === 0) renderPairMatch();
     if (index === 1) renderSliders();
@@ -135,7 +141,6 @@ function advance() {
     if (state.stepIndex < 3) {
       goToStep(state.stepIndex + 1);
     } else {
-      // Scene cycle complete
       state.scenesCompleted++;
       loadNewScene();
     }
@@ -143,7 +148,7 @@ function advance() {
 }
 
 /* =========================
-   Mode A: Pair Match [cite: 63]
+   Mode A: Pair Match
 ========================= */
 function renderPairMatch() {
   const mode = state.currentScene.modes.pairMatch;
@@ -154,14 +159,13 @@ function renderPairMatch() {
 
   $("pairPrompt").textContent = mode.prompt;
 
-  // Shuffle both sides for the match game
   const lefts = [...mode.pairs].sort(() => Math.random() - 0.5);
   const rights = [...mode.pairs].sort(() => Math.random() - 0.5);
 
   lefts.forEach(p => {
     const card = document.createElement("div");
     card.className = "card";
-    card.textContent = p.left; // Left: Objective Micro-beat [cite: 122]
+    [cite_start]card.textContent = p.left; // Objective Micro-beat [cite: 122]
     card.onclick = () => handlePairClick(card, "left", p.id);
     leftBox.appendChild(card);
   });
@@ -169,7 +173,7 @@ function renderPairMatch() {
   rights.forEach(p => {
     const card = document.createElement("div");
     card.className = "card";
-    card.textContent = p.right; // Right: Why-it-lands [cite: 126]
+    [cite_start]card.textContent = p.right; // Why-it-lands [cite: 126]
     card.onclick = () => handlePairClick(card, "right", p.id);
     rightBox.appendChild(card);
   });
@@ -177,13 +181,11 @@ function renderPairMatch() {
 
 function handlePairClick(el, side, id) {
   if (el.classList.contains("locked")) return;
-
   const key = side === "left" ? "selectedLeft" : "selectedRight";
   el.parentElement.querySelectorAll(".card").forEach(c => c.classList.remove("selected"));
   el.classList.add("selected");
   state.pair[key] = { el, id };
 
-  // Evaluate match
   if (state.pair.selectedLeft && state.pair.selectedRight) {
     if (state.pair.selectedLeft.id === state.pair.selectedRight.id) {
       state.pair.selectedLeft.el.classList.add("locked");
@@ -191,7 +193,6 @@ function handlePairClick(el, side, id) {
       state.pair.matchedCount++;
       if (state.pair.matchedCount === state.currentScene.modes.pairMatch.pairs.length) advance();
     }
-    // Cleanup selection
     state.pair.selectedLeft = null;
     state.pair.selectedRight = null;
     setTimeout(() => {
@@ -201,7 +202,7 @@ function handlePairClick(el, side, id) {
 }
 
 /* =========================
-   Mode B: Tone Sliders [cite: 74]
+   Mode B: Tone Sliders
 ========================= */
 function renderSliders() {
   const mode = state.currentScene.modes.sliders;
@@ -209,64 +210,56 @@ function renderSliders() {
   container.innerHTML = "";
 
   $("slidersPrompt").textContent = mode.prompt;
-  // Sliders must declare scope [cite: 147]
-  $("slidersScope").textContent = mode.scope; 
+  $("slidersScope").textContent = mode.scopeLabel; // Fixed key mapping
 
-  // Mapping 'axes' from filmPacks.js / litPacks.js
-  const axesPool = mode.axes || mode.sliders || [];
-
-  axesPool.forEach(axis => {
+  mode.axes.forEach((axis, idx) => {
     const row = document.createElement("div");
     row.className = "slider-row";
+    const axisId = `slider-${idx}`;
     row.innerHTML = `
-      <div class="slider-label">${axis.left}</div>
-      <input type="range" min="0" max="100" value="${axis.defaultValue || 50}">
-      <div class="slider-right">${axis.right}</div>
+      <div class="slider-label">${axis.leftLabel}</div>
+      <input type="range" min="0" max="100" value="${mode.defaults ? mode.defaults[idx] : 50}">
+      <div class="slider-right">${axis.rightLabel}</div>
     `;
     
-    // Track interactions; advance when all are touched [cite: 78]
     row.querySelector("input").oninput = () => {
-      state.slidersTouched.add(axis.id);
-      if (state.slidersTouched.size === axesPool.length) advance();
+      state.slidersTouched.add(axisId);
+      if (state.slidersTouched.size === mode.axes.length) advance();
     };
     container.appendChild(row);
   });
 }
 
 /* =========================
-   Mode C: Rank Buckets [cite: 68]
+   Mode C: Rank Buckets
 ========================= */
 function renderBuckets() {
-  const mode = state.currentScene.modes.rankBuckets;
+  const mode = state.currentScene.modes.buckets; // Fixed key mapping
   const container = $("bucketsContainer");
   container.innerHTML = "";
   $("bucketsPrompt").textContent = mode.prompt;
 
-  // Craft Labels [cite: 70, 71, 72]
-  const labels = ["Engine", "Support", "Spice"];
+  const labels = ["Engine", "Support", "Spice"]; [cite_start]// Based on Buckets logic [cite: 70, 71, 72]
   
-  // The element bank
   const deck = document.createElement("div");
   deck.className = "card-list";
   deck.style.gridColumn = "1 / -1";
   deck.style.marginBottom = "20px";
 
-  mode.cards.forEach(c => {
+  mode.elements.forEach(txt => {
     const card = document.createElement("div");
     card.className = "card";
-    card.textContent = c.text;
+    card.textContent = txt;
     card.draggable = true;
-    card.ondragstart = (e) => e.dataTransfer.setData("text", c.text);
+    card.ondragstart = (e) => e.dataTransfer.setData("text", txt);
     deck.appendChild(card);
   });
   container.appendChild(deck);
 
-  // The dropping buckets
   labels.forEach(l => {
     const b = document.createElement("div");
     b.className = "panel";
-    b.innerHTML = `<div class="pair-column-title">${l}</div><div class="card-list" style="min-height:80px; border: 1px dashed rgba(189,155,64,0.3)"></div>`;
-    
+    b.innerHTML = `<div class="pair-column-title">${l}</div><div class="card-list" style="min-height:80px; border: 1px dashed var(--line2)"></div>`;
     b.ondragover = (e) => e.preventDefault();
     b.ondrop = (e) => {
       e.preventDefault();
@@ -275,7 +268,7 @@ function renderBuckets() {
       if (el) {
         b.querySelector(".card-list").appendChild(el);
         state.bucketCount = container.querySelectorAll(".panel .card").length;
-        if (state.bucketCount === mode.cards.length) advance();
+        if (state.bucketCount === mode.elements.length) advance();
       }
     };
     container.appendChild(b);
@@ -283,32 +276,25 @@ function renderBuckets() {
 }
 
 /* =========================
-   Mode D: Interpretive Spotlights [cite: 79]
+   Mode D: Interpretive Spotlights
 ========================= */
 function renderSpotlights() {
-  const mode = state.currentScene.modes.interpretiveTakes;
+  const mode = state.currentScene.modes.spotlights;
   const list = $("spotlightsList");
   list.innerHTML = "";
   $("spotlightsPrompt").textContent = mode.prompt;
 
-  // Handle both string arrays and object arrays for flexibility
-  const takes = mode.takes || [];
-
-  takes.forEach(t => {
-    const text = typeof t === "string" ? t : t.text;
+  mode.options.forEach(text => {
     const div = document.createElement("div");
     div.className = "spotlight";
     div.textContent = text;
     div.onclick = () => {
       div.classList.toggle("selected");
       const selectedCount = list.querySelectorAll(".selected").length;
-      
-      // Advance when target 'pick' count reached [cite: 80]
-      if (selectedCount === (mode.pick || 3)) advance();
+      [cite_start]if (selectedCount === 3) advance(); // Fixed requirement: pick top 3 [cite: 80]
     };
     list.appendChild(div);
   });
 }
 
-// Start the engine
 window.addEventListener("DOMContentLoaded", init);

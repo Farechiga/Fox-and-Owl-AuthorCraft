@@ -312,12 +312,12 @@ id: "film-homealone-the-doorknob",
               "Using a shovel—the object Kevin feared—to be his salvation.",
               "The silence of the man as he works, making him seem powerful.",
               "Providing a clean 'deus ex machina' that feels earned by Kevin's earlier kindness."
-            ]
+]
           }
         }
       }
-    ]
-  },
+    ] // <--- CLOSES "scenes" for Home Alone
+  }, // <--- CLOSES the "Home Alone" film object
   {
     packId: "film-grinch2018",
     workTitle: "The Grinch",

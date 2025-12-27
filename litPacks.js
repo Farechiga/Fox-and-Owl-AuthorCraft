@@ -170,3 +170,4 @@ export const LIT_PACKS = [
       }
     ]
   }
+];

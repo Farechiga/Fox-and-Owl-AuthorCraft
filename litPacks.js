@@ -6,169 +6,167 @@
 // FAIR USE: For modern books, summarize in your own words; no direct quotes.
 
 export const LIT_PACKS = [
-  {
-    packId: "lit-famous-five",
-    workTitle: "The Famous Five",
+{
+    packId: "lit-secretgarden",
+    workTitle: "The Secret Garden",
     workType: "literature",
-    author: "Enid Blyton",
-    year: 1942,
+    author: "Frances Hodgson Burnett",
+    year: 1911,
     enabled: true,
 
     scenes: [
       {
-        id: "lit-famous-five-01-the-wreck-discovery",
+        id: "lit-secretgarden-the-hidden-door",
         tier: "Owl",
-        headerLine: "The Famous Five — The Wreck in the Bay",
-        displayTitle: "The Famous Five — The Wreck in the Bay",
-
+        headerLine: "The Secret Garden — The Hidden Door",
+        displayTitle: "The Secret Garden — The Hidden Door",
         scene: {
-          summary:
-            "After a massive storm, the cousins look out at the bay and see something new. A giant, dark shape has been dragged up from the bottom of the sea and stuck onto the rocks. George realizes it’s the old shipwreck everyone thought was gone forever. They scramble down the cliffs, slipping on wet rocks, desperate to reach it before the tide comes back in.",
-          sourceContext: "Early: The discovery of the core mystery.",
+          summary: "A strong gust of wind blows a thick curtain of ivy away from the old stone wall. Mary sees a round, iron handle that has been hidden for years. She reaches her hand through the leaves, her fingers touching the cold metal, and realizes this is the entrance to the garden everyone said was lost.",
+          sourceContext: "Early: The moment Mary finally finds the entrance.",
           fairUseNote: "Paraphrase; avoid quoting the text."
         },
-
-        tags: ["discovery", "urgency", "setting"],
-
         modes: {
           pairMatch: {
             prompt: "Match the moment to why it lands.",
             pairs: [
-              {
-                id: "PM1",
-                left: "The storm changes the look of the bay overnight.",
-                right: "It gives the kids a fresh reason to go exploring right away."
-              },
-              {
-                id: "PM2",
-                left: "The kids slip on wet rocks and seaweed while climbing.",
-                right: "The mess makes the wreck feel like it belongs in the wild sea."
-              },
-              {
-                id: "PM3",
-                left: "George points and shouts because she recognized the ship first.",
-                right: "It shows she knows this island better than any of the visitors."
-              },
-              {
-                id: "PM4",
-                left: "The tide is mentioned as 'creeping back in' while they work.",
-                right: "It creates a ticking clock so the kids have to move fast."
-              }
+              { id: "PM1", left: "The wind moves the ivy at the perfect time.", right: "It feels like the garden is finally 'choosing' to be found[cite: 59, 128]." },
+              { id: "PM2", left: "Mary’s fingers touch the cold, rusty iron.", right: "The cold metal makes the secret feel old and heavy[cite: 102, 107]." },
+              { id: "PM3", left: "The ivy acts like a heavy, living curtain.", right: "It shows that nature is actively guarding the secret[cite: 59, 114]." },
+              { id: "PM4", left: "Mary stands perfectly still before reaching.", right: "Her hesitation shows she knows this is a huge moment[cite: 134, 136]." }
             ]
           },
-
           sliders: {
-            scopeLabel: "the scene overall",
-            prompt: "Set your read using descriptive axes.",
+            scopeLabel: "the scene's mood",
+            prompt: "Tone Check: Read these axes based on...",
             axes: [
-              { leftLabel: "Quiet", rightLabel: "Loud" },
-              { leftLabel: "Safe", rightLabel: "Risky" },
-              { leftLabel: "Slow", rightLabel: "Fast" },
-              { leftLabel: "Ordinary", rightLabel: "Magical" }
+              { leftLabel: "Natural", rightLabel: "Mysterious" },
+              { leftLabel: "Still", rightLabel: "Windy" },
+              { leftLabel: "Open", rightLabel: "Hidden" }
             ],
-            defaults: [50, 50, 50, 50]
+            defaults: [50, 50, 50] [cite: 153]
           },
-
           buckets: {
             prompt: "Sort the elements by what drives this moment.",
             elements: [
-              "The giant shipwreck stuck on the rocks",
-              "George’s local knowledge of the bay",
-              "The rising tide coming back in",
-              "The slippery, wet climb down the cliff",
-              "The morning sun after the big storm"
+              "The heavy curtain of ivy [cite: 105]",
+              "The rusty iron door handle [cite: 102]",
+              "The sudden gust of wind [cite: 59]",
+              "Mary's reaching hand [cite: 133]",
+              "The silence of the stone wall [cite: 105]"
             ]
           },
-
           spotlights: {
             prompt: "Rank the top 3 choices that make this moment stick.",
             options: [
-              "Using a storm to bring a hidden secret up to the surface",
-              "Making the kids struggle over wet rocks so the goal feels hard to reach",
-              "Letting George be the leader because it’s her home turf",
-              "Adding the tide as a threat to make the scene feel urgent",
-              "Describing the ship as a 'dark shape' at first to build the mystery"
+              "Using the wind as a 'character' that reveals the secret[cite: 59, 82].",
+              "Focusing on the cold feel of the iron to make the find feel real[cite: 107, 166].",
+              "Keeping the door hidden behind 'living' ivy so it feels like a maze[cite: 105, 174].",
+              "Making Mary find it alone so the secret belongs only to her[cite: 111, 169]."
             ]
           }
         }
       },
       {
-        id: "lit-famous-five-02-george-boat-rules",
+        id: "lit-secretgarden-colin-stands",
         tier: "Lantern",
-        headerLine: "The Famous Five — George’s Island Rules",
-        displayTitle: "The Famous Five — George’s Island Rules",
-
+        headerLine: "The Secret Garden — Colin’s First Step",
+        displayTitle: "The Secret Garden — Colin’s First Step",
         scene: {
-          summary:
-            "George stands by her boat on the beach, looking at her cousins with a serious face. She tells them that Kirrin Island is her island, and they can only go there if they follow her lead. She doesn't smile or offer to help them with their bags; she just waits to see if they’ll listen. Timmy the dog stands right next to her, looking just as tough.",
-          sourceContext: "Middle: George establishing her authority.",
+          summary: "In the middle of the garden, Colin tells Dickon and Mary to watch him. He slowly pushes himself out of his wheelchair, his legs shaking like thin branches. He stands upright for the first time, his face turning red with effort, and his eyes wide with shock as he realizes the ground is actually holding him up.",
+          sourceContext: "Climax: Colin overcomes his fear of being 'sick'.",
           fairUseNote: "Paraphrase; avoid quoting the text."
         },
-
-        tags: ["status", "character", "confrontation"],
-
         modes: {
           pairMatch: {
             prompt: "Match the moment to why it lands.",
             pairs: [
-              {
-                id: "PM1",
-                left: "George stands with her arms crossed by her boat.",
-                right: "She acts like a guard to show the island has a boss."
-              },
-              {
-                id: "PM2",
-                left: "She calls it 'my' island instead of 'the' island.",
-                right: "That one word tells the cousins they are just guests."
-              },
-              {
-                id: "PM3",
-                left: "Timmy the dog stands perfectly still by her side.",
-                right: "His posture makes George look more serious and protected."
-              },
-              {
-                id: "PM4",
-                left: "She doesn't smile or help them with their things.",
-                right: "Her coldness makes the cousins realize they have to earn her trust."
-              }
+              { id: "PM1", left: "Colin’s legs shake 'like thin branches'.", right: "The comparison helps us see how weak and new his legs are[cite: 107]." },
+              { id: "PM2", left: "He looks at the ground with pure shock.", right: "He's learning that the world is more solid than he thought[cite: 136]." },
+              { id: "PM3", left: "He pushes himself up without anyone's help.", right: "Doing it himself makes the victory feel much more earned[cite: 91, 133]." },
+              { id: "PM4", left: "Dickon and Mary stay perfectly quiet.", right: "Their silence makes the moment feel very serious and grand[cite: 134]." }
             ]
           },
-
           sliders: {
-            scopeLabel: "George’s stance here",
-            prompt: "Set your read using descriptive axes.",
+            scopeLabel: "Colin's internal struggle",
+            prompt: "Tone Check: Read these axes based on...",
             axes: [
-              { leftLabel: "Friendly", rightLabel: "Strict" },
-              { leftLabel: "Weak", rightLabel: "Strong" },
-              { leftLabel: "Shy", rightLabel: "Bold" },
-              { leftLabel: "Playful", rightLabel: "Serious" }
+              { leftLabel: "Strained", rightLabel: "Easy" },
+              { leftLabel: "Frightened", rightLabel: "Proud" },
+              { leftLabel: "Fragile", rightLabel: "Solid" }
             ],
-            defaults: [50, 50, 50, 50]
+            defaults: [50, 50, 50] [cite: 153]
           },
-
           buckets: {
             prompt: "Sort the elements by what drives this moment.",
             elements: [
-              "George calling the island 'mine'",
-              "Timmy standing guard by her legs",
-              "George’s crossed-arms posture",
-              "The cousins standing on the sand listening",
-              "The boat acting as the bridge to the secret"
+              "Colin's shaking legs [cite: 133]",
+              "The empty wheelchair left behind [cite: 104]",
+              "Colin's red, determined face [cite: 136]",
+              "The solid ground of the garden [cite: 105]",
+              "Mary and Dickon's silent watching [cite: 134]"
             ]
           },
-
           spotlights: {
             prompt: "Rank the top 3 choices that make this moment stick.",
             options: [
-              "Using the word 'my' to show George is in charge",
-              "Using a dog to make a kid look more powerful and scary",
-              "Making George act cold so the cousins have to try harder to fit in",
-              "Staging the scene by her boat because that's her source of power",
-              "Letting her stay quiet while they react so she keeps the control"
+              "Describing the physical shake of his legs to show the high stakes[cite: 111, 165].",
+              "Contrasting the 'broken' boy with the 'growing' garden[cite: 56, 82].",
+              "Focusing on Colin's eyes to show his world is changing[cite: 136, 170].",
+              "Using the wheelchair as a prop that he finally moves away from[cite: 104, 174]."
+            ]
+          }
+        }
+      },
+      {
+        id: "lit-secretgarden-the-robin-guide",
+        tier: "Fox",
+        headerLine: "The Secret Garden — The Robin’s Tour",
+        displayTitle: "The Secret Garden — The Robin’s Tour",
+        scene: {
+          summary: "A small robin with a bright red chest hops along the top of the garden wall, chirping loudly at Mary. He tilts his head to one side as if he is listening to her, then flies a few feet ahead and waits for her to catch up. He seems to be teasing her into following him deeper into the overgrown trees.",
+          sourceContext: "Early: Mary starting to feel less lonely.",
+          fairUseNote: "Paraphrase; avoid quoting the text."
+        },
+        modes: {
+          pairMatch: {
+            prompt: "Match the moment to why it lands.",
+            pairs: [
+              { id: "PM1", left: "The robin tilts his head to 'listen'.", right: "It makes the bird look like a smart, interested friend[cite: 59, 136]." },
+              { id: "PM2", left: "He flies a bit, then stops and waits.", right: "This movement creates a 'follow the leader' game[cite: 133, 134]." },
+              { id: "PM3", left: "The bird's chest is a 'bright red'.", right: "The splash of color stands out against the gray garden[cite: 107]." },
+              { id: "PM4", left: "He chirps 'loudly' at Mary.", right: "The noise makes the garden feel less empty and scary[cite: 107]." }
+            ]
+          },
+          sliders: {
+            scopeLabel: "the interaction",
+            prompt: "Tone Check: Read these axes based on...",
+            axes: [
+              { leftLabel: "Playful", rightLabel: "Serious" },
+              { leftLabel: "Wild", rightLabel: "Friendly" },
+              { leftLabel: "Leading", rightLabel: "Following" }
+            ],
+            defaults: [50, 50, 50] [cite: 153]
+          },
+          buckets: {
+            prompt: "Sort the elements by what drives this moment.",
+            elements: [
+              "The robin's bright red chest [cite: 107]",
+              "The 'head tilt' of the bird [cite: 136]",
+              "The bird flying and stopping [cite: 133]",
+              "The overgrown, silent trees [cite: 105]",
+              "Mary walking after the bird [cite: 133]"
+            ]
+          },
+          spotlights: {
+            prompt: "Rank the top 3 choices that make this moment stick.",
+            options: [
+              "Treating the bird like a human guide to make Mary feel safe[cite: 59, 114].",
+              "Using bright colors (red) to point the audience toward the 'path'[cite: 107, 166].",
+              "Making the bird 'tease' Mary so the scene feels like a game[cite: 116, 174].",
+              "Using sound (chirping) to break the 'dead' silence of the house[cite: 107, 134]."
             ]
           }
         }
       }
     ]
   }
-];

@@ -61,8 +61,9 @@ export const FILM_PACKS = [
             ]
           }
         }
-      },
-id: "film-homealone-the-doorknob",
+      }, // <-- FIXED: Added missing comma here
+      {
+        id: "film-homealone-the-doorknob",
         tier: "Lantern",
         headerLine: "Home Alone — The Red-Hot Doorknob",
         displayTitle: "Home Alone — The Red-Hot Doorknob",
@@ -312,12 +313,12 @@ id: "film-homealone-the-doorknob",
               "Using a shovel—the object Kevin feared—to be his salvation.",
               "The silence of the man as he works, making him seem powerful.",
               "Providing a clean 'deus ex machina' that feels earned by Kevin's earlier kindness."
-]
+            ]
           }
         }
       }
-    ] // <--- CLOSES "scenes" for Home Alone
-  }, // <--- CLOSES the "Home Alone" film object
+    ]
+  },
   {
     packId: "film-grinch2018",
     workTitle: "The Grinch",
@@ -437,8 +438,7 @@ id: "film-homealone-the-doorknob",
           summary: "Inside his lair, the Grinch reveals his ultimate invention: a giant, rocket-powered sled. He walks through a holographic blueprint of Who-ville, meticulously timing how long it will take to slide down every chimney and vacuum up every gift using a high-powered suction device.",
           sourceContext: "Rising Action: The planning of the great heist.",
           fairUseNote: "Describe; do not quote dialogue."
-"
-        },
+        }, // <-- FIXED: Removed stray quote and closed object correctly
         modes: {
           pairMatch: {
             prompt: "Match the gadget to the logistical problem.",

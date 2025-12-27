@@ -26,10 +26,10 @@ export const FILM_PACKS = [
           pairMatch: {
             prompt: "Match the moment to why it lands.",
             pairs: [
-              { id: "PM1", left: "Marv pulls a string expecting a light to turn on.", right: "The surprise is bigger because he thought he was in control[cite: 54, 127]." },
-              { id: "PM2", left: "The iron leaves a perfectly rectangular red mark.", right: "The cartoonish injury makes the scene feel funny instead of scary[cite: 116, 119]." },
-              { id: "PM3", left: "The heavy iron falls through a narrow laundry chute.", right: "It shows Kevin planned the 'route' of the trap ahead of time[cite: 66, 131]." },
-              { id: "PM4", left: "Marv is silhouetted in a dark doorway.", right: "The shadows hide the trap so the audience is surprised too[cite: 57, 134]." }
+              { id: "PM1", left: "Marv pulls a string expecting a light to turn on.", right: "The surprise is bigger because he thought he was in control." },
+              { id: "PM2", left: "The iron leaves a perfectly rectangular red mark.", right: "The cartoonish injury makes the scene feel funny instead of scary." },
+              { id: "PM3", left: "The heavy iron falls through a narrow laundry chute.", right: "It shows Kevin planned the 'route' of the trap ahead of time." },
+              { id: "PM4", left: "Marv is silhouetted in a dark doorway.", right: "The shadows hide the trap so the audience is surprised too." }
             ]
           },
           sliders: {
@@ -45,20 +45,20 @@ export const FILM_PACKS = [
           buckets: {
             prompt: "Sort the elements by what drives this moment.",
             elements: [
-              "The fake light-switch string [cite: 104]",
-              "The red iron mark on Marv's face [cite: 136]",
-              "The heavy thud of the iron falling [cite: 106]",
-              "The dark basement shadows [cite: 105]",
-              "Marv's confused expression [cite: 136]"
+              "The fake light-switch string",
+              "The red iron mark on Marv's face",
+              "The heavy thud of the iron falling",
+              "The dark basement shadows",
+              "Marv's confused expression"
             ]
           },
           spotlights: {
             prompt: "Rank the top 3 choices that make this moment stick.",
             options: [
-              "Using a laundry chute to turn a household object into a weapon[cite: 104, 114].",
-              "Letting Marv pull the string himself so he triggers his own trap[cite: 81, 166].",
-              "Showing the red mark on his face to prove the trap really worked[cite: 131, 136].",
-              "Using the dark room to build tension before the iron drops[cite: 134, 170]."
+              "Using a laundry chute to turn a household object into a weapon.",
+              "Letting Marv pull the string himself so he triggers his own trap.",
+              "Showing the red mark on his face to prove the trap really worked.",
+              "Using the dark room to build tension before the iron drops."
             ]
           }
         }
@@ -77,10 +77,10 @@ export const FILM_PACKS = [
           pairMatch: {
             prompt: "Match the moment to why it lands.",
             pairs: [
-              { id: "PM1", left: "The spider moves slowly across Marv's cheek.", right: "The slow movement makes the audience wait for the panic[cite: 134]." },
-              { id: "PM2", left: "Marv cross-eyes his gaze to look at his nose.", right: "It shows he is terrified of something very, very small[cite: 136]." },
-              { id: "PM3", left: "Marv screams in a very high-pitched voice.", right: "The funny sound ruins his image as a 'tough burglar'[cite: 55, 128]." },
-              { id: "PM4", left: "He knocks into Harry while trying to escape.", right: "Kevin's trap makes the two bad guys fight each other[cite: 21, 66]." }
+              { id: "PM1", left: "The spider moves slowly across Marv's cheek.", right: "The slow movement makes the audience wait for the panic." },
+              { id: "PM2", left: "Marv cross-eyes his gaze to look at his nose.", right: "It shows he is terrified of something very, very small." },
+              { id: "PM3", left: "Marv screams in a very high-pitched voice.", right: "The funny sound ruins his image as a 'tough burglar'." },
+              { id: "PM4", left: "He knocks into Harry while trying to escape.", right: "Kevin's trap makes the two bad guys fight each other." }
             ]
           },
           sliders: {
@@ -96,20 +96,20 @@ export const FILM_PACKS = [
           buckets: {
             prompt: "Sort the elements by what drives this moment.",
             elements: [
-              "The tarantula's hairy legs moving [cite: 103]",
-              "Marv's high-pitched scream [cite: 135]",
-              "Marv's crossed eyes [cite: 136]",
-              "The spider-tank seen in Buzz's room earlier [cite: 66]",
-              "Harry getting pushed aside [cite: 133]"
+              "The tarantula's hairy legs moving",
+              "Marv's high-pitched scream",
+              "Marv's crossed eyes",
+              "The spider-tank seen in Buzz's room earlier",
+              "Harry getting pushed aside"
             ]
           },
           spotlights: {
             prompt: "Rank the top 3 choices that make this moment stick.",
             options: [
               "Using a tiny pet to defeat a grown man[cite: 55, 59].",
-              "Focusing the camera on Marv's face so we see him freeze up[cite: 165, 170].",
-              "Making the scream sound funny instead of painful[cite: 116, 127].",
-              "Using a real animal to make the danger feel more 'gross' to kids[cite: 119, 166]."
+              "Focusing the camera on Marv's face so we see him freeze up.",
+              "Making the scream sound funny instead of painful.",
+              "Using a real animal to make the danger feel more 'gross' to kids."
             ]
           }
         }
@@ -128,10 +128,10 @@ export const FILM_PACKS = [
           pairMatch: {
             prompt: "Match the moment to why it lands.",
             pairs: [
-              { id: "PM1", left: "The ornaments are bright, pretty, and festive.", right: "Using 'nice' things as traps makes the scene more creative[cite: 72, 105]." },
-              { id: "PM2", left: "We hear a loud 'crunch' with every step.", right: "The sound helps the audience imagine the sharp pain[cite: 106, 134]." },
-              { id: "PM3", left: "Marv is barefoot because he lost his shoes earlier.", right: "One bad moment for the burglar leads directly into the next[cite: 21, 133]." },
-              { id: "PM4", left: "He hops on tiptoes toward the carpet.", right: "His desperate movement shows he’s completely lost his dignity[cite: 55, 136]." }
+              { id: "PM1", left: "The ornaments are bright, pretty, and festive.", right: "Using 'nice' things as traps makes the scene more creative." },
+              { id: "PM2", left: "We hear a loud 'crunch' with every step.", right: "The sound helps the audience imagine the sharp pain." },
+              { id: "PM3", left: "Marv is barefoot because he lost his shoes earlier.", right: "One bad moment for the burglar leads directly into the next." },
+              { id: "PM4", left: "He hops on tiptoes toward the carpet.", right: "His desperate movement shows he’s completely lost his dignity." }
             ]
           },
           sliders: {
@@ -147,20 +147,20 @@ export const FILM_PACKS = [
           buckets: {
             prompt: "Sort the elements by what drives this moment.",
             elements: [
-              "The sharp crunching sound of glass [cite: 106]",
-              "The colorful Christmas ornaments [cite: 105]",
-              "Marv's bare, vulnerable feet [cite: 133]",
-              "The window acting as a 'welcome' sign [cite: 54]",
-              "Marv's tiptoe hopping [cite: 133]"
+              "The sharp crunching sound of glass",
+              "The colorful Christmas ornaments",
+              "Marv's bare, vulnerable feet",
+              "The window acting as a 'welcome' sign",
+              "Marv's tiptoe hopping"
             ]
           },
           spotlights: {
             prompt: "Rank the top 3 choices that make this moment stick.",
             options: [
-              "Turning a holiday decoration into a stinging obstacle[cite: 104, 114].",
-              "Letting the audience see his bare feet earlier so we know what's coming[cite: 57, 134].",
-              "Using the sound of breaking glass to sell the effect without showing blood[cite: 106, 116].",
-              "Contrasting the 'pretty' ornaments with the 'ugly' burglars[cite: 56, 171]."
+              "Turning a holiday decoration into a stinging obstacle.",
+              "Letting the audience see his bare feet earlier so we know what's coming.",
+              "Using the sound of breaking glass to sell the effect without showing blood.",
+              "Contrasting the 'pretty' ornaments with the 'ugly' burglars."
             ]
           }
         }

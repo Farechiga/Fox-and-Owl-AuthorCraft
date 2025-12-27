@@ -61,9 +61,261 @@ export const FILM_PACKS = [
             ]
           }
         }
-      }
-      // Note: Other Home Alone scenes (Tarantula, Ornaments) remain here in your live file.
-    ]
+      },
+id: "film-homealone-the-doorknob",
+        tier: "Lantern",
+        headerLine: "Home Alone — The Red-Hot Doorknob",
+        displayTitle: "Home Alone — The Red-Hot Doorknob",
+        scene: {
+          summary: "Harry reaches for the front doorknob, unaware that Kevin has used an electric charcoal starter to heat it to a glowing red. When Harry grips the metal, he screams in agony as the heat sears the letter 'M' from the doorknob into the palm of his hand. He recoils, plunging his hand into the snow to cool the burn.",
+          sourceContext: "Middle: The burglars' first attempts to breach the perimeter.",
+          fairUseNote: "Describe; do not quote dialogue."
+        },
+        modes: {
+          pairMatch: {
+            prompt: "Match the sensory detail to the scene's impact.",
+            pairs: [
+              { id: "PM1", left: "The doorknob glows a faint, dangerous orange.", right: "It signals the danger to the audience before the character feels it." },
+              { id: "PM2", left: "Harry grips the knob with his full weight.", right: "The commitment to the movement makes the injury feel more earned." },
+              { id: "PM3", left: "The sizzling sound of the hand on metal.", right: "The audio sells the intensity of the heat without needing gore." },
+              { id: "PM4", left: "Harry thrusts his hand into the deep snow.", right: "It uses the winter setting to provide a desperate, temporary relief." }
+            ]
+          },
+          sliders: {
+            scopeLabel: "the thermal trap",
+            prompt: "Scene Analysis: Gauge the dynamics of this moment...",
+            axes: [
+              { leftLabel: "Inviting", rightLabel: "Repelling" },
+              { leftLabel: "Ordinary", rightLabel: "Lethal" },
+              { leftLabel: "Slow Burn", rightLabel: "Instant" }
+            ],
+            defaults: [50, 50, 50]
+          },
+          buckets: {
+            prompt: "Sort the elements by what drives this moment.",
+            elements: [
+              "The glowing electric heating coil",
+              "The 'M' branded on Harry's palm",
+              "The steam rising from the snow",
+              "The deceptive quiet of the front porch",
+              "Harry's muffed yell of pain"
+            ]
+          },
+          spotlights: {
+            prompt: "Rank the top 3 choices that make this moment stick.",
+            options: [
+              "Using a common household object to create a high-stakes injury.",
+              "The visual payoff of the branded 'M' to show the trap's lasting effect.",
+              "Using the freezing outdoor temperature to contrast with the extreme heat.",
+              "Placing the trap at the 'threshold' of the house to show it's a fortress."
+            ]
+          }
+        }
+      },
+      {
+        id: "film-homealone-the-ice-stairs",
+        tier: "Owl",
+        headerLine: "Home Alone — The Frozen Steps",
+        displayTitle: "Home Alone — The Frozen Steps",
+        scene: {
+          summary: "Marv attempts to walk up the outdoor basement stairs, but Kevin has hosed them down with water, creating a thick sheet of ice. Marv loses his footing instantly, sliding all the way back down and landing hard on his back. He tries again, only to have his feet fly out from under him even faster.",
+          sourceContext: "Middle: Physical comedy through environmental manipulation.",
+          fairUseNote: "Describe; do not quote dialogue."
+        },
+        modes: {
+          pairMatch: {
+            prompt: "Match the physical comedy beats.",
+            pairs: [
+              { id: "PM1", left: "Marv's legs kick out into a 'split'.", right: "The exaggerated pose emphasizes the lack of friction." },
+              { id: "PM2", left: "The sound of boots sliding on hollow wood.", right: "The percussion of the fall adds a rhythmic quality to the gag." },
+              { id: "PM3", left: "Marv grabs for a railing that is also iced.", right: "It shows the trap is multi-layered and impossible to escape." },
+              { id: "PM4", left: "He lands flat on his back at the bottom.", right: "The 'thud' signals a temporary end to his forward momentum." }
+            ]
+          },
+          sliders: {
+            scopeLabel: "the lack of friction",
+            prompt: "Scene Analysis: Gauge the dynamics of this moment...",
+            axes: [
+              { leftLabel: "Steady", rightLabel: "Slippery" },
+              { leftLabel: "One-Time", rightLabel: "Repetitive" },
+              { leftLabel: "Climb", rightLabel: "Descent" }
+            ],
+            defaults: [50, 50, 50]
+          },
+          buckets: {
+            prompt: "Sort the elements by what drives this moment.",
+            elements: [
+              "The clear, invisible layer of ice",
+              "Marv's flailing, uncoordinated arms",
+              "The steep angle of the basement stairs",
+              "The sound of a heavy body hitting concrete",
+              "The garden hose left out in the yard"
+            ]
+          },
+          spotlights: {
+            prompt: "Rank the top 3 choices that make this moment stick.",
+            options: [
+              "Using the winter weather as a natural weapon for a child.",
+              "The repetitive nature of the fall to build comedic timing.",
+              "Keeping the camera wide to show the full scale of the stumble.",
+              "Contrasting the 'hard' stairs with the 'soft' character movements."
+            ]
+          }
+        }
+      },
+      {
+        id: "film-homealone-the-blowtorch",
+        tier: "Lantern",
+        headerLine: "Home Alone — The Blowtorch Surprise",
+        displayTitle: "Home Alone — The Blowtorch Surprise",
+        scene: {
+          summary: "Harry manages to open the back door just enough to stick his head inside. As he does, he trips a wire that ignites a blowtorch mounted to the wall. The flame blasts directly onto the top of his head. Harry stands frozen for a second as his hat catches fire before he realizes what is happening and runs back outside.",
+          sourceContext: "Middle: Increasing the 'lethality' of the traps.",
+          fairUseNote: "Describe; do not quote dialogue."
+        },
+        modes: {
+          pairMatch: {
+            prompt: "Match the trap design to the audience reaction.",
+            pairs: [
+              { id: "PM1", left: "The blowtorch is triggered by the door's movement.", right: "The automation makes Kevin seem like a miniature engineer." },
+              { id: "PM2", left: "Harry remains still while his hat smolders.", right: "The delayed reaction allows the comedy of the image to sink in." },
+              { id: "PM3", left: "The bright blue flame in the dark hallway.", right: "The visual pop draws the eye exactly to the point of impact." },
+              { id: "PM4", left: "Harry runs head-first into a snowbank.", right: "It resolves the 'heat' tension with a classic physical gag." }
+            ]
+          },
+          sliders: {
+            scopeLabel: "the sudden heat",
+            prompt: "Scene Analysis: Gauge the dynamics of this moment...",
+            axes: [
+              { leftLabel: "Anticipated", rightLabel: "Shocking" },
+              { leftLabel: "Static", rightLabel: "Explosive" },
+              { leftLabel: "Controlled", rightLabel: "Wild" }
+            ],
+            defaults: [50, 50, 50]
+          },
+          buckets: {
+            prompt: "Sort the elements by what drives this moment.",
+            elements: [
+              "The hissing sound of the torch",
+              "Harry's smoking wool cap",
+              "The tripwire at ankle height",
+              "The narrow frame of the doorway",
+              "The frantic dive into the snow"
+            ]
+          },
+          spotlights: {
+            prompt: "Rank the top 3 choices that make this moment stick.",
+            options: [
+              "The absurdity of a child rigging a gas-powered blowtorch.",
+              "Using the 'delayed realization' trope to maximize the laugh.",
+              "The visual of the smoking head as a 'cartoon' come to life.",
+              "Forcing the burglar to retreat for a second time through the same entrance."
+            ]
+          }
+        }
+      },
+      {
+        id: "film-homealone-the-paint-cans",
+        tier: "Lantern",
+        headerLine: "Home Alone — The Swinging Paint Cans",
+        displayTitle: "Home Alone — The Swinging Paint Cans",
+        scene: {
+          summary: "As Harry and Marv finally begin to climb the main staircase to catch Kevin, they look up to see two paint cans swinging toward them on ropes. Harry is struck first, knocked backward into Marv, and then Marv is hit by the second can. Both burglars are sent flying back down to the foyer floor, losing teeth in the process.",
+          sourceContext: "Climax: The final confrontation inside the McCallister home.",
+          fairUseNote: "Describe; do not quote dialogue."
+        },
+        modes: {
+          pairMatch: {
+            prompt: "Match the momentum to the cinematic effect.",
+            pairs: [
+              { id: "PM1", left: "The cans swing in a wide, heavy arc.", right: "The pendulum motion creates a sense of unavoidable doom." },
+              { id: "PM2", left: "A tooth flies through the air in slow motion.", right: "It adds a tiny, high-detail 'price' to the burglars' failure." },
+              { id: "PM3", left: "Kevin stands at the top of the stairs, watching.", right: "He has moved from hiding to actively defending his high ground." },
+              { id: "PM4", left: "The burglars fall in a tangled heap of limbs.", right: "It visually signals that they are no longer a functional team." }
+            ]
+          },
+          sliders: {
+            scopeLabel: "the pendulum impact",
+            prompt: "Scene Analysis: Gauge the dynamics of this moment...",
+            axes: [
+              { leftLabel: "Light", rightLabel: "Heavy" },
+              { leftLabel: "Random", rightLabel: "Rhythmic" },
+              { leftLabel: "Ascending", rightLabel: "Descending" }
+            ],
+            defaults: [50, 50, 50]
+          },
+          buckets: {
+            prompt: "Sort the elements by what drives this moment.",
+            elements: [
+              "The heavy gallon paint cans",
+              "The taut nylon rope",
+              "Harry's missing gold tooth",
+              "The height of the grand staircase",
+              "Kevin’s defiant expression"
+            ]
+          },
+          spotlights: {
+            prompt: "Rank the top 3 choices that make this moment stick.",
+            options: [
+              "Using the verticality of the house to give the child an advantage.",
+              "The rhythmic 'one-two' punch of the cans to keep the energy up.",
+              "The extreme physical consequence (lost teeth) without showing blood.",
+              "Turning the 'home improvement' supplies into weapons of defense."
+            ]
+          }
+        }
+      },
+      {
+        id: "film-homealone-the-salt-neighbor",
+        tier: "Lantern",
+        headerLine: "Home Alone — Old Man Marley's Rescue",
+        displayTitle: "Home Alone — Old Man Marley's Rescue",
+        scene: {
+          summary: "Just as the burglars have Kevin cornered in a neighbor's house, Old Man Marley appears behind them. He uses his heavy snow shovel to knock both Harry and Marv unconscious with two quick swings. He then picks up Kevin and carries him safely home, proving the 'scary neighbor' was a protector all along.",
+          sourceContext: "Resolution: The unexpected ally saves the protagonist.",
+          fairUseNote: "Describe; do not quote dialogue."
+        },
+        modes: {
+          pairMatch: {
+            prompt: "Match the character arc to the scene's outcome.",
+            pairs: [
+              { id: "PM1", left: "The heavy metal shovel hits the burglars.", right: "It turns a tool of 'chores' into a tool of justice." },
+              { id: "PM2", left: "The neighbor is framed in the doorway.", right: "The silhouette initially creates fear before the rescue." },
+              { id: "PM3", left: "Marley gently picks up Kevin.", right: "The physical contact resolves Kevin's fear of the man." },
+              { id: "PM4", left: "The burglars are left unconscious on the floor.", right: "Their final defeat comes from an adult, balancing the power." }
+            ]
+          },
+          sliders: {
+            scopeLabel: "the dramatic reversal",
+            prompt: "Scene Analysis: Gauge the dynamics of this moment...",
+            axes: [
+              { leftLabel: "Menacing", rightLabel: "Heroic" },
+              { leftLabel: "Helpless", rightLabel: "Protected" },
+              { leftLabel: "Misunderstood", rightLabel: "Known" }
+            ],
+            defaults: [50, 50, 50]
+          },
+          buckets: {
+            prompt: "Sort the elements by what drives this moment.",
+            elements: [
+              "The heavy iron snow shovel",
+              "The salt bucket Marley carries",
+              "The burglars' shock at being caught",
+              "Marley's bandaged hand",
+              "The warm light of the neighboring house"
+            ]
+          },
+          spotlights: {
+            prompt: "Rank the top 3 choices that make this moment stick.",
+            options: [
+              "The payoff of the 'scary neighbor' setup from the first act.",
+              "Using a shovel—the object Kevin feared—to be his salvation.",
+              "The silence of the man as he works, making him seem powerful.",
+              "Providing a clean 'deus ex machina' that feels earned by Kevin's earlier kindness."
+            ]
+          }
+        }
+      }    
   },
   {
     packId: "film-grinch2018",

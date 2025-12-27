@@ -315,7 +315,8 @@ id: "film-homealone-the-doorknob",
             ]
           }
         }
-      }    
+      }
+    ]
   },
   {
     packId: "film-grinch2018",

@@ -1,12 +1,9 @@
 // litPacks.js
 // AuthorCraft Appreciation — LITERATURE PACKS
 // ES module: exports LIT_PACKS
-// Tiers: "Fox" | "Owl" | "Lantern" (Lantern = hardest)
-// Authoring goal: concrete, kid-friendly, no seminar jargon. Prefer vivid specifics.
-// FAIR USE: For modern books, summarize in your own words; no direct quotes.
 
 export const LIT_PACKS = [
-{
+  {
     packId: "lit-secretgarden",
     workTitle: "The Secret Garden",
     workType: "literature",
@@ -43,7 +40,7 @@ export const LIT_PACKS = [
               { leftLabel: "Still", rightLabel: "Windy" },
               { leftLabel: "Open", rightLabel: "Hidden" }
             ],
-            defaults: [50, 50, 50] [cite: 153]
+            defaults: [50, 50, 50] // [cite: 153]
           },
           buckets: {
             prompt: "Sort the elements by what drives this moment.",
@@ -94,7 +91,7 @@ export const LIT_PACKS = [
               { leftLabel: "Frightened", rightLabel: "Proud" },
               { leftLabel: "Fragile", rightLabel: "Solid" }
             ],
-            defaults: [50, 50, 50] [cite: 153]
+            defaults: [50, 50, 50] // [cite: 153]
           },
           buckets: {
             prompt: "Sort the elements by what drives this moment.",
@@ -145,7 +142,7 @@ export const LIT_PACKS = [
               { leftLabel: "Wild", rightLabel: "Friendly" },
               { leftLabel: "Leading", rightLabel: "Following" }
             ],
-            defaults: [50, 50, 50] [cite: 153]
+            defaults: [50, 50, 50] // [cite: 153]
           },
           buckets: {
             prompt: "Sort the elements by what drives this moment.",
